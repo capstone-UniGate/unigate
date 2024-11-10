@@ -1,0 +1,28 @@
+name: User story
+description: Write a user story
+labels: ["workflow: user story"]
+projects:
+  - "capstone-UniGate/5"
+body:
+  - type: textarea
+    id: front
+    attributes:
+      label: "Front"
+      description: "Describe the user story."
+      placeholder: "I as {{USER}} would like to {{FEATURE}} to {{OBJECTIVE}}"
+  - type: textarea
+    id: notes
+    attributes:
+      label: "Notes"
+      placeholder: "Add any additional notes here..."
+  - type: textarea
+    id: mockup
+    attributes:
+      label: "Mockups"
+      placeholder: "Link to mockups or additional details"
+  - type: textarea
+    id: back
+    attributes:
+      label: "Back"
+      description: "Describe the scenarios."
+      placeholder: "Scenario:\n- Given:\n- When:\n- Then:"

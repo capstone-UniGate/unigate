@@ -1,0 +1,11 @@
+name: Task
+description: Write a task
+labels: ["workflow: task"]
+projects:
+  - "capstone-UniGate/5"
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: "Task Details"
+      placeholder: "Describe the task here..."
