@@ -1,6 +1,6 @@
 # Conventions
 1. The `main` branch is protected because it must contain only working code that is approved and passed all tests
-2. When you pick a task you create a new branch named `issue-{issue-number}/{short-description-in-kebab-case` (e.g. `issue-42/styling-login-form`)
+2. When you pick a task you create a new branch named `issue-{issue-number}/{short-description-in-kebab-case}` (e.g. `issue-42/styling-login-form`)
 4. Everytime you do relevant working stuff you should commit it, especially if you are going to work on a separate thing that is not connected to the current one
 5. Your commits must follow this convention:
     - `feat` is for adding a new feature
