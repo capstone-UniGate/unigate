@@ -3,7 +3,7 @@
       <div class="container mx-auto flex items-center justify-between">
         <!-- Logo -->
         <div class="text-2xl font-bold">
-          <router-link to="/" class="text-white">MySite</router-link>
+          <router-link to="/" class="text-white">UniGate</router-link>
         </div>
   
         <!-- Desktop Navigation -->
