@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto p-6">
     <div class="flex flex-col md:flex-row bg-white rounded-lg shadow-md overflow-hidden max-w-3xl mx-auto">
-      
+
       <div class="w-full md:w-1/2 p-6 flex items-center justify-center">
         <CardContent class="max-w-full">
         </CardContent>
