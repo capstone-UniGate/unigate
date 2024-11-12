@@ -32,3 +32,9 @@ def init_db() -> None:
     #     session.commit()
     # SQLModel.metadata.drop_all(engine)
     SQLModel.metadata.create_all(engine)
+
+
+# USE THIS SCRIPT TO INITIALIZE THE DATABASE
+# if __name__ == "__main__":
+#    init_db()
+#    print("Database initialized")
