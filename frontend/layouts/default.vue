@@ -28,4 +28,3 @@
   <style scoped>
   /* Optional custom styles */
   </style>
-
