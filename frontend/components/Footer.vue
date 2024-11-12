@@ -2,14 +2,14 @@
     <footer class="bg-gray-800 text-white py-6">
       <div class="container mx-auto text-center">
         <p class="text-sm">© 2024 MySite. All Rights Reserved.</p>
-  
+
         <!-- Links for Desktop -->
         <div class="hidden md:flex justify-center space-x-8 mt-4">
           <router-link to="/" class="hover:text-blue-300">Home</router-link>
           <router-link to="/about" class="hover:text-blue-300">About</router-link>
           <router-link to="/contact" class="hover:text-blue-300">Contact</router-link>
         </div>
-  
+
         <!-- Social Media Icons (Optional) -->
         <div class="flex justify-center space-x-6 mt-4">
           <a href="#" class="text-white hover:text-blue-300">
@@ -26,14 +26,14 @@
       </div>
     </footer>
   </template>
-  
+
   <script>
   export default {
     name: 'Footer',
   };
   </script>
-  
+
   <style scoped>
   /* Optional custom styles */
   </style>
-  
+

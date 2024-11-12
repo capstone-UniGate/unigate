@@ -5,7 +5,7 @@
     <!-- <Button>Button</Button> -->
     <!-- <NuxtRouteAnnouncer /> -->
      <Header />
-      <NuxtPage /> 
+      <NuxtPage />
     <Footer />
   </div>
 </template>
