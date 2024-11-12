@@ -1,5 +1,8 @@
 from fastapi import APIRouter, FastAPI
 
+from unigate.core.database import init_db
+
+init_db()
 app = FastAPI()
 
 
