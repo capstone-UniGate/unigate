@@ -8,7 +8,7 @@ const isError = ref(false);
 
 async function loadGroups() {
   try {
-    isError.value = false;
+    isError.value = true;
     isLoading.value = true;
     groups.value = userGroupData();
   } catch (error) {
