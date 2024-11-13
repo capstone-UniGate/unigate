@@ -1,30 +1,30 @@
 <template>
-    <div>
-      <!-- Header -->
-      <Header />
+  <div>
+    <!-- Header -->
+    <Header />
 
-      <!-- Main Content -->
-      <main>
-        <Nuxt />
-      </main>
+    <!-- Main Content -->
+    <main>
+      <slot />
+    </main>
 
-      <!-- Footer -->
-      <Footer />
-    </div>
-  </template>
+    <!-- Footer -->
+    <Footer />
+  </div>
+</template>
 
-  <script>
-  import Header from '~/components/Header.vue';
-  import Footer from '~/components/Footer.vue';
+<script>
+import Header from "~/components/Header.vue";
+import Footer from "~/components/Footer.vue";
 
-  export default {
-    components: {
-      Header,
-      Footer,
-    },
-  };
-  </script>
+export default {
+  components: {
+    Header,
+    Footer,
+  },
+};
+</script>
 
-  <style scoped>
-  /* Optional custom styles */
-  </style>
+<style scoped>
+/* Optional custom styles */
+</style>

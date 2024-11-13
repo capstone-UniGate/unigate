@@ -1,11 +1,16 @@
 <template>
   <div>
     <!-- <NuxtRouteAnnouncer /> -->
-     <!-- <h1 class="font-serif | font-bold | text-3xl" >Welcome to UniGate!</h1> -->
+    <!-- <h1 class="font-serif | font-bold | text-3xl" >Welcome to UniGate!</h1> -->
     <!-- <Button>Button</Button> -->
     <!-- <NuxtRouteAnnouncer /> -->
-     <Header />
+
+    <!-- <Header />
       <NuxtPage />
-    <Footer />
+    <Footer /> -->
+
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </div>
 </template>
