@@ -11,7 +11,7 @@
             <FormMessage />
           </FormItem>
         </FormField>
-  
+
         <!-- Course Field -->
         <FormField v-slot="{ componentField }" name="course">
           <FormItem>
@@ -27,7 +27,7 @@
             <FormMessage />
           </FormItem>
         </FormField>
-  
+
         <!-- Privacy Type (Public or Private) -->
         <div>
         <FormField v-slot="{ componentField, errorMessage }" name="isPublic">
@@ -47,7 +47,7 @@
             </FormItem>
         </FormField>
         </div>
-  
+
         <!-- Description Field -->
         <FormField v-slot="{ componentField }" name="description">
           <FormItem>
@@ -58,7 +58,7 @@
             <FormMessage />
           </FormItem>
         </FormField>
-  
+
         <!-- Tags Field -->
         <FormField v-slot="{ componentField }" name="tags">
           <FormItem>
@@ -66,7 +66,7 @@
         <FormControl>
         <TagsInput class="px-0 gap-0 w-80" :model-value="modelValue">
     <div class="flex gap-2 flex-wrap items-center px-3">
-     
+
       <TagsInputItem v-for="item in modelValue" :key="item" :value="item">
         <TagsInputItemText />
         <TagsInputItemDelete />
@@ -115,7 +115,7 @@
 </FormField>
         <!-- Error Message Placeholder -->
         <div v-if="errorMessage" class="text-red-600">{{ errorMessage }}</div>
-  
+
         <!-- Buttons -->
         <div class="flex justify-end space-x-4 margin-bottom-custom">
           <Button type="button" @click="onCancel"  variant="destructive">
@@ -128,7 +128,7 @@
       </form>
     </div>
   </template>
-  
+
   <script setup lang="ts">
   import { Button } from '@/components/ui/button'
   import {
@@ -148,7 +148,7 @@
   import { toTypedSchema } from '@vee-validate/zod'
   import { useForm } from 'vee-validate'
   import * as z from 'zod'
-  
+
   // Define the schema for validation
   const formSchema = toTypedSchema(z.object({
     name: z.string().min(2, "Name must be at least 2 characters long").max(50),
@@ -157,11 +157,11 @@
     description: z.string().min(10, "The description is too short").max(300),
     tags: z.string().min(1, "Set at least one tag"),
   }))
-  
+
   const { handleSubmit, errors } = useForm({
     validationSchema: formSchema,
   })
-  
+
   const errorMessage = ref("")
 
   const frameworks = [
@@ -177,7 +177,7 @@ const open = ref(false)
 const searchTerm = ref('')
 
 const filteredFrameworks = computed(() => frameworks.filter(i => !modelValue.value.includes(i.label)))
-  
+
   const onSubmit = handleSubmit((values) => {
     if(checkTags(values.tags)){
       errorMessage.value = "Set at least one tag"
@@ -200,22 +200,22 @@ const filteredFrameworks = computed(() => frameworks.filter(i => !modelValue.val
     }
     let actualTags = tags.split(",");
     console.log(actualTags);
-    return actualTags.length < 1; 
+    return actualTags.length < 1;
 
   }
-  
+
   const onCancel = () => {
-        history.go(-1) 
+        history.go(-1)
   }
-  
+
   const checkForDuplicateGroup = (/*name, course*/) => {
     // Replace with actual check logic
     return false
   }
-  
+
   const formHasErrors = computed(() => Object.keys(errors.value).length > 0)
   </script>
-  
+
   <style scoped>
   .form-select, .form-textarea {
     width: 100%;
@@ -223,20 +223,20 @@ const filteredFrameworks = computed(() => frameworks.filter(i => !modelValue.val
     border: 1px solid #ddd;
     border-radius: 0.25rem;
   }
-  
+
   .text-red-600 {
     color: #e3342f;
   }
 
   .margin-bottom-custom {
-  padding-bottom: 3px; 
+  padding-bottom: 3px;
 }
 
  .margin-top-custom {
-  padding-top: 6px; 
+  padding-top: 6px;
  }
 
 
 
   </style>
-  
+
