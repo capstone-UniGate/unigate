@@ -1,8 +1,8 @@
-import os
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy import engine_from_config, pool
+
+from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -19,7 +19,8 @@ fileConfig(config.config_file_name)
 # target_metadata = None
 
 from sqlmodel import SQLModel
-from unigate.core.config import settings # noqa
+
+from unigate.core.config import settings  # noqa
 
 target_metadata = SQLModel.metadata
 
