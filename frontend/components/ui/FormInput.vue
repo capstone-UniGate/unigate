@@ -26,13 +26,13 @@ export default {
 .formInput {
     margin-bottom: 1em;
 }
-  
+
 .formInput label {
     display: block;
     margin-bottom: 0.5em;
     font-weight: bold;
 }
-  
+
 .formInput input[type="text"],
 .formInput select,
 .formInput textarea {
@@ -41,7 +41,7 @@ export default {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
-  
+
 .formInput textarea {
     resize: vertical;
 }

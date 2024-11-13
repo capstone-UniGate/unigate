@@ -29,13 +29,13 @@ export default {
 .formSelect {
     margin-bottom: 1em;
   }
-  
+
   .formSelect label {
     display: block;
     margin-bottom: 0.5em;
     font-weight: bold;
   }
-  
+
   .formSelect input[type="text"],
   .formSelect select,
   .formSelect textarea {
@@ -44,7 +44,7 @@ export default {
     border: 1px solid #ccc;
     border-radius: 4px;
   }
-  
+
   .formSelect textarea {
     resize: vertical;
   }

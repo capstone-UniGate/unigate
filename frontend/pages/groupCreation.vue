@@ -239,4 +239,3 @@ const filteredFrameworks = computed(() => frameworks.filter(i => !modelValue.val
 
 
   </style>
-

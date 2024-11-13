@@ -26,13 +26,13 @@ export default {
 .formTextArea {
     margin-bottom: 1em;
   }
-  
+
 .formTextArea label {
     display: block;
     margin-bottom: 0.5em;
     font-weight: bold;
   }
-  
+
   .formTextArea input[type="text"],
   .formTextArea select,
   .formTextArea textarea {
@@ -41,7 +41,7 @@ export default {
     border: 1px solid #ccc;
     border-radius: 4px;
   }
-  
+
   .formTextArea textarea {
     resize: vertical;
   }

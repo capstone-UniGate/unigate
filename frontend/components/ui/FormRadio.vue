@@ -26,13 +26,13 @@ export default {
 .formRadio {
   margin-bottom: 1em;
 }
-  
+
 .formRadio label {
   display: inline;
   margin-bottom: 0.5em;
   font-weight: bold;
 }
-  
+
 .formRadio input[type="text"],
 .formRadio select,
 .formRadio textarea {
@@ -41,7 +41,7 @@ export default {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
-  
+
 .formRadio textarea {
   resize: vertical;
 }
