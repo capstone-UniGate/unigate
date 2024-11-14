@@ -17,9 +17,8 @@ fileConfig(config.config_file_name)
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
 
-from sqlmodel import SQLModel
-
-from unigate.core.config import settings  # noqa
+from unigate.core.config import settings  # noqa: E402
+from unigate.models import SQLModel  # noqa: E402
 
 target_metadata = SQLModel.metadata
 
@@ -29,11 +28,15 @@ target_metadata = SQLModel.metadata
 # ... etc.
 
 
-def get_url():
+class MissingConfigError(Exception):
+    pass
+
+
+def get_url() -> str:
     return str(settings.DATABASE_URI)
 
 
-def run_migrations_offline():
+def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
     This configures the context with just a URL
@@ -54,7 +57,7 @@ def run_migrations_offline():
         context.run_migrations()
 
 
-def run_migrations_online():
+def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
@@ -62,6 +65,8 @@ def run_migrations_online():
 
     """
     configuration = config.get_section(config.config_ini_section)
+    if configuration is None:
+        raise MissingConfigError("No alembic configuration found")
     configuration["sqlalchemy.url"] = get_url()
     connectable = engine_from_config(
         configuration,
