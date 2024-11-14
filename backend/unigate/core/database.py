@@ -1,5 +1,7 @@
+from collections.abc import Generator
+
 from sqlmodel import (
-    Session,  # type: ignore  # noqa: F401
+    Session,  # type: ignore
     SQLModel,  # type: ignore  # noqa: F401
     create_engine,
     text,  # type: ignore  # noqa: F401
@@ -28,3 +30,11 @@ def init_db() -> None:
     # SQLModel.metadata.create_all(engine)
 
     pass
+
+
+def get_session() -> Generator[Session, None, None]:
+    with Session(engine) as session:
+        try:
+            yield session
+        finally:
+            session.close()
