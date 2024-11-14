@@ -25,17 +25,16 @@ onMounted(() => {
 
 <template>
   <div class="container mx-auto p-6">
+        <!-- Error Message Component -->
+    <ErrorMessage v-if="isError" @retry="loadGroups" />
+    <!-- Loading Indicator Component -->
+    <LoadingIndicator v-if="isLoading" />
+
     <div class="flex justify-end items-center mb-6 py-2">
     <h1 class="text-2xl font-semibold text-gray-800 mb-6">Your Enrolled Groups</h1>
       <!-- Add the button here -->
       <Button class="ml-auto">Create a new group</Button>
     </div>
-
-    <!-- Error Message Component -->
-    <ErrorMessage v-if="isError" @retry="loadGroups" />
-
-    <!-- Loading Indicator Component -->
-    <LoadingIndicator v-if="isLoading" />
 
     <!-- Group Cards List -->
     <div v-if="!isLoading && !isError"
