@@ -21,9 +21,15 @@
     <div class="text-gray-600 mb-6">
       <p>{{ group.description || 'Group description...' }}</p>
     </div>
+
+    <!-- Display Number of Members with "Members" as a Link -->
     <div class="mb-6">
-      <NuxtLink :to="`/group/${groupId}/members`" class="text-xl font-semibold text-blue-500 hover:underline">Members</NuxtLink>
+      <p class="text-lg text-gray-700">
+        Number of <NuxtLink :to="`/group/${groupId}/members`" class="text-blue-500 hover:underline">members</NuxtLink>: {{ group.members.length }}
+      </p>
     </div>
+
+    <!-- Show Join Button Only if User is Not a Member -->
     <div v-if="!isMember" class="text-center mt-6">
       <Button @click="joinGroup" class="bg-blue-500 text-white px-4 py-2 rounded-md">Join Group</Button>
     </div>
@@ -38,23 +44,36 @@ import { useRoute } from 'vue-router';
 
 const route = useRoute();
 const groupId = route.params.id;
-const currentUserId = 1;
+const currentUserId = 3; // Assume this is the logged-in user’s ID
 const showModal = ref(false);
 
+// Mock data to represent the groups and their members
 const groupsData = [
-  { id: '1', name: 'Group 1', description: 'This is a sample description for Group 1. This is a sample description for Group 1, This is a sample description for Group 1This is a sample description for Group 1.', isPrivate: true },
-  { id: '2', name: 'Group 2', description: 'This is a sample description for Group 2.', isPrivate: false },
+  { 
+    id: '1', 
+    name: 'Group 1', 
+    description: 'This is a sample description for Group 1, This is a sample description for Group 1, This is a sample description for Group 1, This is a sample description for Group 1.', 
+    isPrivate: true, 
+    members: [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }] 
+  },
+  { 
+    id: '2', 
+    name: 'Group 2', 
+    description: 'This is a sample description for Group 2.', 
+    isPrivate: false, 
+    members: [{ id: 3, name: 'David' }, { id: 4, name: 'Alice' }] // Assuming the user is a member of Group 2
+  },
 ];
-const group = groupsData.find(g => g.id === groupId) || { name: 'Group...', description: '', creatorId: null, isPrivate: false, members: [] };
-const isMember = ref(false); 
-const isPrivate = computed(() => group.isPrivate);
+const group = groupsData.find(g => g.id === groupId) || { name: 'Group...', description: '', isPrivate: false, members: [] };
 
-const joinRequests = ref([
-  { id: 1, name: 'New Member 1' },
-  { id: 2, name: 'New Member 2' },
-]);
+// Check if the current user is a member of the group
+const isMember = computed(() => group.members.some(member => member.id === currentUserId));
 
+const joinGroup = () => {
+  alert('Join group clicked');
+};
 </script>
+
 <style scoped>
 .p-6 {
   padding: 1.5rem;
