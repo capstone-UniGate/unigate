@@ -1,14 +1,18 @@
 <template>
-    <div class="container mx-auto p-6">
-      <h1 class="text-2xl font-semibold text-gray-800 mb-6">Your Enrolled Groups</h1>
+  <div class="container mx-auto p-6">
+    <h1 class="text-2xl font-semibold text-gray-800 mb-6">Your Enrolled Groups</h1>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <SeeMyGroups v-for="group in groups" :key="group.id" :group="group" />
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
+      <div v-for="group in groups" :key="group.id">
+
+        <nuxt-link :to="`/group/${group.id}`">
+          <SeeMyGroups :group="group" />
+        </nuxt-link>
       </div>
     </div>
-
-  </template>
+  </div>
+</template>
 
   <script setup>
   import SeeMyGroups from './SeeMyGroups.vue';
