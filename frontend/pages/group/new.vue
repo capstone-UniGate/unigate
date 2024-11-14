@@ -117,12 +117,12 @@
         <div v-if="errorMessage" class="text-red-600">{{ errorMessage }}</div>
 
         <!-- Buttons -->
-        <div class="flex justify-end space-x-4 margin-bottom-custom">
-          <Button type="button" @click="onCancel"  variant="destructive">
-            Cancel
-          </Button>
+        <div class="flex justify-start space-x-4 margin-bottom-custom">
           <Button type="submit" :disabled="formHasErrors">
             Create
+          </Button>
+          <Button type="button" @click="onCancel"  variant="destructive">
+            Cancel
           </Button>
         </div>
       </form>
@@ -239,4 +239,3 @@ const filteredFrameworks = computed(() => frameworks.filter(i => !modelValue.val
 
 
   </style>
-
