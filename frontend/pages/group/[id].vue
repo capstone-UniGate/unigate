@@ -49,18 +49,18 @@ const showModal = ref(false);
 
 // Mock data to represent the groups and their members
 const groupsData = [
-  { 
-    id: '1', 
-    name: 'Group 1', 
-    description: 'This is a sample description for Group 1, This is a sample description for Group 1, This is a sample description for Group 1, This is a sample description for Group 1.', 
-    isPrivate: true, 
-    members: [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }] 
+  {
+    id: '1',
+    name: 'Group 1',
+    description: 'This is a sample description for Group 1, This is a sample description for Group 1, This is a sample description for Group 1, This is a sample description for Group 1.',
+    isPrivate: true,
+    members: [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]
   },
-  { 
-    id: '2', 
-    name: 'Group 2', 
-    description: 'This is a sample description for Group 2.', 
-    isPrivate: false, 
+  {
+    id: '2',
+    name: 'Group 2',
+    description: 'This is a sample description for Group 2.',
+    isPrivate: false,
     members: [{ id: 3, name: 'David' }, { id: 4, name: 'Alice' }] // Assuming the user is a member of Group 2
   },
 ];
