@@ -1,3 +1,5 @@
+from sqlmodel import SQLModel  # type: ignore  # noqa: F401
+
 from unigate.models.group import Group
 from unigate.models.join import Join
 from unigate.models.request import Request
