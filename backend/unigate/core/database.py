@@ -1,5 +1,7 @@
+from collections.abc import Generator
+
 from sqlmodel import (
-    Session,  # type: ignore  # noqa: F401
+    Session,  # type: ignore
     SQLModel,
     create_engine,
     text,  # type: ignore  # noqa: F401
@@ -34,7 +36,14 @@ def init_db() -> None:
     SQLModel.metadata.create_all(engine)
 
 
+def get_session() -> Generator[Session, None, None]:
+    with Session(engine) as session:
+        try:
+            yield session
+        finally:
+            session.close()
+
+
 # USE THIS SCRIPT TO INITIALIZE THE DATABASE
-# if __name__ == "__main__":
-#    init_db()
-#    print("Database initialized")
+if __name__ == "__main__":
+    init_db()

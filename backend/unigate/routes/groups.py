@@ -1,15 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from sqlalchemy.exc import SQLAlchemyError
-from sqlmodel import Session, select
 
-from unigate.core import get_session
+from unigate.crud.group_crud import group_crud
 from unigate.models import Group
 
 router = APIRouter()
 
 
-@router.get("/getall", response_model=list[Group])
-async def get_groups(session: Session = Depends(get_session)) -> list[Group]:
+@router.get("/get", response_model=list[Group])
+def get_groups() -> list[Group]:
     """
     Retrieve a list of all available groups.
 
@@ -23,8 +22,6 @@ async def get_groups(session: Session = Depends(get_session)) -> list[Group]:
         HTTPException: Raises a 500 error if the query fails.
     """
     try:
-        statement = select(Group)
-        return session.exec(statement).all()
+        return group_crud.get_multi()
     except SQLAlchemyError:
-        # Log the error message if a logging system is available
         raise HTTPException(status_code=500, detail="Unable to load groups.")
