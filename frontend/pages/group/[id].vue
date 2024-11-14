@@ -46,7 +46,6 @@ const groupsData = [
   { id: '2', name: 'Group 2', description: 'This is a sample description for Group 2.', isPrivate: false },
 ];
 const group = groupsData.find(g => g.id === groupId) || { name: 'Group...', description: '', creatorId: null, isPrivate: false, members: [] };
-const isSuperstudent = computed(() => group.creatorId === currentUserId);
 const isMember = ref(false); 
 const isPrivate = computed(() => group.isPrivate);
 
