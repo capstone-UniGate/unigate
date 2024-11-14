@@ -31,7 +31,7 @@
 
     <!-- Show Join Button Only if User is Not a Member -->
     <div v-if="!isMember" class="text-center mt-6">
-      <Button @click="joinGroup" class="bg-blue-500 text-white px-4 py-2 rounded-md">Join Group</Button>
+      <Button class="bg-blue-500 text-white px-4 py-2 rounded-md">Join Group</Button>
     </div>
   </div>
 </template>
@@ -69,9 +69,6 @@ const group = groupsData.find(g => g.id === groupId) || { name: 'Group...', desc
 // Check if the current user is a member of the group
 const isMember = computed(() => group.members.some(member => member.id === currentUserId));
 
-const joinGroup = () => {
-  alert('Join group clicked');
-};
 </script>
 
 <style scoped>
