@@ -6,7 +6,7 @@
     <!-- <NuxtRouteAnnouncer /> -->
 
     <!-- <Header />
-      <NuxtPage />
+    <NuxtPage />
     <Footer /> -->
 
     <NuxtLayout>
