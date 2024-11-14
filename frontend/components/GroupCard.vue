@@ -15,7 +15,7 @@ const props = defineProps<{ group: Group }>();
 </script>
 
 <template>
-  <Card v-if="group" class="max-w-sm mx-auto">
+  <Card v-if="group" class="max-w-sm mx-auto flex flex-col h-full">
     <CardHeader>
       <div class="flex items-center space-x-5">
         <Avatar>
@@ -30,20 +30,9 @@ const props = defineProps<{ group: Group }>();
           <CardDescription>{{ group.category }}</CardDescription>
         </div>
       </div>
-      <!-- <div>
-        <Avatar>
-          <AvatarImage
-            src="https://github.com/radix-vue.png"
-            alt="@radix-vue"
-          />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-        <CardTitle>{{ group.name }}</CardTitle>
-        <CardDescription>{{ group.category }}</CardDescription>
-      </div> -->
     </CardHeader>
     <CardContent class="grid gap-4">
-      <p class="text-sm">{{ group.description }}</p>
+      <p class="text-sm overflow-hidden line-clamp-2">{{ group.description }}</p>
       <p class="text-xs text-muted-foreground">
         Last activity: {{ group.recentActivity }}
       </p>
@@ -51,7 +40,7 @@ const props = defineProps<{ group: Group }>();
         Members: {{ group.enrollmentCount }}
       </p>
     </CardContent>
-    <CardFooter>
+    <CardFooter class="mt-auto">
       <Button class="w-full">View Group</Button>
     </CardFooter>
   </Card>
