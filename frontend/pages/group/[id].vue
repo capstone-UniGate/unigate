@@ -47,7 +47,7 @@
               <div class="flex space-x-2">
 
 
-                
+
                 <!-- Approve Button with Tooltip -->
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -59,7 +59,7 @@
                   </TooltipTrigger>
                   <TooltipContent>Accept</TooltipContent>
                 </Tooltip>
-                
+
 
                 <!-- Reject Button with Tooltip -->
                 <Tooltip>
