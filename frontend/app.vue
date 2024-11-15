@@ -1,14 +1,17 @@
 <template>
   <div class="app-container">
     <!-- <NuxtRouteAnnouncer /> -->
-     <!-- <h1 class="font-serif | font-bold | text-3xl" >Welcome to UniGate!</h1> -->
+    <!-- <h1 class="font-serif | font-bold | text-3xl" >Welcome to UniGate!</h1> -->
     <!-- <Button>Button</Button> -->
     <!-- <NuxtRouteAnnouncer /> -->
-    <Header />
-    <div class="main-content">
+
+    <!-- <Header />
+    <NuxtPage />
+    <Footer /> -->
+
+    <NuxtLayout>
       <NuxtPage />
-    </div>
-    <Footer />
+    </NuxtLayout>
   </div>
 </template>
 

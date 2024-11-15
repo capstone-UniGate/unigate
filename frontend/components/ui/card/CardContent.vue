@@ -9,6 +9,6 @@ const props = defineProps<{
 
 <template>
   <div :class="cn('p-6 pt-0', props.class)">
-    <img src="@/static/images/test.png" alt="random image" class="rounded-lg" />
+    <slot />
   </div>
 </template>

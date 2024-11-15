@@ -10,10 +10,3 @@
     layout: 'default', // This will use a layout named 'customLayout.vue' instead of 'default.vue'
   };
   </script>
-
-  <style scoped>
-  /* Styles specific to the About page */
-  .container {
-    max-width: 1200px;
-  }
-  </style>

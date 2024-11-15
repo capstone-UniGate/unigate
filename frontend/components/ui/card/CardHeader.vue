@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue'
 import { cn } from '@/lib/utils'
-import { ImagePlay } from 'lucide-vue-next';
 
 const props = defineProps<{
   class?: HTMLAttributes['class']
