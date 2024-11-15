@@ -11,12 +11,12 @@
       </div>
 
       <!-- Modal for Enlarged Avatar -->
-      <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <!-- <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
         <div class="bg-white p-6 rounded-lg shadow-lg">
           <img src="https://github.com/radix-vue.png" alt="Enlarged Avatar" class="w-64 h-64 object-cover rounded-full" />
           <button @click="showModal = false" class="mt-4 bg-red-500 text-white px-4 py-2 rounded-md">Close</button>
         </div>
-      </div>
+      </div> -->
 
       <!-- Other Group Details -->
       <div class="text-gray-600 mb-6">
@@ -45,21 +45,29 @@
             <li v-for="request in joinRequests" :key="request.id" class="flex items-center justify-between mb-2">
               <span>{{ request.name }}</span>
               <div class="flex space-x-2">
+
+
+                
                 <!-- Approve Button with Tooltip -->
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button class="bg-green-500 text-white w-8 h-8 rounded-full hover:bg-green-600">
-                      <Avatar src="/icons/check.svg" alt="Approve" />
+                    <Button @click="approveRequest(request.id)" class=" w-8 h-8 rounded-full">
+                    <Avatar>
+                      <AvatarImage src="https://cdn-icons-png.flaticon.com/128/390/390973.png" alt="Approved" />
+                    </Avatar>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Accept</TooltipContent>
                 </Tooltip>
+                
 
                 <!-- Reject Button with Tooltip -->
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button class="bg-red-500 text-white w-8 h-8 rounded-full hover:bg-red-600">
-                      <Avatar src="/icons/x.svg" alt="Reject" />
+                    <Button @click="rejectRequest(request.id)" class=" w-8 h-8 rounded-full">
+                    <Avatar>
+                      <AvatarImage src="https://cdn-icons-png.flaticon.com/128/7698/7698976.png" alt="Reject" />
+                    </Avatar>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Reject</TooltipContent>
@@ -68,12 +76,15 @@
                 <!-- Block Button with Tooltip -->
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button class="bg-gray-500 text-white w-8 h-8 rounded-full hover:bg-gray-600">
-                      <Avatar src="/icons/ban.svg" alt="Block" />
+                    <Button @click="blockRequest(request.id)" class=" w-8 h-8 rounded-full">
+                    <Avatar>
+                      <AvatarImage src="https://cdn-icons-png.flaticon.com/128/6834/6834501.png" alt="Block" />
+                    </Avatar>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Block</TooltipContent>
                 </Tooltip>
+
               </div>
             </li>
           </ul>
@@ -90,8 +101,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { useRoute } from 'vue-router';
+import { useToast } from '@/components/ui/toast/use-toast'
+
 
 const route = useRoute();
+const { toast } = useToast();
 const groupId = route.params.id;
 const currentUserId = 3;
 const showModal = ref(false);
@@ -125,15 +139,15 @@ const joinRequests = ref([
 ]);
 
 function approveRequest(requestId: number) {
-  alert(`Approved request for user ID: ${requestId}`);
+  //TODO: Implement approve request logic
 }
 
 function rejectRequest(requestId: number) {
-  alert(`Rejected request for user ID: ${requestId}`);
+  //TODO: Implement reject request logic
 }
 
 function blockRequest(requestId: number) {
-  alert(`Blocked request for user ID: ${requestId}`);
+  //TODO: Implement block request logic
 }
 
 const joinGroup = () => {
