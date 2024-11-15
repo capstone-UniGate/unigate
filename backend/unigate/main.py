@@ -1,21 +1,18 @@
-from fastapi import APIRouter, FastAPI
+from fastapi import FastAPI
 
-from unigate.core.database import init_db
+from .routes import groups  # Import the new groups router
 
-init_db()
 app = FastAPI()
 
 
 @app.get("/")
 def main() -> dict[str, str]:
+    """Root endpoint to confirm the API is working."""
     return {"message": "Hello, World!"}
 
 
-router = APIRouter()
-
-# define routers inside the routers folder and add them here
-app.include_router(router)
-
+# Include the groups router under /groups
+app.include_router(groups.router, prefix="/groups")
 
 if __name__ == "__main__":
     import uvicorn
