@@ -32,15 +32,14 @@ const props = defineProps<{ group: Group }>();
       </div>
     </CardHeader>
     <CardContent class="grid gap-4">
-      <p class="text-sm overflow-hidden line-clamp-2">{{ group.description }}</p>
-      <p class="text-xs text-muted-foreground">
-        Last activity: {{ group.recentActivity }}
+      <p class="text-sm overflow-hidden line-clamp-2">
+        {{ group.description }}
       </p>
       <p class="text-xs text-muted-foreground">
         Members: {{ group.enrollmentCount }}
       </p>
     </CardContent>
-    <CardFooter class="mt-auto">
+    <CardFooter class="mb-0">
       <Button class="w-full">View Group</Button>
     </CardFooter>
   </Card>
