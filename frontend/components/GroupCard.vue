@@ -40,7 +40,7 @@ const props = defineProps<{ group: Group }>();
         Members: {{ group.enrollmentCount }}
       </p>
     </CardContent>
-    <CardFooter class="mt-auto">
+    <CardFooter class="mt-auto p-0">
       <Button class="w-full">View Group</Button>
     </CardFooter>
   </Card>
