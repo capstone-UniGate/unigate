@@ -79,7 +79,6 @@
                   </TooltipTrigger>
                   <TooltipContent>Accept</TooltipContent>
                 </Tooltip>
-
                 <!-- Reject Button with Tooltip -->
                 <Tooltip>
                   <TooltipTrigger asChild>
