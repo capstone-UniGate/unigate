@@ -33,7 +33,8 @@ onMounted(() => {
     <div class="flex justify-end items-center mb-6 py-2">
     <h1 class="text-2xl font-semibold text-gray-800 mb-6">Your Enrolled Groups</h1>
       <!-- Add the button here -->
-      <Button class="ml-auto">Create a new group</Button>
+      <Button @click="() => $router.push('/group/create')" class="ml-auto">Create a new group</Button>
+
     </div>
 
     <!-- Group Cards List -->
