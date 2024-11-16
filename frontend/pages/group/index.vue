@@ -1,4 +1,5 @@
+<script setup></script>
+
 <template>
-    <div class="container mx-auto p-6">
-    </div>
+  <GroupList />
 </template>
