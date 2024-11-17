@@ -108,6 +108,9 @@ ignore = [
     "W191",    # indentation contains tabs
     "B904",    # Allow raising exceptions without from e, for HTTPException
     "A002",    # Allow shadowing of builtins
+    "TRY300",  # else blocks
+    "BLE001",  # blind exception
+    "FIX002",  # TODO's
 ]
 fixable = ["ALL"]
 
