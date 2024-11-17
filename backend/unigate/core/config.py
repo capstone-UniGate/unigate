@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str = "unigate"
+    SENDGRID_API_KEY: str
 
     @computed_field  # type: ignore
     @property
