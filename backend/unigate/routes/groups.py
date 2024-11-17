@@ -44,7 +44,7 @@ def get_groups() -> list[Group]:
     status_code=status.HTTP_201_CREATED,
     responses={
         201: {"description": "Group successfully created", "model": Group},
-        400: {"description": "Group with this name already exists"},
+        400: {"description": "Validation error while creating the group"},
         500: {"description": "An error occurred while creating the group"},
     },
 )
