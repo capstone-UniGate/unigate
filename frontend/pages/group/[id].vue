@@ -178,7 +178,7 @@ const group = groupsData.find((g) => g.id === groupId) || {
 };
 
 const isMember = computed(() =>
-  group.members.some((member) => member.id === currentUserId)
+  group.members.some((member) => member.id === currentUserId),
 );
 const isSuperstudent = computed(() => group.creatorId === currentUserId);
 
@@ -205,7 +205,6 @@ const joinGroup = () => {
 </script>
 
 <style scoped>
-
 .p-6 {
   padding: 1.5rem;
 }

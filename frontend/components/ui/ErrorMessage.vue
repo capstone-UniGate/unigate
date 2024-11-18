@@ -7,15 +7,15 @@
 <script>
 export default {
   props: {
-    message: String
-  }
+    message: String,
+  },
 };
 </script>
 
 <style>
 .error-message {
-    color: red;
-    font-size: 0.9em;
-    margin-bottom: 1em;
-  }
+  color: red;
+  font-size: 0.9em;
+  margin-bottom: 1em;
+}
 </style>
