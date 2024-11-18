@@ -217,6 +217,7 @@ const frameworks = [
 const modelValue = ref<string[]>([]);
 const open = ref(false);
 const searchTerm = ref("");
+const router = useRouter();
 
 const filteredFrameworks = computed(() =>
   frameworks.filter((i) => !modelValue.value.includes(i.label)),
@@ -227,16 +228,9 @@ const onSubmit = handleSubmit((values) => {
     errorMessage.value = "Set at least one tag";
   }
 
-  if (checkForDuplicateGroup(/*values.name, values.course*/)) {
-    errorMessage.value =
-      "Duplicate group name or already enrolled in a group for that course";
-  } else {
-    toast({
-      title: "Group Created Successfully",
-      description: `You created a group with the following details: ${JSON.stringify(values)}`,
-    });
-    errorMessage.value = "";
-  }
+  const onCancel = () => {
+    router.push("/group");
+  };
 });
 
 const checkTags = (tags: string | undefined) => {
