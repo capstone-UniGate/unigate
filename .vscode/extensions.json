@@ -1,0 +1,23 @@
+{
+  "recommendations": [
+    "eamodio.gitlens",
+    "github.copilot",
+    "github.vscode-github-actions",
+    "github.copilot-chat",
+    "visualstudioexptteam.vscodeintellicode",
+    "visualstudioexptteam.intellicode-api-usage-examples",
+    "ms-python.vscode-pylance",
+    "ms-python.python",
+    "ms-python.debugpy",
+    "charliermarsh.ruff",
+    "dbaeumer.vscode-eslint",
+    "xabikos.javascriptsnippets",
+    "ms-vscode.vscode-typescript-next",
+    "ms-vscode.js-debug-nightly",
+    "nuxtr.nuxt-vscode-extentions",
+    "selemondev.shadcn-vue",
+    "vue.volar",
+    "esbenp.prettier-vscode",
+    "nefrob.vscode-just-syntax"
+  ]
+}

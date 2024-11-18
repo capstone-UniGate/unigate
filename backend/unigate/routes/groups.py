@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.exc import SQLAlchemyError
-
 from unigate.crud.group_crud import group_crud
 from unigate.models import Group
 

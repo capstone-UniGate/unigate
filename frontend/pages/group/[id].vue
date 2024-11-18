@@ -162,8 +162,8 @@ const groupsData = [
       { id: 2, name: "Bob" },
     ],
     rejectedUsers: [4], // Example rejected user ID
-    blockedUsers: [5],  // Example blocked user ID
-      },
+    blockedUsers: [5], // Example blocked user ID
+  },
   {
     id: "2",
     name: "Group 2",
@@ -175,7 +175,7 @@ const groupsData = [
       { id: 4, name: "Alice" },
     ],
     rejectedUsers: [], // Add this field
-    blockedUsers: [],  // Example blocked user ID
+    blockedUsers: [], // Example blocked user ID
   },
 ];
 const group = groupsData.find((g) => g.id === groupId) || {
@@ -208,8 +208,6 @@ const joinRequests = ref([
   { id: 6, name: "New Member 2" },
 ]);
 
-
-
 if (group.isPrivate && isRejected.value) {
   router.push("/access-denied"); // Redirect to an "Access Denied" page
 }
@@ -228,7 +226,7 @@ if (group.isPrivate && isBlocked.value) {
 function approveRequest(requestId: number) {
   // Find the request being approved
   const requestIndex = joinRequests.value.findIndex(
-    (req) => req.id === requestId
+    (req) => req.id === requestId,
   );
   if (requestIndex !== -1) {
     // Add the approved member to the group's members
@@ -247,7 +245,9 @@ function approveRequest(requestId: number) {
 
 function rejectRequest(requestId: number) {
   // Find the rejected request
-  const requestIndex = joinRequests.value.findIndex((req) => req.id === requestId);
+  const requestIndex = joinRequests.value.findIndex(
+    (req) => req.id === requestId,
+  );
   if (requestIndex !== -1) {
     // Remove the request from the list
     const rejectedMember = joinRequests.value[requestIndex];
@@ -262,13 +262,13 @@ function rejectRequest(requestId: number) {
 
     // Notify the superstudent of the rejection
     //TODO: Implement notification logic
-
   }
 }
 
-
 function blockRequest(requestId: number) {
-  const requestIndex = joinRequests.value.findIndex((req) => req.id === requestId);
+  const requestIndex = joinRequests.value.findIndex(
+    (req) => req.id === requestId,
+  );
   if (requestIndex !== -1) {
     const blockedMember = joinRequests.value[requestIndex];
 
@@ -282,7 +282,6 @@ function blockRequest(requestId: number) {
     //TODO: Implement notification logic
   }
 }
-
 
 const joinGroup = () => {
   alert("Join group clicked");
