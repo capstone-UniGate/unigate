@@ -7,15 +7,15 @@
 
 <script>
 export default {
-  name: 'FormRadio',
-  props: ['label', 'name', 'value', 'modelValue'],
+  name: "FormRadio",
+  props: ["label", "name", "value", "modelValue"],
   computed: {
     selectedValue: {
       get() {
         return this.modelValue;
       },
       set(value) {
-        this.$emit('update:modelValue', value);
+        this.$emit("update:modelValue", value);
       },
     },
   },

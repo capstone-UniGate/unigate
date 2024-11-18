@@ -1,5 +1,4 @@
 from sqlmodel import select
-
 from unigate.models import Group
 
 from .base_crud import CRUDBase
