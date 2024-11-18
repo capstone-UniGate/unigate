@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { defineProps } from "vue";
-import { useRouter } from 'vue-router';
-
+import { useRouter } from "vue-router";
 
 // Define the Group interface with required fields
 interface Group {
@@ -38,7 +37,9 @@ const goToGroupPage = () => {
       </div>
     </CardHeader>
     <CardContent class="grid gap-4">
-      <p class="text-sm overflow-hidden line-clamp-2">{{ group.description }}</p>
+      <p class="text-sm overflow-hidden line-clamp-2">
+        {{ group.description }}
+      </p>
       <p class="text-xs text-muted-foreground">
         Last activity: {{ group.recentActivity }}
       </p>
@@ -48,7 +49,6 @@ const goToGroupPage = () => {
     </CardContent>
     <CardFooter class="mt-auto p-0">
       <Button class="w-full" @click="goToGroupPage">View Group</Button>
-
     </CardFooter>
   </Card>
 </template>
