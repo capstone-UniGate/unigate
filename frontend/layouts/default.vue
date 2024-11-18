@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div class="layout-container">
     <!-- Header -->
     <Header />
 
     <!-- Main Content -->
-    <main>
+    <main class="main-content">
       <slot />
     </main>
 
@@ -26,5 +26,13 @@ export default {
 </script>
 
 <style scoped>
-/* Optional custom styles */
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensure the layout takes the full viewport height */
+}
+
+.main-content {
+  flex: 1; /* This ensures the main content takes up all the available space */
+}
 </style>

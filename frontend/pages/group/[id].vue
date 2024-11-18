@@ -1,4 +1,6 @@
 <template>
+  <Toaster />
+
   <div class="p-6 md:p-10 flex flex-col lg:flex-row">
     <!-- Left Side: Group Details -->
     <div class="flex-grow mb-6 lg:mb-0">
@@ -124,6 +126,8 @@
 </template>
 
 <script setup lang="ts">
+import { Toaster } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/toast/use-toast";
 import { ref, computed } from "vue";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -135,10 +139,11 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import { useRoute } from "vue-router";
-import { useToast } from "@/components/ui/toast/use-toast";
 
 const route = useRoute();
-const { toast } = useToast();
+const router = useRouter();
+const toast = useToast();
+
 const groupId = route.params.id;
 const currentUserId = 3;
 const showModal = ref(false);
@@ -156,6 +161,8 @@ const groupsData = [
       { id: 1, name: "Alice" },
       { id: 2, name: "Bob" },
     ],
+    rejectedUsers: [4], // Example rejected user ID
+    blockedUsers: [5], // Example blocked user ID
   },
   {
     id: "2",
@@ -167,6 +174,8 @@ const groupsData = [
       { id: 3, name: "David" },
       { id: 4, name: "Alice" },
     ],
+    rejectedUsers: [], // Add this field
+    blockedUsers: [], // Example blocked user ID
   },
 ];
 const group = groupsData.find((g) => g.id === groupId) || {
@@ -175,28 +184,103 @@ const group = groupsData.find((g) => g.id === groupId) || {
   isPrivate: false,
   creatorId: null,
   members: [],
+  rejectedUsers: [],
+  blockedUsers: [],
 };
 
-const isMember = computed(() =>
-  group.members.some((member) => member.id === currentUserId),
-);
+// Computed Properties for Access Control
 const isSuperstudent = computed(() => group.creatorId === currentUserId);
 
+const isMember = computed(() => {
+  return group.members.some((member) => member.id === currentUserId);
+});
+
+// Check the rejection status when loading the group page. If the user is rejected, redirect them away
+const isRejected = computed(() => {
+  return group.rejectedUsers.includes(currentUserId);
+});
+
+const isBlocked = computed(() => {
+  return group.blockedUsers.includes(currentUserId);
+});
 const joinRequests = ref([
   { id: 5, name: "New Member 1" },
   { id: 6, name: "New Member 2" },
 ]);
 
+if (group.isPrivate && isRejected.value) {
+  router.push("/access-denied"); // Redirect to an "Access Denied" page
+}
+
+// Access Logic
+if (group.isPrivate && isBlocked.value) {
+  // Redirect to the "Blocked" page
+  router.push("/blocked"); // Redirect to the "Blocked" page
+} else if (group.isPrivate && isRejected.value) {
+  // Redirect to the main page of the group with normal view
+  // router.push("/access-denied"); // Redirect to an "Access Denied" page
+} else if (group.isPrivate && !isMember.value) {
+  // Redirect to the "Join Group" page
+}
+
 function approveRequest(requestId: number) {
-  //TODO: Implement approve request logic
+  // Find the request being approved
+  const requestIndex = joinRequests.value.findIndex(
+    (req) => req.id === requestId,
+  );
+  if (requestIndex !== -1) {
+    // Add the approved member to the group's members
+    const approvedMember = joinRequests.value[requestIndex];
+    group.members.push(approvedMember);
+
+    // Remove the request from the joinRequests array
+    joinRequests.value.splice(requestIndex, 1);
+
+    // Redirect the student to the group page after approval
+    //TODO: Implement redirect logic
+
+    router.push(`/group/${groupId}`);
+  }
 }
 
 function rejectRequest(requestId: number) {
-  //TODO: Implement reject request logic
+  // Find the rejected request
+  const requestIndex = joinRequests.value.findIndex(
+    (req) => req.id === requestId,
+  );
+  if (requestIndex !== -1) {
+    // Remove the request from the list
+    const rejectedMember = joinRequests.value[requestIndex];
+    joinRequests.value.splice(requestIndex, 1);
+
+    // Optionally, add a way to mark the user as "rejected" for private groups
+    // For example: Store their rejection status in a database or local state
+    if (!group.rejectedUsers) {
+      group.rejectedUsers = [];
+    }
+    group.rejectedUsers.push(rejectedMember.id);
+
+    // Notify the superstudent of the rejection
+    //TODO: Implement notification logic
+  }
 }
 
 function blockRequest(requestId: number) {
-  //TODO: Implement block request logic
+  const requestIndex = joinRequests.value.findIndex(
+    (req) => req.id === requestId,
+  );
+  if (requestIndex !== -1) {
+    const blockedMember = joinRequests.value[requestIndex];
+
+    // Add the blocked user to blockedUsers
+    group.blockedUsers.push(blockedMember.id);
+
+    // Remove the request from joinRequests
+    joinRequests.value.splice(requestIndex, 1);
+
+    // Notify the stufdent of the block
+    //TODO: Implement notification logic
+  }
 }
 
 const joinGroup = () => {
@@ -209,7 +293,7 @@ const joinGroup = () => {
   padding: 1.5rem;
 }
 
-.md\:p-10 {
+.md:p-10 {
   padding: 2.5rem;
 }
 
