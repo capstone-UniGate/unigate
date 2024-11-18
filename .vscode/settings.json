@@ -1,0 +1,26 @@
+{
+  "files.autoSave": "afterDelay",
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "github.copilot.enable": {
+    "*": true
+  },
+  "python.analysis.typeCheckingMode": "strict",
+  "python.analysis.stubPath": "typings",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "github.copilot.editor.enableAutoCompletions": true,
+  "telemetry.telemetryLevel": "off",
+  "gitlens.telemetry.enabled": false,
+  "mdb.sendTelemetry": false,
+  "editor.smoothScrolling": true,
+  "window.titleBarStyle": "custom"
+}

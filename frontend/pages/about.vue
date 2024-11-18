@@ -7,6 +7,6 @@
 
 <script>
 export default {
-  layout: 'default', // This will use a layout named 'customLayout.vue' instead of 'default.vue'
+  layout: "default", // This will use a layout named 'customLayout.vue' instead of 'default.vue'
 };
 </script>
