@@ -1,8 +1,10 @@
 import datetime
 import uuid
 
+from loguru import logger
 from sqlmodel import Field, SQLModel  # type: ignore
-from utils.mail import Mailer
+
+from unigate.utils.mail import Mailer
 
 
 class Join(SQLModel, table=True):
@@ -17,7 +19,10 @@ class Join(SQLModel, table=True):
         foreign_key="groups.id", primary_key=True, ondelete="CASCADE"
     )
 
-    def send_join_request_email(admin_email, student_name, group_name):
+    @staticmethod
+    def send_join_request_email(
+        admin_email: str, student_name: str, group_name: str
+    ) -> None:
         """
         Sends an email to the group admin notifying them about a join request.
 
@@ -37,4 +42,4 @@ class Join(SQLModel, table=True):
 
         mail = Mailer(to, subject, content)
         mail.send()
-        print("Email sent successfully to the admin.")
+        logger.info("Email sent successfully to the admin.")
