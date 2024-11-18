@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { defineProps } from "vue";
+import { useRouter } from "vue-router";
 
 // Define the Group interface with required fields
 interface Group {
@@ -12,6 +13,10 @@ interface Group {
 
 // Define props with TypeScript, ensuring `group` matches the Group interface
 const props = defineProps<{ group: Group }>();
+const router = useRouter();
+const goToGroupPage = () => {
+  router.push(`/group/${props.group.id}`);
+};
 </script>
 
 <template>
@@ -39,8 +44,8 @@ const props = defineProps<{ group: Group }>();
         Members: {{ group.enrollmentCount }}
       </p>
     </CardContent>
-    <CardFooter class="mb-0">
-      <Button class="w-full">View Group</Button>
+    <CardFooter class="mt-auto p-0">
+      <Button class="w-full" @click="goToGroupPage">View Group</Button>
     </CardFooter>
   </Card>
 </template>
