@@ -41,9 +41,6 @@ const goToGroupPage = () => {
         {{ group.description }}
       </p>
       <p class="text-xs text-muted-foreground">
-        Last activity: {{ group.recentActivity }}
-      </p>
-      <p class="text-xs text-muted-foreground">
         Members: {{ group.enrollmentCount }}
       </p>
     </CardContent>
