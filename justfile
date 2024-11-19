@@ -10,6 +10,9 @@ backend_python := backend_venv + python
 burndown_venv := "scripts/burndown" / venv
 burndown_python := burndown_venv + python
 
+frontend_venv := "frontend" / venv
+frontend_python := frontend_venv + python
+
 @_default:
     just --list
 
@@ -44,6 +47,7 @@ burndown-sprint1: burndown-deps
 
 frontend-deps:
     cd frontend && pnpm install
+    cd frontend && uv sync
 
 frontend-dev: frontend-deps
     cd frontend && pnpm run dev
@@ -51,3 +55,6 @@ frontend-dev: frontend-deps
 frontend-fix:
     cd frontend && npx prettier . --write
     cd frontend && npx eslint --fix
+
+frontend-test:
+    cd frontend && ../{{ frontend_venv }}/pytest tests/
