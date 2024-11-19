@@ -8,7 +8,6 @@ from pydantic import BaseModel
 from sqlalchemy import exc
 from sqlmodel import Session, SQLModel, func, select
 from sqlmodel.sql.expression import Select
-
 from unigate.core.database import get_session
 
 ModelType = TypeVar("ModelType", bound=SQLModel)

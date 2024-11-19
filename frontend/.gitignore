@@ -22,3 +22,21 @@ logs
 .env
 .env.*
 !.env.example
+
+# Python
+__pycache__
+*.py[oc]
+build
+dist
+wheels
+*.egg-info
+
+.ruff_cache
+.pytest_cache
+
+.coverage
+htmlcov
+
+.cache
+
+.venv

@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session
-
 from unigate.core.database import get_session
 from unigate.crud.group_crud import group_crud
 from unigate.models import Group

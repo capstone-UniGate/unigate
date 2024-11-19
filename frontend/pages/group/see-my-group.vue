@@ -1,5 +1,5 @@
 <script setup>
-import SeeMyGroup from '~/components/SeeMyGroup.vue';
+import SeeMyGroup from "~/components/SeeMyGroup.vue";
 </script>
 
 <template>

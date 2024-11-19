@@ -3,7 +3,6 @@ from uuid import UUID
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
-
 from unigate.models import Group, GroupType, Student
 
 from .base_crud import CRUDBase
