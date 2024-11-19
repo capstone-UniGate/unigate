@@ -33,8 +33,6 @@ repos:
       - id: eslint
         args: [--fix, --config=frontend/eslint.config.js]
         exclude: ^(backend/|scripts/)
-        files: \.(js|jsx|ts|tsx|vue)$
-        types: [file]
         additional_dependencies:
           - eslint@9.15.0
           - globals@15.12.0
@@ -42,6 +40,7 @@ repos:
           - eslint-plugin-vue@9.31.0
           - typescript-eslint@8.15.0
           - eslint-config-prettier@9.1.0
+          - eslint-plugin-prettier@5.2.1
 
   - repo: https://github.com/ComPWA/prettier-pre-commit
     rev: "v3.3.3"
