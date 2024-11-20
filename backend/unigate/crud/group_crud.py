@@ -3,9 +3,11 @@ from uuid import UUID
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
-from unigate.models import Group, GroupType, Student
+from unigate.models import Group, GroupType, Student, Join
 
 from .base_crud import CRUDBase
+
+import uuid
 
 
 class CRUDGroup(CRUDBase[Group, Group, Group]):
@@ -14,6 +16,7 @@ class CRUDGroup(CRUDBase[Group, Group, Group]):
         statement = select(self.model).where(self.model.name == name)
         result = db_session.exec(statement)
         return result.first()
+        
 
     def create_group(self, *, session: Session, group_data: Group) -> Group:
         # Validation: Check UUID format for group ID

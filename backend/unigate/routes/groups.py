@@ -3,7 +3,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session
 from unigate.core.database import get_session
 from unigate.crud.group_crud import group_crud
-from unigate.models import Group
+from unigate.crud.join_crud import join_crud
+from unigate.crud.student_crud import student_crud
+from unigate.models import Group, Student
+import uuid
 
 router = APIRouter()
 
@@ -73,3 +76,53 @@ def create_group(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while creating the group.",
         )
+@router.post(
+    "/get_members",
+    response_model=list[Student],
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"description": "List of all students in the group", "model": list[Student]},
+        400: {"description": "You cannot visualize members of a private group of which you are not part of"},
+        500: {"description": "An error occurred while creating the group"},
+    },
+)   
+def get_memebrs(group_id: uuid.UUID, student_id: uuid.UUID | None) -> list[Student]:
+    """
+    Get a list of all memebers of a group
+
+    Args:
+        group_id (UUID): group's user ID
+        student_id (UUID): student's user ID
+
+    Returns:
+        list[Students]: list of all students in that group
+
+    Raises:
+        HTTPException: Raises a 500 error if the query fails.
+    """
+
+    try:
+        return student_crud.get_members(group_id=group_id, student_id=student_id)
+    except SQLAlchemyError:
+        raise HTTPException(status_code=500, detail="Internal server error.")
+
+@router.post("/join_public_group", response_model=str)
+def join_public_group(student_id: uuid.UUID, group_id: uuid.UUID) -> str:
+    """
+    Join a public group (if not already enrolled in another group for the same course).
+
+    Args:
+        student_id (UUID): student's user ID
+        group_id (UUID): group's user ID
+
+    Returns:
+        bool: returns wether the join has failed ro not.
+
+    Raises:
+        HTTPException: Raises a 500 error if the query fails.
+    """
+
+    try:
+        return join_crud.join_public_group(student_id, group_id)
+    except SQLAlchemyError:
+        raise HTTPException(status_code=500, detail="Internal server error.")
