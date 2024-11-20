@@ -18,10 +18,16 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
         if not self.check_double_enrollment(student_id, group.category):
             return "You are already enrolled in a team for the same course"
 
-        self.create(obj_in=Join(date=datetime.date.today(), student_id=student_id, group_id=group_id))
+        self.create(
+            obj_in=Join(
+                date=datetime.date.today(), student_id=student_id, group_id=group_id
+            )
+        )
         return "Insert successful"
 
-    def check_double_enrollment(self, student_id: uuid.UUID, category: str | None = None) -> bool:
+    def check_double_enrollment(
+        self, student_id: uuid.UUID, category: str | None = None
+    ) -> bool:
         db_session = self.get_db()
         try:
             statement = (
@@ -34,5 +40,6 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
             return result.one_or_none() is None
         except exc.MultipleResultsFound:
             return False
+
 
 join_crud = CRUDJoin(Join)

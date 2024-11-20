@@ -9,7 +9,9 @@
         <h1 class="text-3xl font-bold text-gray-800 mb-6">
           Members of {{ group.name || "Group..." }}
         </h1>
-        <ScrollArea class="h-[300px] lg:h-[400px] bg-gray-100 p-4 rounded-lg shadow-md">
+        <ScrollArea
+          class="h-[300px] lg:h-[400px] bg-gray-100 p-4 rounded-lg shadow-md"
+        >
           <ul>
             <li
               v-for="member in group.members"
@@ -162,7 +164,6 @@
     </div>
   </div>
 </template>
-
 
 <script setup lang="ts">
 import { Toaster } from "@/components/ui/toast";

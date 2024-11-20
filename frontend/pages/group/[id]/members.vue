@@ -18,13 +18,11 @@ const groupMembers = [
 
 <template>
   <div class="p-6">
-    <h1 class="text-2xl font-bold mb-4">
-      Members of Group {{ groupId }}
-    </h1>
+    <h1 class="text-2xl font-bold mb-4">Members of Group {{ groupId }}</h1>
 
     <ScrollArea class="h-72 w-full rounded-md border p-4">
       <div v-for="member in groupMembers" :key="member.id">
-          {{ member.name }}
+        {{ member.name }}
         <Separator class="my-2" />
       </div>
     </ScrollArea>
