@@ -29,6 +29,9 @@ backend-fix: backend-deps
     {{ backend_venv }}/ruff check backend --config backend/pyproject.toml
     {{ backend_venv }}/ruff format backend --config backend/pyproject.toml
 
+backend-test: backend-deps
+    cd backend && ../{{ backend_venv }}/pytest tests/
+
 pre-commit: backend-deps
     {{ backend_venv }}/pre-commit run --all-files
 
