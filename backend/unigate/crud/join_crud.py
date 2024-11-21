@@ -1,6 +1,7 @@
 import datetime
 import uuid
 
+import pytz
 from sqlalchemy import exc
 from sqlmodel import select
 from unigate.models import Group, Join
@@ -20,7 +21,9 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
 
         self.create(
             obj_in=Join(
-                date=datetime.date.today(), student_id=student_id, group_id=group_id
+                date=datetime.datetime.now(tz=pytz.timezone("Europe/Rome")).date(),
+                student_id=student_id,
+                group_id=group_id,
             )
         )
         return "Insert successful"
