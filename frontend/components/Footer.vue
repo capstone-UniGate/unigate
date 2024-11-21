@@ -1,52 +1,22 @@
 <template>
-  <footer class="bg-gray-800 text-white py-6">
+  <footer class="bg-stone-100 text-blue-800 py-1 border border-blue-300">
     <div class="container mx-auto text-center">
-      <p class="text-sm">© 2024 MySite. All Rights Reserved.</p>
+      <!-- Logo Section -->
+      <div class="text-2xl font-bold mb-4">
+        <router-link to="/" class="text-blue-800">UniGate</router-link>
+      </div>
 
-      <!-- Links for Desktop -->
-      <div class="hidden md:flex justify-center space-x-8 mt-4">
-        <router-link to="/" class="hover:text-blue-300">Home</router-link>
-        <router-link to="/about" class="hover:text-blue-300">About</router-link>
-        <router-link to="/contact" class="hover:text-blue-300"
-          >Contact</router-link
+      <!-- Navigation Links -->
+      <div class="flex justify-center space-x-8 text-sm font-light mb-4">
+        <router-link to="/" class="hover:text-blue-500">Home</router-link>
+        <router-link to="/about" class="hover:text-blue-500">About</router-link>
+        <router-link to="/contact" class="hover:text-blue-500"
+          >Contact Us</router-link
         >
       </div>
 
-      <!-- Social Media Icons (Optional) -->
-      <div class="flex justify-center space-x-6 mt-4">
-        <a href="#" class="text-white hover:text-blue-300">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 3v18M6 3l4 4-4 4M18 3v18M18 3l-4 4 4 4"
-            />
-          </svg>
-        </a>
-        <a href="#" class="text-white hover:text-blue-300">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 3v18M6 3l4 4-4 4M18 3v18M18 3l-4 4 4 4"
-            />
-          </svg>
-        </a>
-      </div>
+      <!-- Footer Bottom -->
+      <div class="mt-6 text-xs text-gray-600">© 2024 Knowledge Collective</div>
     </div>
   </footer>
 </template>
@@ -58,5 +28,8 @@ export default {
 </script>
 
 <style scoped>
-/* Optional custom styles */
+/* Add padding and spacing adjustments */
+footer {
+  font-family: "Arial", sans-serif;
+}
 </style>
