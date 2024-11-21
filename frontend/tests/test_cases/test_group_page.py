@@ -1,24 +1,22 @@
-from ..pages.base_page import (
-    TimeoutException,
-    # ... other needed imports
-    fixture,
-    pytest,
-)
-from ..pages.group_page import GroupPage
+from loguru import logger
+from selenium.webdriver.remote.webdriver import WebDriver
+
+from tests.pages.base_page import TimeoutException, fixture, pytest
+from tests.pages.group_page import GroupPage
 
 
 class TestGroupPage:
     @fixture(autouse=True)
-    def setup(self, driver):
+    def setup(self, driver: WebDriver) -> None:
         self.page = GroupPage(driver)
         self.load_success = self.page.load()
 
-    def test_page_loads_successfully(self):
+    def test_page_loads_successfully(self) -> None:
         """Test that the page loads successfully"""
         assert self.load_success, "Page should load successfully"
         assert self.page.is_page_loaded(), "Page document should be in complete state"
 
-    def test_page_header_visible(self):
+    def test_page_header_visible(self) -> None:
         """Test that the page header is visible"""
         if not self.load_success:
             pytest.skip("Page failed to load, skipping header test")
@@ -26,7 +24,7 @@ class TestGroupPage:
         is_visible = self.page.is_heading_visible()
         assert is_visible, "Page header should be visible"
 
-    def test_group_cards_display(self):
+    def test_group_cards_display(self) -> None:
         """Test that group cards container is present"""
         if not self.load_success:
             pytest.skip("Page failed to load, skipping cards test")
@@ -39,14 +37,14 @@ class TestGroupPage:
 
             # Log the number of cards found (helpful for debugging)
             cards_count = len(group_cards)
-            print(f"Found {cards_count} group cards on the page")
+            logger.info(f"Found {cards_count} group cards on the page")
 
         except TimeoutException:
             pytest.fail("Group cards did not load within the expected timeout")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             pytest.fail(f"Unexpected error while checking group cards: {e!s}")
 
-    def test_page_structure_complete(self):
+    def test_page_structure_complete(self) -> None:
         """Test that all essential page elements are present"""
         if not self.load_success:
             pytest.fail("Page failed to load")

@@ -1,5 +1,6 @@
 import pytest
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
 
 from tests.pages.see_my_groups_page import SeeMyGroupsPage
@@ -12,7 +13,7 @@ class TestSeeMyGroups:
     BASE_URL = "http://localhost:3000/group/see-my-group"
 
     @pytest.fixture(autouse=True)
-    def setup(self, driver):
+    def setup(self, driver: WebDriver) -> None:
         self.page = SeeMyGroupsPage(driver)
         self.page.load()
         # Wait for initial page load
@@ -20,21 +21,21 @@ class TestSeeMyGroups:
             EC.presence_of_element_located(self.page.HEADING)
         )
 
-    def test_page_header_visible(self):
+    def test_page_header_visible(self) -> None:
         """Test that the page header is visible"""
         assert self.page.is_heading_visible(), "Page header should be visible"
 
-    def test_loading_state(self):
+    def test_loading_state(self) -> None:
         """Test that loading state is shown and then disappears"""
         # Give time for loading state to appear
         WebDriverWait(self.page.driver, 10).until(
-            lambda d: self.page.is_loading() or self.page.get_group_cards()
+            lambda _: self.page.is_loading() or self.page.get_group_cards()
         )
         # After loading completes, verify cards are accessible
-        group_cards = self.page.get_group_cards()
+        self.page.get_group_cards()
         assert not self.page.is_loading(), "Loading indicator should disappear"
 
-    def test_create_group_navigation(self):
+    def test_create_group_navigation(self) -> None:
         """Test navigation to create group page"""
         self.page.click_create_group()
         WebDriverWait(self.page.driver, 10).until(
@@ -47,7 +48,7 @@ class TestSeeMyGroups:
             "/group/create" in self.page.driver.current_url
         ), "Should navigate to create group page"
 
-    def test_group_cards_display(self):
+    def test_group_cards_display(self) -> None:
         """Test that group cards are displayed after loading"""
         # Wait for loading to complete
         WebDriverWait(self.page.driver, 10).until_not(
@@ -60,7 +61,8 @@ class TestSeeMyGroups:
         ), "Should return a list of cards (even if empty)"
 
 
-""" These test cases are not currently being used but are here for future reference"""
+# These test cases are not currently being used but are here for future reference
+
 # def test_page_header_not_visible_when_invalid(self):
 #     """Test that the page header is not visible when page is invalid"""
 #     self.page.URL = "http://localhost:3000/invalid-url"  # Set invalid URL

@@ -37,14 +37,14 @@ onMounted(() => {
 
     <div class="flex justify-end items-center mb-6 py-2">
       <h1
-        class="text-2xl font-semibold text-gray-800 mb-6"
+        class="text-2xl font-semibold text-gray-800"
         data-testid="page-heading"
       >
         Your Enrolled Groups
       </h1>
       <Button
         @click="() => $router.push('/group/create')"
-        class="ml-auto"
+        class="ml-auto bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-semibold py-1 px-2 rounded-lg shadow-lg hover:from-blue-500 hover:to-blue-600 hover:shadow-xl active:scale-95 transition-all"
         data-testid="create-group-button"
       >
         Create a new group
