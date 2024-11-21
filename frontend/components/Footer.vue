@@ -18,12 +18,18 @@
       <!-- Footer Bottom -->
       <div class="mt-6 text-xs text-gray-600">© 2024 Knowledge Collective</div>
     </div>
+    <ScrollToTop />
   </footer>
 </template>
 
 <script>
+import ScrollToTop from "./ui/button/ScrollToTop.vue";
+
 export default {
   name: "Footer",
+  components: {
+    ScrollToTop,
+  },
 };
 </script>
 
