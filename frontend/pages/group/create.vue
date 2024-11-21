@@ -154,7 +154,7 @@ const formSchema = toTypedSchema(
     isPublic: z.enum(["public", "private"]),
     description: z.string().min(10, "The description is too short").max(300),
     tags: z.array(z.string()).min(1, "Please add at least one tag"),
-  })
+  }),
 );
 
 const { handleSubmit, errors, setFieldValue } = useForm({
@@ -218,7 +218,7 @@ const filterSuggestions = () => {
   filteredSuggestions.value = allSuggestions.filter(
     (suggestion) =>
       suggestion.toLowerCase().includes(query) &&
-      !tags.value.includes(suggestion)
+      !tags.value.includes(suggestion),
   );
 };
 
