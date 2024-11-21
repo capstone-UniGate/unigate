@@ -43,6 +43,9 @@ class TestSeeMyGroups:
         assert (
             "/group/create" in self.page.driver.current_url
         ), "Should navigate to create group page"
+        assert (
+            "/group/create" in self.page.driver.current_url
+        ), "Should navigate to create group page"
 
     def test_group_cards_display(self):
         """Test that group cards are displayed after loading"""
