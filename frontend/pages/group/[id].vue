@@ -2,51 +2,92 @@
   <Toaster />
 
   <div class="p-6 md:p-10 flex flex-col lg:flex-row">
-    <!-- Left Side: Group Details -->
+    <!-- Left Side: Group Details or Members -->
     <div class="flex-grow mb-6 lg:mb-0">
-      <div class="flex items-center gap-4 mb-6">
-        <Avatar class="cursor-pointer" @click="showModal = true">
-          <AvatarImage
-            src="https://github.com/radix-vue.png"
-            alt="@radix-vue"
-          />
-          <AvatarFallback>GN</AvatarFallback>
-        </Avatar>
-        <h1 class="text-3xl font-bold text-gray-800">
-          {{ group.name || "Group..." }}
+      <!-- Show members if is in the sezction "members" -->
+      <div v-if="isViewingMembers">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">
+          Members of {{ group.name || "Group..." }}
         </h1>
-      </div>
-
-      <!-- Other Group Details -->
-      <div class="text-gray-600 mb-6">
-        <p>{{ group.description || "Group description..." }}</p>
-      </div>
-
-      <!-- Display Number of Members with "Members" as a Link -->
-      <div class="mb-6">
-        <p class="text-lg text-gray-700">
-          Number of
-          <NuxtLink
-            :to="`/group/${groupId}/members`"
-            class="text-blue-500 hover:underline"
-            >members</NuxtLink
-          >: {{ group.members.length }}
-        </p>
-      </div>
-
-      <!-- Show Join Button Only if User is Not a Member or Superstudent -->
-      <div v-if="!isMember && !isSuperstudent" class="text-center mt-6">
-        <Button
-          @click="joinGroup"
-          class="bg-blue-500 text-white px-4 py-2 rounded-md"
-          >Join Group</Button
+        <ScrollArea
+          class="h-[300px] lg:h-[400px] bg-gray-100 p-4 rounded-lg shadow-md"
         >
+          <ul>
+            <li
+              v-for="member in group.members"
+              :key="member.id"
+              class="mb-4 text-lg text-gray-700 flex items-center"
+            >
+              <Avatar class="inline-block mr-2">
+                <AvatarImage
+                  src="https://via.placeholder.com/50"
+                  alt="Member Avatar"
+                />
+                <AvatarFallback>NA</AvatarFallback>
+              </Avatar>
+              <router-link
+                :to="`/group/${groupId}`"
+                class="text-blue-500 hover:underline"
+              >
+                {{ member.name }}
+              </router-link>
+            </li>
+          </ul>
+        </ScrollArea>
+        <NuxtLink
+          :to="`/group/${groupId}`"
+          class="text-blue-500 hover:underline mt-4 inline-block"
+        >
+          Back to Group Details
+        </NuxtLink>
+      </div>
+
+      <!-- Dettagli del gruppo (se non si sta visualizzando i membri) -->
+      <div v-else>
+        <div class="flex items-center gap-4 mb-6">
+          <Avatar class="cursor-pointer" @click="showModal = true">
+            <AvatarImage
+              src="https://github.com/radix-vue.png"
+              alt="@radix-vue"
+            />
+            <AvatarFallback>GN</AvatarFallback>
+          </Avatar>
+          <h1 class="text-3xl font-bold text-gray-800">
+            {{ group.name || "Group..." }}
+          </h1>
+        </div>
+
+        <div class="text-gray-600 mb-6">
+          <p>{{ group.description || "Group description..." }}</p>
+        </div>
+
+        <div class="mb-6">
+          <p class="text-lg text-gray-700">
+            Number of
+            <NuxtLink
+              :to="`/group/${groupId}/members`"
+              class="text-blue-500 hover:underline"
+            >
+              members
+            </NuxtLink>
+            : {{ group.members.length }}
+          </p>
+        </div>
+
+        <div v-if="!isMember && !isSuperstudent" class="text-center mt-6">
+          <Button
+            @click="joinGroup"
+            class="bg-blue-500 text-white px-4 py-2 rounded-md"
+          >
+            Join Group
+          </Button>
+        </div>
       </div>
     </div>
 
-    <!-- Right Side: Superstudent Join Requests Section as a Scroll Area -->
+    <!-- Right Side: Superstudent Join Requests Section -->
     <div
-      v-if="isSuperstudent && group.isPrivate"
+      v-if="!isViewingMembers && isSuperstudent && group.isPrivate"
       class="w-full lg:w-80 lg:ml-6"
     >
       <ScrollArea
@@ -98,7 +139,6 @@
                   </TooltipTrigger>
                   <TooltipContent>Reject</TooltipContent>
                 </Tooltip>
-
                 <!-- Block Button with Tooltip -->
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -187,6 +227,10 @@ const group = groupsData.find((g) => g.id === groupId) || {
   rejectedUsers: [],
   blockedUsers: [],
 };
+
+const isViewingMembers = computed(() => {
+  return route.path.endsWith("/members");
+});
 
 // Computed Properties for Access Control
 const isSuperstudent = computed(() => group.creatorId === currentUserId);
