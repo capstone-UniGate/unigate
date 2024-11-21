@@ -1,10 +1,11 @@
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
 
 class SeeMyGroupsPage:
     URL = "http://localhost:3000/group/see-my-group"
-    
+
     # Locators
     HEADING = (By.CSS_SELECTOR, "h1")
     LOADING_INDICATOR = (By.CSS_SELECTOR, "[data-testid='loading-indicator']")

@@ -1,11 +1,13 @@
 import pytest
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
 from tests.pages.see_my_groups_page import SeeMyGroupsPage
+
 
 class TestSeeMyGroups:
     BASE_URL = "http://localhost:3000/group/see-my-group"
-    
+
     @pytest.fixture(autouse=True)
     def setup(self, driver):
         self.page = SeeMyGroupsPage(driver)
@@ -35,8 +37,9 @@ class TestSeeMyGroups:
         WebDriverWait(self.page.driver, 10).until(
             lambda d: "/group/create" in d.current_url
         )
-        assert "/group/create" in self.page.driver.current_url, \
-            "Should navigate to create group page"
+        assert (
+            "/group/create" in self.page.driver.current_url
+        ), "Should navigate to create group page"
 
     def test_group_cards_display(self):
         """Test that group cards are displayed after loading"""
@@ -46,4 +49,6 @@ class TestSeeMyGroups:
         )
         group_cards = self.page.get_group_cards()
         # Test passes whether there are cards or not
-        assert isinstance(group_cards, list), "Should return a list of cards (even if empty)"
+        assert isinstance(
+            group_cards, list
+        ), "Should return a list of cards (even if empty)"
