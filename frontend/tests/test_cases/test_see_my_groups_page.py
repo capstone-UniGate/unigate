@@ -1,5 +1,5 @@
 import pytest
-from selenium.webdriver.remote.webdriver import WebDriver
+from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -13,7 +13,7 @@ class TestSeeMyGroups:
     BASE_URL = "http://localhost:3000/group/see-my-group"
 
     @pytest.fixture(autouse=True)
-    def setup(self, driver: WebDriver) -> None:
+    def setup(self, driver: webdriver.Chrome) -> None:
         self.page = SeeMyGroupsPage(driver)
         self.page.load()
         # Wait for initial page load

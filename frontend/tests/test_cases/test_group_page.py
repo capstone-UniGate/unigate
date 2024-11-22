@@ -1,13 +1,15 @@
+import pytest
 from loguru import logger
-from selenium.webdriver.remote.webdriver import WebDriver
+from pytest import fixture
+from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 
-from tests.pages.base_page import TimeoutException, fixture, pytest
 from tests.pages.group_page import GroupPage
 
 
 class TestGroupPage:
     @fixture(autouse=True)
-    def setup(self, driver: WebDriver) -> None:
+    def setup(self, driver: webdriver.Chrome) -> None:
         self.page = GroupPage(driver)
         self.load_success = self.page.load()
 
