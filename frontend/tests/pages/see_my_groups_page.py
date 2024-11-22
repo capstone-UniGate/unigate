@@ -1,5 +1,5 @@
+from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
@@ -14,7 +14,7 @@ class SeeMyGroupsPage:
     GROUP_CARDS = (By.CSS_SELECTOR, "[data-testid='group-card']")
     CREATE_GROUP_BUTTON = (By.CSS_SELECTOR, "[data-testid='create-group-button']")
 
-    def __init__(self, driver: WebDriver) -> None:
+    def __init__(self, driver: webdriver.Chrome) -> None:
         self.driver = driver
         self.wait = WebDriverWait(driver, 10)
 
@@ -35,12 +35,12 @@ class SeeMyGroupsPage:
         except Exception:  # noqa: BLE001
             return False
 
-    def has_error(self) -> bool | WebElement:
-        """Check if error message is visible"""
-        try:
-            return self.driver.find_element(*self.ERROR_MESSAGE).is_displayed()
-        except Exception:  # noqa: BLE001
-            return False
+    # def has_error(self) -> bool | WebElement:
+    #     """Check if error message is visible"""
+    #     try:
+    #         return self.driver.find_element(*self.ERROR_MESSAGE).is_displayed()
+    #     except Exception:
+    #         return False
 
     def get_group_cards(self) -> list[WebElement]:
         """Get all group cards on the page"""

@@ -1,5 +1,5 @@
 import pytest
-from selenium.webdriver.remote.webdriver import WebDriver
+from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -13,7 +13,7 @@ class TestSeeMyGroups:
     BASE_URL = "http://localhost:3000/group/see-my-group"
 
     @pytest.fixture(autouse=True)
-    def setup(self, driver: WebDriver) -> None:
+    def setup(self, driver: webdriver.Chrome) -> None:
         self.page = SeeMyGroupsPage(driver)
         self.page.load()
         # Wait for initial page load
@@ -35,18 +35,18 @@ class TestSeeMyGroups:
         self.page.get_group_cards()
         assert not self.page.is_loading(), "Loading indicator should disappear"
 
-    # def test_create_group_navigation(self) -> None:
-    #     """Test navigation to create group page"""
-    #     self.page.click_create_group()
-    #     WebDriverWait(self.page.driver, 10).until(
-    #         lambda d: "/group/create" in d.current_url
-    #     )
-    #     assert (
-    #         "/group/create" in self.page.driver.current_url
-    #     ), "Should navigate to create group page"
-    #     assert (
-    #         "/group/create" in self.page.driver.current_url
-    #     ), "Should navigate to create group page"
+    def test_create_group_navigation(self) -> None:
+        """Test navigation to create group page"""
+        self.page.click_create_group()
+        WebDriverWait(self.page.driver, 10).until(
+            lambda d: "/group/create" in d.current_url
+        )
+        assert (
+            "/group/create" in self.page.driver.current_url
+        ), "Should navigate to create group page"
+        assert (
+            "/group/create" in self.page.driver.current_url
+        ), "Should navigate to create group page"
 
     def test_group_cards_display(self) -> None:
         """Test that group cards are displayed after loading"""

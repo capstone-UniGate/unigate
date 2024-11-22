@@ -1,14 +1,11 @@
-from selenium.webdriver.remote.webdriver import WebDriver
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
+from selenium.webdriver.support.ui import WebDriverWait
 
-from .base_page import (
-    EC,
-    BasePage,
-    By,
-    NoSuchElementException,
-    TimeoutException,
-    WebDriverWait,
-)
+from tests.pages.base_page import BasePage
 
 
 class GroupPage(BasePage):
@@ -18,7 +15,7 @@ class GroupPage(BasePage):
     PAGE_HEADING = (By.CSS_SELECTOR, "h1")
     GROUP_CARDS = (By.CSS_SELECTOR, ".grid > div")
 
-    def __init__(self, driver: WebDriver) -> None:
+    def __init__(self, driver: webdriver.Chrome) -> None:
         super().__init__(driver)
         self.wait = WebDriverWait(driver, 10)
 
@@ -47,7 +44,7 @@ class GroupPage(BasePage):
     def is_page_loaded(self) -> bool:
         try:
             return (
-                self.driver.execute_script("return document.readyState") == "complete"
+                self.driver.execute_script("return document.readyState") == "complete"  # type: ignore
             )
         except Exception:  # noqa: BLE001
             return False
