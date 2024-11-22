@@ -114,7 +114,8 @@ ignore = [
     "TRY300",  # else blocks
     "BLE001",  # blind exception
     "FIX002",  # TODO's
-    "S101"     # Use of assert
+    "S101",     # Use of assert,
+    "ARG001",  # unused arg
 ]
 fixable = ["ALL"]
 
