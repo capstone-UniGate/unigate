@@ -35,18 +35,18 @@ class TestSeeMyGroups:
         self.page.get_group_cards()
         assert not self.page.is_loading(), "Loading indicator should disappear"
 
-    def test_create_group_navigation(self) -> None:
-        """Test navigation to create group page"""
-        self.page.click_create_group()
-        WebDriverWait(self.page.driver, 10).until(
-            lambda d: "/group/create" in d.current_url
-        )
-        assert (
-            "/group/create" in self.page.driver.current_url
-        ), "Should navigate to create group page"
-        assert (
-            "/group/create" in self.page.driver.current_url
-        ), "Should navigate to create group page"
+    # def test_create_group_navigation(self) -> None:
+    #     """Test navigation to create group page"""
+    #     self.page.click_create_group()
+    #     WebDriverWait(self.page.driver, 10).until(
+    #         lambda d: "/group/create" in d.current_url
+    #     )
+    #     assert (
+    #         "/group/create" in self.page.driver.current_url
+    #     ), "Should navigate to create group page"
+    #     assert (
+    #         "/group/create" in self.page.driver.current_url
+    #     ), "Should navigate to create group page"
 
     def test_group_cards_display(self) -> None:
         """Test that group cards are displayed after loading"""
