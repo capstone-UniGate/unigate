@@ -12,6 +12,7 @@ from unigate.models import Student
 
 client: TestClient = TestClient(app)
 
+client = TestClient(app)
 
 @pytest.fixture
 def mock_session() -> MagicMock:
