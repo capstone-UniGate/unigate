@@ -21,11 +21,29 @@ repos:
     rev: "v0.7.4"
     hooks:
       - id: ruff
+        name: ruff-backend
         args: [--fix, --config, backend/pyproject.toml]
-        exclude: ^frontend/(?!tests/)
+        exclude: ^(frontend/|scripts/burndown/)
       - id: ruff-format
+        name: ruff-backend-format
         args: [--config, backend/pyproject.toml]
-        exclude: ^frontend/(?!tests/)
+        exclude: ^(frontend/|scripts/burndown/)
+      - id: ruff
+        name: ruff-frontend
+        args: [--fix, --config, frontend/pyproject.toml]
+        exclude: ^(backend/|scripts/burndown/)
+      - id: ruff-format
+        name: ruff-frontend-format
+        args: [--config, frontend/pyproject.toml]
+        exclude: ^(backend/|scripts/burndown/)
+      - id: ruff
+        name: ruff-burndown
+        args: [--fix, --config, scripts/burndown/pyproject.toml]
+        exclude: ^(frontend/|backend/)
+      - id: ruff-format
+        name: ruff-burndown-format
+        args: [--config, scripts/burndown/pyproject.toml]
+        exclude: ^(frontend/|backend/)
 
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: "v9.15.0"

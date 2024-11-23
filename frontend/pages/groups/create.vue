@@ -1,4 +1,5 @@
 <template>
+  <Toaster />
   <div class="w-2/3 mx-auto margin-top-custom">
     <form class="space-y-6" @submit.prevent="onSubmit">
       <!-- Name Field -->
@@ -67,77 +68,49 @@
         </FormItem>
       </FormField>
 
-      <!-- Tags Field -->
+      <!-- Updated Tags Field -->
       <FormField v-slot="{ componentField }" name="tags">
         <FormItem>
           <FormLabel>Tags</FormLabel>
           <FormControl>
-            <TagsInput class="px-0 gap-0 w-80" :model-value="modelValue">
-              <div class="flex gap-2 flex-wrap items-center px-3">
-                <TagsInputItem
-                  v-for="item in modelValue"
-                  :key="item"
-                  :value="item"
-                >
-                  <TagsInputItemText />
-                  <TagsInputItemDelete />
-                </TagsInputItem>
+            <div class="tags-input-container">
+              <div class="tags">
+                <span v-for="(tag, index) in tags" :key="index" class="tag">
+                  {{ tag }}
+                  <button
+                    type="button"
+                    @click="removeTag(index)"
+                    class="remove-tag-button"
+                  >
+                    &times;
+                  </button>
+                </span>
               </div>
-
-              <ComboboxRoot
-                v-bind="componentField"
-                v-model="modelValue"
-                v-model:open="open"
-                v-model:search-term="searchTerm"
-                class="w-full"
-              >
-                <ComboboxAnchor as-child>
-                  <ComboboxInput placeholder="Framework..." as-child>
-                    <TagsInputInput
-                      class="w-full px-3"
-                      :class="modelValue.length > 0 ? 'mt-2' : ''"
-                      @keydown.enter.prevent
-                    />
-                  </ComboboxInput>
-                </ComboboxAnchor>
-
-                <ComboboxPortal>
-                  <ComboboxContent>
-                    <CommandList
-                      position="popper"
-                      class="w-[--radix-popper-anchor-width] rounded-md mt-2 border bg-popover text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
-                    >
-                      <CommandEmpty />
-                      <CommandGroup>
-                        <CommandItem
-                          v-for="framework in filteredFrameworks"
-                          :key="framework.value"
-                          :value="framework.label"
-                          @select.prevent="
-                            (ev) => {
-                              if (typeof ev.detail.value === 'string') {
-                                searchTerm = '';
-                                modelValue.push(ev.detail.value);
-                              }
-
-                              if (filteredFrameworks.length === 0) {
-                                open = false;
-                              }
-                            }
-                          "
-                        >
-                          {{ framework.label }}
-                        </CommandItem>
-                      </CommandGroup>
-                    </CommandList>
-                  </ComboboxContent>
-                </ComboboxPortal>
-              </ComboboxRoot>
-            </TagsInput>
+              <input
+                type="text"
+                v-model="tagInput"
+                @keydown.enter.prevent="addTag"
+                @keydown.delete="removeLastTag"
+                @input="filterSuggestions"
+                placeholder="Add tags..."
+                class="tags-input"
+              />
+              <ul v-if="filteredSuggestions.length" class="suggestions-list">
+                <li
+                  v-for="(suggestion, index) in filteredSuggestions"
+                  :key="index"
+                  @click="selectSuggestion(suggestion)"
+                  class="suggestion-item"
+                >
+                  {{ suggestion }}
+                </li>
+              </ul>
+            </div>
           </FormControl>
+          <FormMessage />
         </FormItem>
-        <FormMessage />
       </FormField>
+
       <!-- Error Message Placeholder -->
       <div v-if="errorMessage" class="text-red-600">{{ errorMessage }}</div>
 
@@ -161,33 +134,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
-import {
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  TagsInput,
-  TagsInputInput,
-  TagsInputItem,
-  TagsInputItemDelete,
-  TagsInputItemText,
-} from "@/components/ui/tags-input";
-import {
-  ComboboxAnchor,
-  ComboboxContent,
-  ComboboxInput,
-  ComboboxPortal,
-  ComboboxRoot,
-} from "radix-vue";
-import { computed, ref } from "vue";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/toast";
+import { Toaster } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/toast/use-toast";
+import { computed, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import * as z from "zod";
+
+// Toast setup
+const { toast } = useToast();
 
 // Define the schema for validation
 const formSchema = toTypedSchema(
@@ -196,62 +153,109 @@ const formSchema = toTypedSchema(
     course: z.string().nonempty("Course is required"),
     isPublic: z.enum(["public", "private"]),
     description: z.string().min(10, "The description is too short").max(300),
-    tags: z.string().min(1, "Set at least one tag"),
+    tags: z.array(z.string()).min(1, "Please add at least one tag"),
   }),
 );
 
-const { handleSubmit, errors } = useForm({
+const { handleSubmit, errors, setFieldValue } = useForm({
   validationSchema: formSchema,
 });
 
+// Error message reference
 const errorMessage = ref("");
 
-const frameworks = [
-  { value: "next.js", label: "Next.js" },
-  { value: "sveltekit", label: "SvelteKit" },
-  { value: "nuxt", label: "Nuxt" },
-  { value: "remix", label: "Remix" },
-  { value: "astro", label: "Astro" },
-];
-
-const modelValue = ref<string[]>([]);
-const open = ref(false);
-const searchTerm = ref("");
+// Router for navigation
 const router = useRouter();
 
-const filteredFrameworks = computed(() =>
-  frameworks.filter((i) => !modelValue.value.includes(i.label)),
-);
+// Reactive references for tags
+const tags = ref<string[]>([]);
+const tagInput = ref("");
+const filteredSuggestions = ref<string[]>([]);
 
-const onSubmit = handleSubmit((values) => {
-  if (checkTags(values.tags)) {
-    errorMessage.value = "Set at least one tag";
+// Tag suggestions
+const allSuggestions = [
+  "JavaScript",
+  "Vue.js",
+  "React",
+  "Angular",
+  "Svelte",
+  "Next.js",
+  "Nuxt.js",
+  "TypeScript",
+  "Webpack",
+  "Rollup",
+];
+
+// Methods to handle tag input
+const addTag = () => {
+  const newTag = tagInput.value.trim();
+  if (newTag && !tags.value.includes(newTag)) {
+    tags.value.push(newTag);
+    setFieldValue("tags", tags.value); // Synchronize with form
   }
+  tagInput.value = "";
+  filteredSuggestions.value = [];
+};
 
-  const onCancel = () => {
+const removeTag = (index: number) => {
+  tags.value.splice(index, 1);
+  setFieldValue("tags", tags.value); // Synchronize with form
+};
+
+const removeLastTag = (event: KeyboardEvent) => {
+  if (
+    tagInput.value === "" &&
+    tags.value.length &&
+    (event.key === "Backspace" || event.key === "Delete")
+  ) {
+    tags.value.pop();
+    setFieldValue("tags", tags.value); // Synchronize with form
+  }
+};
+
+const filterSuggestions = () => {
+  const query = tagInput.value.toLowerCase();
+  filteredSuggestions.value = allSuggestions.filter(
+    (suggestion) =>
+      suggestion.toLowerCase().includes(query) &&
+      !tags.value.includes(suggestion),
+  );
+};
+
+// Select a suggestion from the dropdown
+const selectSuggestion = (suggestion: string) => {
+  if (!tags.value.includes(suggestion)) {
+    tags.value.push(suggestion);
+    setFieldValue("tags", tags.value); // Synchronize with form
+  }
+  tagInput.value = "";
+  filteredSuggestions.value = [];
+};
+
+// Check for form errors
+const formHasErrors = computed(() => Object.keys(errors.value).length > 0);
+
+// Form submission handler
+const onSubmit = handleSubmit((values) => {
+  // Include tags in the form values
+  values.tags = tags.value;
+
+  // Display success toast
+  toast({
+    variant: "success",
+    description: "You joined the team",
+  });
+
+  // Redirect to the /group page after a brief delay
+  setTimeout(() => {
     router.push("/group");
-  };
+  }, 1500);
 });
 
-const checkTags = (tags: string | undefined) => {
-  if (typeof tags === "undefined") {
-    return true;
-  }
-  let actualTags = tags.split(",");
-  console.log(actualTags);
-  return actualTags.length < 1;
-};
-
+// Cancel button handler
 const onCancel = () => {
-  history.go(-1);
+  router.push("/group");
 };
-
-const checkForDuplicateGroup = (/*name, course*/) => {
-  // Replace with actual check logic
-  return false;
-};
-
-const formHasErrors = computed(() => Object.keys(errors.value).length > 0);
 </script>
 
 <style scoped>
@@ -273,5 +277,65 @@ const formHasErrors = computed(() => Object.keys(errors.value).length > 0);
 
 .margin-top-custom {
   padding-top: 6px;
+}
+
+/* Tags Input Styles */
+.tags-input-container {
+  position: relative;
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  background-color: #e2e8f0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.remove-tag-button {
+  background: none;
+  border: none;
+  margin-left: 0.25rem;
+  cursor: pointer;
+}
+
+.tags-input {
+  border: none;
+  outline: none;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.suggestions-list {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 1000;
+  border-radius: 0.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+.suggestion-item {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.suggestion-item:hover {
+  background-color: #f1f5f9;
 }
 </style>

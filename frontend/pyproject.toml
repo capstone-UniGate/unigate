@@ -1,29 +1,21 @@
 [project]
-name = "unigate"
+name = "frontend"
 version = "0.1.0"
-description = ""
+description = "Add your description here"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi-pagination>=0.12.31",
-    "fastapi[all,standard]>=0.115.4",
     "loguru>=0.7.2",
-    "psycopg[binary]>=3.2.3",
-    "pytz>=2024.2",
-    "sendgrid>=6.11.0",
-    "sqlmodel>=0.0.22",
 ]
 
-[tool.uv]
-dev-dependencies = [
-    "alembic>=1.14.0",
+[dependency-groups]
+dev = [
     "pre-commit>=4.0.1",
     "pytest>=8.3.3",
-    "ruff>=0.7.0",
+    "ruff>=0.7.4",
+    "selenium>=4.26.1",
 ]
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+
 
 [tool.pyright]
 typeCheckingMode = "strict"
@@ -111,10 +103,7 @@ ignore = [
     "W191",    # indentation contains tabs
     "B904",    # Allow raising exceptions without from e, for HTTPException
     "A002",    # Allow shadowing of builtins
-    "TRY300",  # else blocks
-    "BLE001",  # blind exception
-    "FIX002",  # TODO's
-    "S101"     # Use of assert
+    "S101",    # Use of assert detected
 ]
 fixable = ["ALL"]
 
