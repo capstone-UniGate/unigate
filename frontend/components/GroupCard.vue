@@ -15,7 +15,7 @@ interface Group {
 const props = defineProps<{ group: Group }>();
 const router = useRouter();
 const goToGroupPage = () => {
-  router.push(`/group/${props.group.id}`);
+  router.push(`/groups/${props.group.id}`);
 };
 </script>
 

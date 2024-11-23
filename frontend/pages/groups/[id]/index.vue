@@ -27,7 +27,7 @@
         <p class="text-lg text-gray-700">
           Number of
           <NuxtLink
-            :to="`/group/${groupId}/members`"
+            :to="`/groups/${groupId}/members`"
             class="text-blue-500 hover:underline"
             >members</NuxtLink
           >: {{ group.members.length }}
@@ -45,104 +45,28 @@
     </div>
 
     <!-- Right Side: Superstudent Join Requests Section as a Scroll Area -->
-    <div
-      v-if="isSuperstudent && group.isPrivate"
-      class="w-full lg:w-80 lg:ml-6"
-    >
-      <ScrollArea
-        class="h-[300px] lg:h-[400px] bg-gray-100 p-4 rounded-lg shadow-md"
-      >
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">
-          Manage Join Requests
-        </h2>
-        <TooltipProvider>
-          <ul>
-            <li
-              v-for="request in joinRequests"
-              :key="request.id"
-              class="flex items-center justify-between mb-2"
-            >
-              <span>{{ request.name }}</span>
-              <div class="flex space-x-2">
-                <!-- Approve Button with Tooltip -->
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      @click="approveRequest(request.id)"
-                      class="w-8 h-8 rounded-full"
-                    >
-                      <Avatar>
-                        <AvatarImage
-                          src="https://cdn-icons-png.flaticon.com/128/390/390973.png"
-                          alt="Approved"
-                        />
-                      </Avatar>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Accept</TooltipContent>
-                </Tooltip>
-                <!-- Reject Button with Tooltip -->
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      @click="rejectRequest(request.id)"
-                      class="w-8 h-8 rounded-full"
-                    >
-                      <Avatar>
-                        <AvatarImage
-                          src="https://cdn-icons-png.flaticon.com/128/7698/7698976.png"
-                          alt="Reject"
-                        />
-                      </Avatar>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Reject</TooltipContent>
-                </Tooltip>
+   
+    
 
-                <!-- Block Button with Tooltip -->
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      @click="blockRequest(request.id)"
-                      class="w-8 h-8 rounded-full"
-                    >
-                      <Avatar>
-                        <AvatarImage
-                          src="https://cdn-icons-png.flaticon.com/128/6834/6834501.png"
-                          alt="Block"
-                        />
-                      </Avatar>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Block</TooltipContent>
-                </Tooltip>
-              </div>
-            </li>
-          </ul>
-        </TooltipProvider>
-      </ScrollArea>
-    </div>
+      <NuxtLink  v-if="isSuperstudent && group.isPrivate"           
+        :to="`/groups/${group.id}/requests`"      
+        class="text-blue-500 hover:underline"
+        >
+        Manage join Request
+      </NuxtLink>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Toaster } from "@/components/ui/toast";
-import { useToast } from "@/components/ui/toast/use-toast";
 import { ref, computed } from "vue";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Tooltip,
-  TooltipProvider,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
+
 import { useRoute } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
-const toast = useToast();
 
 const groupId = route.params.id;
 const currentUserId = 3;
@@ -151,7 +75,7 @@ const showModal = ref(false);
 // Mock data to represent the groups and their members
 const groupsData = [
   {
-    id: "1",
+    id: "7a270b41-ae9f-41f8-97af-d560190793d7",
     name: "Group 1",
     description:
       "This is a sample description for Group 1. This is a sample description for Group 1.",
@@ -239,7 +163,7 @@ function approveRequest(requestId: number) {
     // Redirect the student to the group page after approval
     //TODO: Implement redirect logic
 
-    router.push(`/group/${groupId}`);
+    router.push(`/groups/${groupId}`);
   }
 }
 
