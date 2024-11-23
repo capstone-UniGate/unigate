@@ -1,9 +1,10 @@
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 
 from tests.pages.group_page_detail import GroupPageDetail
 
 
-def test_group_details_for_non_member(driver):
+def test_group_details_for_non_member(driver: webdriver.Chrome) -> None:
     """Test that a non-member student sees the correct details on a private group page."""
 
     # Arrange: Set up the group details
@@ -30,5 +31,3 @@ def test_group_details_for_non_member(driver):
         By.XPATH, "//button[contains(text(), 'Join Group')]"
     )
     assert join_button.is_displayed(), "Join button is not displayed for non-members."
-
-    print("Test passed: Group details are displayed correctly for a non-member.")

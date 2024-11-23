@@ -1,9 +1,11 @@
+from loguru import logger
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 
 from tests.pages.group_page_detail import GroupPageDetail
 
 
-def test_group_details_for_superstudent(driver):
+def test_group_details_for_superstudent(driver: webdriver.Chrome) -> None:
     """Test that a superstudent sees the group details with join requests on group page with group id 1."""
 
     # Arrange: Set up the group details for a superstudent (group ID 1)
@@ -60,10 +62,6 @@ def test_group_details_for_superstudent(driver):
             avatar_element = member.find_element(By.CSS_SELECTOR, "Avatar img")
             assert avatar_element.is_displayed(), "Profile picture is not displayed."
 
-        except Exception as e:
-            print(f"Error finding name or avatar for member {member.text}: {e}")
+        except Exception as e:  # noqa: BLE001
+            logger.info(f"Skipping member {member.text} due to exception: {e}")
             continue  # Skip this member if the name or avatar element is not found
-
-    print(
-        "Test passed: Group details with join requests are displayed correctly for a superstudent."
-    )

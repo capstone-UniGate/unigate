@@ -1,6 +1,6 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
 
 
@@ -20,10 +20,10 @@ class GroupPageDetail:
         try:
             section = self.driver.find_element(By.CLASS_NAME, "scroll-area")
             return section.is_displayed()
-        except Exception:
+        except Exception:  # noqa: BLE001
             return False
 
-    def get_join_requests(self):
+    def get_join_requests(self) -> list | None:
         """Return all join requests as elements."""
         return self.driver.find_elements(By.CSS_SELECTOR, ".scroll-area ul li")
 
@@ -60,7 +60,7 @@ class GroupPageDetail:
     def get_toast_message(self) -> str:
         """Retrieve the text from the success toast message."""
         WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.CLASS_NAME, "toast-success"))
+            ec.visibility_of_element_located((By.CLASS_NAME, "toast-success"))
         )
         toast_message = self.driver.find_element(By.CLASS_NAME, "toast-success")
         return toast_message.text
