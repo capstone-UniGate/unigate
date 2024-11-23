@@ -1,11 +1,14 @@
+import random
+import string
 from unittest.mock import MagicMock
 from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
+from unigate.core.database import engine
 from unigate.main import app
-from unigate.models import Group, GroupType
+from unigate.models import Student
 
 client: TestClient = TestClient(app)
 
@@ -16,15 +19,10 @@ def mock_session() -> MagicMock:
     return session
 
 
-# These tests, for now, assume the existence of a valid creator_id in the `students` table
-# This is because the `students` table is not mocked in this test suite
-# You have to ensure that the creator_id: 12345678-1234-5678-1234-567812345678 exists in the `students` table before running these tests
-
-
 @pytest.fixture
 def valid_group_payload() -> dict[str, str]:
     return {
-        "name": "Test Group",
+        "name": f"TestGroup-{''.join(random.choices(string.ascii_letters, k=6))}",
         "description": "A test group description",
         "category": "Test Category",
         "type": "Public",
@@ -32,9 +30,35 @@ def valid_group_payload() -> dict[str, str]:
     }
 
 
-def test_create_group_success(
-    mock_session: MagicMock, valid_group_payload: dict[str, str]
-) -> None:
+def create_student(student_id: str) -> None:
+    """
+    Check if a Student record exists, and create one if it does not.
+
+    Args:
+        student_id (str): The UUID of the student to check or insert.
+    """
+    with Session(engine) as session:
+        # Check if the student already exists
+        existing_student = session.query(Student).filter_by(id=UUID(student_id)).first()
+        if existing_student:
+            return
+
+        # Create a new student record
+        student = Student(
+            id=UUID(student_id),
+            hashed_password="hashedpassword123",  # Replace with actual hashed password logic
+            number=12345,  # Unique student number
+            email="teststudent@example.com",  # Unique email
+            name="Test",
+            surname="Student",
+        )
+        session.add(student)
+        session.commit()
+
+
+def test_create_group_success(valid_group_payload: dict[str, str]) -> None:
+    create_student("12345678-1234-5678-1234-567812345678")
+
     response = client.post("/groups/create", json=valid_group_payload)
     assert response.status_code == 201
     data: dict[str, str] = response.json()
@@ -45,25 +69,22 @@ def test_create_group_success(
     assert data["creator_id"] == valid_group_payload["creator_id"]
 
 
-def test_create_group_duplicate_name(
-    mock_session: MagicMock, valid_group_payload: dict[str, str]
-) -> None:
-    # Create a mock `Group` instance matching the payload
-    mock_group = Group(
-        id=UUID("12345678-1234-5678-1234-567812345678"),  # UUID for id
-        name=valid_group_payload["name"],
-        description=valid_group_payload["description"],
-        category=valid_group_payload["category"],
-        type=GroupType(valid_group_payload["type"]),  # Convert string to GroupType
-        creator_id=UUID(valid_group_payload["creator_id"]),  # Convert string to UUID
+def test_create_group_duplicate_name(valid_group_payload: dict[str, str]) -> None:
+    # Randomize the group name for the initial creation
+    randomized_group_name = (
+        f"TestGroup-{''.join(random.choices(string.ascii_letters, k=6))}"
     )
-    mock_session.query.return_value.filter_by.return_value.first.return_value = (
-        mock_group
-    )
+    valid_group_payload["name"] = randomized_group_name
 
+    # Call the success test manually to ensure the group is created
+    create_student("12345678-1234-5678-1234-567812345678")  # Ensure the creator exists
     response = client.post("/groups/create", json=valid_group_payload)
-    assert response.status_code == 400
-    assert response.json()["detail"] == "Group with this name already exists."
+    assert response.status_code == 201  # Ensure the group was created successfully
+
+    # Attempt to create the group again with the same randomized name
+    duplicate_response = client.post("/groups/create", json=valid_group_payload)
+    assert duplicate_response.status_code == 400
+    assert duplicate_response.json()["detail"] == "Group with this name already exists."
 
 
 def test_create_group_invalid_type(valid_group_payload: dict[str, str]) -> None:
