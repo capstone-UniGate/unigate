@@ -72,13 +72,17 @@ class CreateGroupPage(BasePage):
         return [element.text for element in error_elements if element.text.strip()]
 
     def enter_tag_text(self, tag_text: str) -> None:
-        tags_input = self.wait.until(ExpectedConditions.presence_of_element_located(self.TAGS_INPUT))
+        tags_input = self.wait.until(
+            ExpectedConditions.presence_of_element_located(self.TAGS_INPUT)
+        )
         tags_input.send_keys(tag_text)
 
     def get_tag_suggestions(self) -> list[str]:
         """Get the list of tag suggestions"""
         # Wait for suggestions list to be visible
-        self.wait.until(ExpectedConditions.presence_of_element_located(self.SUGGESTIONS_LIST))
+        self.wait.until(
+            ExpectedConditions.presence_of_element_located(self.SUGGESTIONS_LIST)
+        )
         # Get all suggestion items
         suggestion_elements = self.driver.find_elements(*self.SUGGESTION_ITEM)
         # Return the text of each suggestion
@@ -89,7 +93,9 @@ class CreateGroupPage(BasePage):
 
     def verify_success_toast(self) -> bool:
         toast = self.wait.until(
-            ExpectedConditions.presence_of_element_located((By.CLASS_NAME, "toast-success"))
+            ExpectedConditions.presence_of_element_located(
+                (By.CLASS_NAME, "toast-success")
+            )
         )
         return "Group created successfully" in toast.text
 
