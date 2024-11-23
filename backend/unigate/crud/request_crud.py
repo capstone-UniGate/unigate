@@ -1,33 +1,34 @@
-import uuid
-from sqlmodel import select
-from fastapi import HTTPException
 import datetime
+import uuid
 
-from unigate.models import Request,Join
+from fastapi import HTTPException
+from sqlmodel import select
+from unigate.models import Join, Request
+
 from .base_crud import CRUDBase
 from .group_crud import group_crud
 
 
 class CRUDRequest(CRUDBase[Request, Request, Request]):
-
     def get_all_requests_for_group(self, group_id: uuid.UUID) -> list[Request]:
-
         group = group_crud.get(id=group_id)
         if not group:
             raise HTTPException(status_code=404, detail="Group not found.")
 
-        requests = self.db_session.exec(select(Request).where(Request.group_id == group_id)).all()
+        requests = self.db_session.exec(
+            select(Request).where(Request.group_id == group_id)
+        ).all()
         return requests
 
     def get_request(self, request_id: uuid.UUID) -> Request:
-
-        request = self.db_session.exec(select(Request).where(Request.id == request_id)).first()
+        request = self.db_session.exec(
+            select(Request).where(Request.id == request_id)
+        ).first()
         if not request:
             raise HTTPException(status_code=404, detail="Request not found.")
         return request
 
     def approve_request(self, request_id: uuid.UUID) -> Request:
-
         request = self.get_request(request_id=request_id)
 
         if request.status == "APPROVED":
@@ -39,7 +40,7 @@ class CRUDRequest(CRUDBase[Request, Request, Request]):
         join_entry = Join(
             student_id=request.student_id,
             group_id=request.group_id,
-            date=datetime.date.today()
+            date=datetime.date.today(),
         )
         self.db_session.add(join_entry)
 
@@ -48,14 +49,17 @@ class CRUDRequest(CRUDBase[Request, Request, Request]):
             self.db_session.commit()
         except Exception as e:
             self.db_session.rollback()
-            raise HTTPException(status_code=500, detail=f"Failed to approve request: {str(e)}")
+            raise HTTPException(
+                status_code=500, detail=f"Failed to approve request: {e!s}"
+            )
 
         self.db_session.refresh(request)
         return request
 
     def reject_request(self, request_id: uuid.UUID) -> Request:
-
-        request = self.db_session.exec(select(Request).where(Request.id == request_id)).first()
+        request = self.db_session.exec(
+            select(Request).where(Request.id == request_id)
+        ).first()
         if not request:
             raise HTTPException(status_code=404, detail="Request not found.")
 
@@ -69,9 +73,12 @@ class CRUDRequest(CRUDBase[Request, Request, Request]):
             self.db_session.commit()
         except Exception as e:
             self.db_session.rollback()
-            raise HTTPException(status_code=500, detail=f"Failed to reject request: {str(e)}")
+            raise HTTPException(
+                status_code=500, detail=f"Failed to reject request: {e!s}"
+            )
 
         self.db_session.refresh(request)
         return request
+
 
 request_crud = CRUDRequest(Request)

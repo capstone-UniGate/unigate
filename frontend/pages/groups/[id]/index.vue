@@ -85,7 +85,8 @@
       </div>
     </div>
 
-    <NuxtLink :to="`groups/${group.id}/requests`"
+    <NuxtLink
+      :to="`groups/${group.id}/requests`"
       v-if="!isViewingMembers && isSuperstudent && group.isPrivate"
       class="w-full lg:w-80 lg:ml-6"
     >

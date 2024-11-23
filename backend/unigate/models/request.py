@@ -1,8 +1,9 @@
 import enum
 import uuid
-from unigate.models.student import Student
 
-from sqlmodel import Column, Enum, Field, SQLModel ,Relationship # type: ignore
+from sqlmodel import Column, Enum, Field, Relationship, SQLModel  # type: ignore
+
+from unigate.models.student import Student
 
 
 class RequestStatus(str, enum.Enum):

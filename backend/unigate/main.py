@@ -1,16 +1,14 @@
 from fastapi import FastAPI
-
-from .routes import groups  # Import the new groups router
-from .routes import requests
 from fastapi.middleware.cors import CORSMiddleware
+
+from .routes import (
+    groups,  # Import the new groups router
+    requests,
+)
 
 app = FastAPI()
 
-origins = [
-    "http://localhost",
-    "http://localhost:3000"
-
-]
+origins = ["http://localhost", "http://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,6 +17,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/")
 def main() -> dict[str, str]:

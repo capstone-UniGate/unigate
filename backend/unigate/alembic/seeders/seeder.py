@@ -1,10 +1,20 @@
 import uuid
 from datetime import date
 
+from sqlmodel import Session
+from unigate.core.database import (
+    engine,  # Assuming you have a central engine for the database
+)
+
 # Import your existing models from the project
-from unigate.models import Student, Group, Join, Request, SuperStudent  # Adjust import path
-from sqlmodel import Session, create_engine
-from unigate.core.database import engine  # Assuming you have a central engine for the database
+from unigate.models import (  # Adjust import path
+    Group,
+    Join,
+    Request,
+    Student,
+    SuperStudent,
+)
+
 
 # Helper function to create some dummy data
 def create_dummy_data():
