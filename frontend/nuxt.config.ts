@@ -9,6 +9,11 @@ export default defineNuxtConfig({
     "@nuxtjs/color-mode",
     "@nuxt/image",
   ],
+  runtimeConfig: {
+    public: {
+      baseURL: process.env.BASE_URL || "http://localhost:8000/",
+    },
+  },
   shadcn: {
     /**
      * Prefix for all the imported component

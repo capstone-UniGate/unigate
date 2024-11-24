@@ -6,8 +6,9 @@ from sqlmodel import Session
 from unigate.core.database import get_session
 from unigate.crud.group_crud import group_crud
 from unigate.crud.join_crud import join_crud
+from unigate.crud.request_crud import request_crud
 from unigate.crud.student_crud import student_crud
-from unigate.models import Group, Student
+from unigate.models import Group, Request, Student
 
 router = APIRouter()
 
@@ -35,10 +36,24 @@ def get_groups() -> list[Group]:
     try:
         return group_crud.get_multi()
     except SQLAlchemyError:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Unable to load groups.",
-        )
+        raise HTTPException(status_code=500, detail="Unable to load groups.")
+
+
+@router.get("/{id}", response_model=Group)
+def get_group(id: uuid.UUID) -> Group:
+    group = group_crud.get(id=id)
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found.")
+    return group
+
+
+@router.get("/{group_id}/requests", response_model=list[Request])
+def get_group_requests(group_id: uuid.UUID) -> list[Request]:
+    group = group_crud.get(id=group_id)
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found.")
+
+    return request_crud.get_all_requests_for_group(group_id=group_id)
 
 
 @router.post(

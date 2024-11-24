@@ -85,83 +85,13 @@
       </div>
     </div>
 
-    <!-- Right Side: Superstudent Join Requests Section -->
-    <div
+    <NuxtLink
+      :to="`groups/${group.id}/requests`"
       v-if="!isViewingMembers && isSuperstudent && group.isPrivate"
       class="w-full lg:w-80 lg:ml-6"
     >
-      <ScrollArea
-        class="h-[300px] lg:h-[400px] bg-gray-100 p-4 rounded-lg shadow-md"
-      >
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">
-          Manage Join Requests
-        </h2>
-        <TooltipProvider>
-          <ul>
-            <li
-              v-for="request in joinRequests"
-              :key="request.id"
-              class="flex items-center justify-between mb-2"
-            >
-              <span>{{ request.name }}</span>
-              <div class="flex space-x-2">
-                <!-- Approve Button with Tooltip -->
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      @click="approveRequest(request.id)"
-                      class="w-8 h-8 rounded-full"
-                    >
-                      <Avatar>
-                        <AvatarImage
-                          src="https://cdn-icons-png.flaticon.com/128/390/390973.png"
-                          alt="Approved"
-                        />
-                      </Avatar>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Accept</TooltipContent>
-                </Tooltip>
-                <!-- Reject Button with Tooltip -->
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      @click="rejectRequest(request.id)"
-                      class="w-8 h-8 rounded-full"
-                    >
-                      <Avatar>
-                        <AvatarImage
-                          src="https://cdn-icons-png.flaticon.com/128/7698/7698976.png"
-                          alt="Reject"
-                        />
-                      </Avatar>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Reject</TooltipContent>
-                </Tooltip>
-                <!-- Block Button with Tooltip -->
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      @click="blockRequest(request.id)"
-                      class="w-8 h-8 rounded-full"
-                    >
-                      <Avatar>
-                        <AvatarImage
-                          src="https://cdn-icons-png.flaticon.com/128/6834/6834501.png"
-                          alt="Block"
-                        />
-                      </Avatar>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Block</TooltipContent>
-                </Tooltip>
-              </div>
-            </li>
-          </ul>
-        </TooltipProvider>
-      </ScrollArea>
-    </div>
+      Manage Requests
+    </NuxtLink>
   </div>
 </template>
 
