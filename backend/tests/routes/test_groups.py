@@ -1,4 +1,4 @@
-import random
+import secrets
 import string
 from unittest.mock import MagicMock
 from uuid import UUID
@@ -22,7 +22,7 @@ def mock_session() -> MagicMock:
 @pytest.fixture
 def valid_group_payload() -> dict[str, str]:
     return {
-        "name": f"TestGroup-{''.join(random.choices(string.ascii_letters, k=6))}",
+        "name": f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}",
         "description": "A test group description",
         "category": "Test Category",
         "type": "Public",
@@ -46,7 +46,7 @@ def create_student(student_id: str) -> None:
         # Create a new student record
         student = Student(
             id=UUID(student_id),
-            hashed_password="hashedpassword123",  # Replace with actual hashed password logic
+            hashed_password="hashedpassword123",  # noqa: S106  # Replace with actual hashed password logic
             number=12345,  # Unique student number
             email="teststudent@example.com",  # Unique email
             name="Test",
@@ -72,7 +72,7 @@ def test_create_group_success(valid_group_payload: dict[str, str]) -> None:
 def test_create_group_duplicate_name(valid_group_payload: dict[str, str]) -> None:
     # Randomize the group name for the initial creation
     randomized_group_name = (
-        f"TestGroup-{''.join(random.choices(string.ascii_letters, k=6))}"
+        f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}"
     )
     valid_group_payload["name"] = randomized_group_name
 
