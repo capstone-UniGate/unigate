@@ -2,7 +2,7 @@ import time
 
 import pytest
 from selenium import webdriver
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 
 from tests.constants import TestData, Urls
 from tests.pages.create_group_page import CreateGroupPage

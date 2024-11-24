@@ -1,6 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as ExpectedConditions
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
 
 from tests.constants import Urls
@@ -72,30 +73,24 @@ class CreateGroupPage(BasePage):
         return [element.text for element in error_elements if element.text.strip()]
 
     def enter_tag_text(self, tag_text: str) -> None:
-        tags_input = self.wait.until(
-            ExpectedConditions.presence_of_element_located(self.TAGS_INPUT)
-        )
+        tags_input = self.wait.until(EC.presence_of_element_located(self.TAGS_INPUT))
         tags_input.send_keys(tag_text)
 
     def get_tag_suggestions(self) -> list[str]:
         """Get the list of tag suggestions"""
         # Wait for suggestions list to be visible
-        self.wait.until(
-            ExpectedConditions.presence_of_element_located(self.SUGGESTIONS_LIST)
-        )
+        self.wait.until(EC.presence_of_element_located(self.SUGGESTIONS_LIST))
         # Get all suggestion items
         suggestion_elements = self.driver.find_elements(*self.SUGGESTION_ITEM)
         # Return the text of each suggestion
         return [element.text for element in suggestion_elements]
 
-    def get_added_tags(self):
+    def get_added_tags(self) -> list[WebElement]:
         return self.driver.find_elements(*self.TAG)
 
     def verify_success_toast(self) -> bool:
         toast = self.wait.until(
-            ExpectedConditions.presence_of_element_located(
-                (By.CLASS_NAME, "toast-success")
-            )
+            EC.presence_of_element_located((By.CLASS_NAME, "toast-success"))
         )
         return "Group created successfully" in toast.text
 
