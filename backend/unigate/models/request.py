@@ -1,11 +1,7 @@
 import enum
 import uuid
-from typing import TYPE_CHECKING
 
-from sqlmodel import Column, Enum, Field, Relationship, SQLModel  # type: ignore
-
-if TYPE_CHECKING:
-    from unigate.models.student import Student
+from sqlmodel import Column, Enum, Field, SQLModel  # type: ignore
 
 
 class RequestStatus(str, enum.Enum):
@@ -24,6 +20,3 @@ class Request(SQLModel, table=True):
 
     student_id: uuid.UUID = Field(foreign_key="students.id", ondelete="CASCADE")
     group_id: uuid.UUID = Field(foreign_key="groups.id", ondelete="CASCADE")
-
-    # Relationship to Student (forward reference using a string)
-    student: "Student" = Relationship(back_populates="requests")
