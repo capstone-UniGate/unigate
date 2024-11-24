@@ -86,7 +86,8 @@
     </div>
 
     <!-- Right Side: Superstudent Join Requests Section -->
-    <NuxtLink :to="`/groups/${groupId}/requests`"
+    <NuxtLink
+      :to="`/groups/${groupId}/requests`"
       v-if="!isViewingMembers && isSuperstudent && group.isPrivate"
       class="w-full lg:w-80 lg:ml-6"
     >
