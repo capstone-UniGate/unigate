@@ -3,14 +3,12 @@ from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
 
+from tests.constants import Urls
 from tests.pages.see_my_groups_page import SeeMyGroupsPage
-
-# from selenium.common.exceptions import TimeoutException
-# from selenium.webdriver.common.by import By
 
 
 class TestSeeMyGroups:
-    BASE_URL = "http://localhost:3000/group/see-my-group"
+    BASE_URL = Urls.SEE_MY_GROUP
 
     @pytest.fixture(autouse=True)
     def setup(self, driver: webdriver.Chrome) -> None:

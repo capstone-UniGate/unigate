@@ -11,6 +11,7 @@
               type="text"
               placeholder="Group Name"
               v-bind="componentField"
+              id="group-name-input"
             />
           </FormControl>
           <FormMessage />
@@ -22,7 +23,11 @@
         <FormItem>
           <FormLabel>Course</FormLabel>
           <FormControl>
-            <select v-bind="componentField" class="form-select">
+            <select
+              v-bind="componentField"
+              class="form-select"
+              id="course-select"
+            >
               <option value="">Select from student's courses</option>
               <option value="course1">Course 1</option>
               <option value="course2">Course 2</option>
@@ -39,11 +44,21 @@
           <FormItem>
             <div class="flex items-center space-x-4">
               <label class="inline-flex items-center">
-                <input type="radio" value="public" v-bind="componentField" />
+                <input
+                  type="radio"
+                  value="public"
+                  v-bind="componentField"
+                  id="privacy-public"
+                />
                 <span class="ml-2">Public</span>
               </label>
               <label class="inline-flex items-center">
-                <input type="radio" value="private" v-bind="componentField" />
+                <input
+                  type="radio"
+                  value="private"
+                  v-bind="componentField"
+                  id="privacy-private"
+                />
                 <span class="ml-2">Private</span>
               </label>
             </div>
@@ -62,6 +77,7 @@
               v-bind="componentField"
               placeholder="Describe your group"
               class="form-textarea"
+              id="group-description"
             ></textarea>
           </FormControl>
           <FormMessage />
@@ -94,6 +110,7 @@
                 @input="filterSuggestions"
                 placeholder="Add tags..."
                 class="tags-input"
+                id="tags-input"
               />
               <ul v-if="filteredSuggestions.length" class="suggestions-list">
                 <li
@@ -116,8 +133,19 @@
 
       <!-- Buttons -->
       <div class="flex justify-start space-x-4 margin-bottom-custom">
-        <Button type="submit" :disabled="formHasErrors"> Create </Button>
-        <Button type="button" @click="onCancel" variant="destructive">
+        <Button
+          type="submit"
+          :disabled="formHasErrors"
+          id="create-group-button"
+        >
+          Create
+        </Button>
+        <Button
+          type="button"
+          @click="onCancel"
+          variant="destructive"
+          id="cancel-button"
+        >
           Cancel
         </Button>
       </div>
@@ -243,7 +271,7 @@ const onSubmit = handleSubmit((values) => {
   // Display success toast
   toast({
     variant: "success",
-    description: "You joined the team",
+    description: "Group created successfully",
   });
 
   // Redirect to the /group page after a brief delay
