@@ -48,3 +48,12 @@ class GroupPage(BasePage):
             )
         except Exception:  # noqa: BLE001
             return False
+
+    def click_create_group(self) -> None:
+        # Option 1: Wait for element to be clickable
+        button = self.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, "[data-testid='create-group-button']")
+            )
+        )
+        button.click()
