@@ -1,6 +1,7 @@
 import datetime
 import uuid
 
+import pytz
 from fastapi import HTTPException
 from sqlmodel import select
 from unigate.models import Join, Request
@@ -15,10 +16,9 @@ class CRUDRequest(CRUDBase[Request, Request, Request]):
         if not group:
             raise HTTPException(status_code=404, detail="Group not found.")
 
-        requests = self.db_session.exec(
+        return self.db_session.exec(
             select(Request).where(Request.group_id == group_id)
         ).all()
-        return requests
 
     def get_request(self, request_id: uuid.UUID) -> Request:
         request = self.db_session.exec(
@@ -40,7 +40,7 @@ class CRUDRequest(CRUDBase[Request, Request, Request]):
         join_entry = Join(
             student_id=request.student_id,
             group_id=request.group_id,
-            date=datetime.date.today(),
+            date=datetime.datetime.now(tz=pytz.timezone("Europe/Rome")).date(),
         )
         self.db_session.add(join_entry)
 

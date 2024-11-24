@@ -1,9 +1,11 @@
 import enum
 import uuid
+from typing import TYPE_CHECKING
 
 from sqlmodel import Column, Enum, Field, Relationship, SQLModel  # type: ignore
 
-from unigate.models.student import Student
+if TYPE_CHECKING:
+    from unigate.models.student import Student
 
 
 class RequestStatus(str, enum.Enum):

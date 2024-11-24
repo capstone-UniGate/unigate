@@ -1,6 +1,8 @@
+import datetime
 import uuid
-from datetime import date
 
+import pytz
+from loguru import logger
 from sqlmodel import Session
 from unigate.core.database import (
     engine,  # Assuming you have a central engine for the database
@@ -17,12 +19,12 @@ from unigate.models import (  # Adjust import path
 
 
 # Helper function to create some dummy data
-def create_dummy_data():
+def create_dummy_data() -> None:
     with Session(engine) as session:
         # Seed students
         student1 = Student(
             id=uuid.uuid4(),
-            hashed_password="hashedpassword1",
+            hashed_password="hashedpassword1",  # noqa: S106
             number=101,
             email="student1@example.com",
             name="Alice",
@@ -30,7 +32,7 @@ def create_dummy_data():
         )
         student2 = Student(
             id=uuid.uuid4(),
-            hashed_password="hashedpassword2",
+            hashed_password="hashedpassword2",  # noqa: S106
             number=102,
             email="student2@example.com",
             name="Bob",
@@ -60,8 +62,16 @@ def create_dummy_data():
         session.commit()
 
         # Seed joins
-        join1 = Join(student_id=student1.id, group_id=group1.id, date=date.today())
-        join2 = Join(student_id=student2.id, group_id=group2.id, date=date.today())
+        join1 = Join(
+            student_id=student1.id,
+            group_id=group1.id,
+            date=datetime.datetime.now(tz=pytz.timezone("Europe/Rome")).date(),
+        )
+        join2 = Join(
+            student_id=student2.id,
+            group_id=group2.id,
+            date=datetime.datetime.now(tz=pytz.timezone("Europe/Rome")).date(),
+        )
         session.add_all([join1, join2])
         session.commit()
 
@@ -87,7 +97,7 @@ def create_dummy_data():
         session.add_all([super_student1, super_student2])
         session.commit()
 
-        print("Dummy data seeded successfully!")
+        logger.debug("Dummy data seeded successfully!")
 
 
 if __name__ == "__main__":

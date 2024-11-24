@@ -53,8 +53,7 @@ def get_group_requests(group_id: uuid.UUID) -> list[Request]:
     if not group:
         raise HTTPException(status_code=404, detail="Group not found.")
 
-    requests = request_crud.get_all_requests_for_group(group_id=group_id)
-    return requests
+    return request_crud.get_all_requests_for_group(group_id=group_id)
 
 
 @router.post(
