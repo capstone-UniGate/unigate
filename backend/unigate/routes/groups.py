@@ -3,10 +3,9 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session
-
 from unigate.core.database import get_session
-from unigate.crud.join_crud import join_crud
 from unigate.crud.group_crud import group_crud
+from unigate.crud.join_crud import join_crud
 from unigate.crud.request_crud import request_crud
 from unigate.crud.student_crud import student_crud
 from unigate.models import Group, Request, Student
@@ -70,7 +69,7 @@ def get_group_requests(group_id: uuid.UUID) -> list[Request]:
 def create_group(
     group_data: Group,
     session: Session = Depends(get_session),
-) -> None:
+) -> Group:
     """
     Creates a new group in the system.
 
@@ -84,9 +83,6 @@ def create_group(
     """
     try:
         return group_crud.create_group(session=session, group_data=group_data)
-
-    except HTTPException:
-        raise  # Re-raise any HTTPExceptions for client handling
     except Exception:
         session.rollback()
         raise HTTPException(
@@ -155,17 +151,12 @@ def join_public_group(student_id: uuid.UUID, group_id: uuid.UUID) -> str:
 
 @router.post("/join_private_group", response_model=str)
 def join_private_group(student_id: uuid.UUID, group_id: uuid.UUID) -> str:
-
     try:
         # Use the create_request method from request_crud to create a new join request
         join_crud.join_private_group(student_id, group_id)
 
         # Instead of returning the Request object, return a success message
         return "Join request submitted successfully."
-
-    except HTTPException as e:
-        # Reraise HTTPException to return appropriate error message
-        raise e
     except SQLAlchemyError:
         # Generic SQLAlchemy error handling
         raise HTTPException(status_code=500, detail="Internal server error.")

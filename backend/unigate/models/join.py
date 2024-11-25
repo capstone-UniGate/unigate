@@ -1,10 +1,7 @@
 import datetime
 import uuid
 
-from loguru import logger
 from sqlmodel import Field, SQLModel  # type: ignore
-
-from unigate.utils.mail import Mailer
 
 
 class Join(SQLModel, table=True):

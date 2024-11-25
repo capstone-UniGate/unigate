@@ -2,9 +2,10 @@ import datetime
 import uuid
 
 import pytz
+from loguru import logger
 from sqlalchemy import exc
 from sqlmodel import select
-from unigate.models import Group, Join, Request
+from unigate.models import Group, Join
 from loguru import logger
 
 from .base_crud import CRUDBase
@@ -65,16 +66,14 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
 
         # Fetch the super student (group admin) for the group
         super_student = super_student_crud.get_by_group_id(group_id=group_id)
-        print(super_student)
         if super_student:
-            print('first if')
             admin_student = student_crud.get(id=super_student.student_id)
             if admin_student and admin_student.email:  # Ensure the admin has an email address
                 print('second if')
                 self.send_join_request_email(
                     admin_email=admin_student.email,  # This ensures the super student's email is used
                     student_name=student.name,
-                    group_name=group.name
+                    group_name=group.name,
                 )
 
         return "Join request submitted successfully"
