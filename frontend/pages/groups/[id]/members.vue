@@ -23,7 +23,7 @@ const groupMembers = [
     <ScrollArea class="h-72 w-full rounded-md border p-4">
       <div v-for="member in groupMembers" :key="member.id">
         {{ member.name }}
-        <Separator class="my-2" />
+        <Separator class="my-2" data-testid="{{ member.name }}" />
       </div>
     </ScrollArea>
   </div>

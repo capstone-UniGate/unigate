@@ -26,5 +26,5 @@ class TestGroupCreate(BaseTest):
         # Get and verify alert
         alert = page.driver.switch_to.alert
         alert_text = alert.text
-        # alert.accept()
         assert "Join group clicked" in alert_text
+        alert.accept()

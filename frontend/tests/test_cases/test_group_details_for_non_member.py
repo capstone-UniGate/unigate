@@ -22,7 +22,7 @@ def test_group_details_for_non_member(driver: webdriver.Chrome) -> None:
     # Assert: Verify the link to view members
     members_link = driver.find_element(By.CSS_SELECTOR, "a.text-blue-500")
     assert members_link.is_displayed(), "Link to view members is not displayed."
-    assert "/group/" in members_link.get_attribute(
+    assert "/groups/" in members_link.get_attribute(
         "href"
     ), "Members link URL is incorrect."
 

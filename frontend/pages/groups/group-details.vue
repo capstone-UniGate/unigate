@@ -45,7 +45,7 @@
         <p class="text-lg text-gray-700">
           Number of
           <NuxtLink
-            :to="`/group/${groupId}/members`"
+            :to="`/groups/${groupId}/members`"
             class="text-blue-500 hover:underline"
             >members</NuxtLink
           >: {{ group.members.length }}
