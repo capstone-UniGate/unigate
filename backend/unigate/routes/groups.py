@@ -83,6 +83,8 @@ def create_group(
     """
     try:
         return group_crud.create_group(session=session, group_data=group_data)
+    except HTTPException:
+        raise  # Re-raise any HTTPExceptions for client handling
     except Exception:
         session.rollback()
         raise HTTPException(
@@ -145,6 +147,9 @@ def join_public_group(student_id: uuid.UUID, group_id: uuid.UUID) -> str:
 
     try:
         return join_crud.join_public_group(student_id, group_id)
+    except HTTPException:
+        # Reraise HTTPException to return appropriate error message
+        raise
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Internal server error.")
 
@@ -157,6 +162,9 @@ def join_private_group(student_id: uuid.UUID, group_id: uuid.UUID) -> str:
 
         # Instead of returning the Request object, return a success message
         return "Join request submitted successfully."
+    except HTTPException:
+        # Reraise HTTPException to return appropriate error message
+        raise
     except SQLAlchemyError:
         # Generic SQLAlchemy error handling
         raise HTTPException(status_code=500, detail="Internal server error.")
