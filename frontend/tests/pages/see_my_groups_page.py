@@ -6,6 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from tests.constants import Urls
 
+
 class SeeMyGroupsPage:
     URL = Urls.SEE_MY_GROUP
     # Locators
@@ -19,7 +20,7 @@ class SeeMyGroupsPage:
         self.wait = WebDriverWait(driver, 10)
 
     def load(self) -> None:
-        self.driver.get(self.)
+        self.driver.get(self.URL)
 
     def is_heading_visible(self) -> bool:
         try:
