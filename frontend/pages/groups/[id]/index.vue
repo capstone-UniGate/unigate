@@ -3,35 +3,38 @@
 
   <!-- Avatar Modal -->
   <div
-      v-if="isAvatarModalOpen"
-      class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50"
-    >
-      <div class="bg-white rounded-lg shadow-xl p-6 w-80 text-center relative">
-        <!-- Close Button -->
-        <button
-          @click="closeAvatarModal"
-          class="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-        >
-          ✖
-        </button>
-        <!-- Enlarged Avatar -->
-        <img
-          :src="group.avatar"
-          alt="Group Avatar"
-          class="w-40 h-40 mx-auto rounded-full mb-4"
-        />
-        <!-- Group Name -->
-        <h2 class="text-lg font-semibold text-gray-800">{{ group.name }}</h2>
-      </div>
+    v-if="isAvatarModalOpen"
+    class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50"
+  >
+    <div class="bg-white rounded-lg shadow-xl p-6 w-80 text-center relative">
+      <!-- Close Button -->
+      <button
+        @click="closeAvatarModal"
+        class="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+      >
+        ✖
+      </button>
+      <!-- Enlarged Avatar -->
+      <img
+        :src="group.avatar"
+        alt="Group Avatar"
+        class="w-40 h-40 mx-auto rounded-full mb-4"
+      />
+      <!-- Group Name -->
+      <h2 class="text-lg font-semibold text-gray-800">{{ group.name }}</h2>
     </div>
+  </div>
 
-  <div class="p-6 md:p-10 flex flex-col lg:flex-row items-center lg:items-start text-center lg:text-left gap-10">
+  <div
+    class="p-6 md:p-10 flex flex-col lg:flex-row items-center lg:items-start text-center lg:text-left gap-10"
+  >
     <!-- Left Side: Group Details or Members -->
     <div class="flex-grow w-full lg:w-2/3">
       <!-- Show members if in the "members" section -->
       <div v-if="isViewingMembers">
         <h1 class="text-2xl font-semibold text-gray-800 mb-6">
-          Members of <span class="text-primary-600">{{ group.name || "Group" }}</span>
+          Members of
+          <span class="text-primary-600">{{ group.name || "Group" }}</span>
         </h1>
         <ScrollArea
           class="h-[300px] lg:h-[400px] bg-white border border-gray-200 p-4 rounded-lg shadow-sm"
@@ -62,7 +65,9 @@
 
       <!-- Group Details (if not viewing members) -->
       <div v-else>
-        <div class="flex items-center gap-4 mb-6 justify-center lg:justify-start">
+        <div
+          class="flex items-center gap-4 mb-6 justify-center lg:justify-start"
+        >
           <Avatar
             class="cursor-pointer w-20 h-20 rounded-full border border-gray-300 hover:shadow-lg hover:scale-105 transition-all"
             @click="openAvatarModal"
@@ -105,14 +110,18 @@
 
         <div class="text-left mb-6">
           <p class="text-sm text-gray-500">Description</p>
-          <p class="text-gray-700 text-base bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <p
+            class="text-gray-700 text-base bg-gray-50 border border-gray-200 rounded-lg p-4"
+          >
             {{ group.description || "No description available." }}
           </p>
         </div>
 
         <div class="text-left mb-6">
           <p class="text-sm text-gray-500">Tags</p>
-          <p class="text-gray-700 text-base bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <p
+            class="text-gray-700 text-base bg-gray-50 border border-gray-200 rounded-lg p-4"
+          >
             [tag1], [tag2]
           </p>
         </div>
@@ -199,7 +208,9 @@ const group = groupsData.find((g) => g.id === groupId) || {
 
 const isViewingMembers = computed(() => route.path.endsWith("/members"));
 const isSuperstudent = computed(() => group.creatorId === currentUserId);
-const isMember = computed(() => group.members.some((member) => member.id === currentUserId));
+const isMember = computed(() =>
+  group.members.some((member) => member.id === currentUserId),
+);
 
 const isAvatarModalOpen = ref(false);
 
