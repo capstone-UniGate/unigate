@@ -5,12 +5,12 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
 
+from tests.constants import Urls
 from tests.pages.base_page import BasePage
 
 
 class GroupPage(BasePage):
-    URL = "http://localhost:3000/group"
-
+    URL = Urls.GROUP_PAGE
     # Locators using standard CSS selectors
     PAGE_HEADING = (By.CSS_SELECTOR, "h1")
     GROUP_CARDS = (By.CSS_SELECTOR, ".grid > div")
