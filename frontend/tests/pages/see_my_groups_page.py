@@ -4,10 +4,10 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
 
+from tests.constants import Urls
 
 class SeeMyGroupsPage:
-    URL = "http://localhost:3000/group/see-my-group"
-
+    URL = Urls.SEE_MY_GROUP
     # Locators
     HEADING = (By.CSS_SELECTOR, "h1")
     LOADING_INDICATOR = (By.CSS_SELECTOR, "[data-testid='loading-indicator']")
@@ -19,7 +19,7 @@ class SeeMyGroupsPage:
         self.wait = WebDriverWait(driver, 10)
 
     def load(self) -> None:
-        self.driver.get(self.URL)
+        self.driver.get(self.)
 
     def is_heading_visible(self) -> bool:
         try:

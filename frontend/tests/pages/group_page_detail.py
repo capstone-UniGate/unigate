@@ -5,7 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 
 class GroupPageDetail:
-    URL_TEMPLATE = "http://localhost:3000/group/{group_id}"
+    URL_TEMPLATE = "http://localhost:3000/groups/{group_id}"
 
     def __init__(self, driver: WebDriver, group_id: str) -> None:
         self.driver = driver
