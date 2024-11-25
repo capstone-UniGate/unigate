@@ -26,7 +26,7 @@
                 <AvatarFallback>NA</AvatarFallback>
               </Avatar>
               <router-link
-                :to="`/group/${groupId}`"
+                :to="`/groups/${groupId}`"
                 class="text-blue-500 hover:underline"
               >
                 {{ member.name }}
@@ -35,7 +35,7 @@
           </ul>
         </ScrollArea>
         <NuxtLink
-          :to="`/group/${groupId}`"
+          :to="`/groups/${groupId}`"
           class="text-blue-500 hover:underline mt-4 inline-block"
         >
           Back to Group Details
@@ -65,7 +65,7 @@
           <p class="text-lg text-gray-700">
             Number of
             <NuxtLink
-              :to="`/group/${groupId}/members`"
+              :to="`/groups/${groupId}/members`"
               class="text-blue-500 hover:underline"
             >
               members
@@ -85,8 +85,9 @@
       </div>
     </div>
 
+    <!-- Right Side: Superstudent Join Requests Section -->
     <NuxtLink
-      :to="`groups/${group.id}/requests`"
+      :to="`/groups/${groupId}/requests`"
       v-if="!isViewingMembers && isSuperstudent && group.isPrivate"
       class="w-full lg:w-80 lg:ml-6"
     >
@@ -213,7 +214,7 @@ function approveRequest(requestId: number) {
     // Redirect the student to the group page after approval
     //TODO: Implement redirect logic
 
-    router.push(`/group/${groupId}`);
+    router.push(`/groups/${groupId}`);
   }
 }
 
