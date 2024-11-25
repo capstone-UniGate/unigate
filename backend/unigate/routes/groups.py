@@ -69,7 +69,7 @@ def get_group_requests(group_id: uuid.UUID) -> list[Request]:
 def create_group(
     group_data: Group,
     session: Session = Depends(get_session),
-) -> None:
+) -> Group:
     """
     Creates a new group in the system.
 
@@ -83,9 +83,6 @@ def create_group(
     """
     try:
         return group_crud.create_group(session=session, group_data=group_data)
-
-    except HTTPException:
-        raise  # Re-raise any HTTPExceptions for client handling
     except Exception:
         session.rollback()
         raise HTTPException(
@@ -149,4 +146,17 @@ def join_public_group(student_id: uuid.UUID, group_id: uuid.UUID) -> str:
     try:
         return join_crud.join_public_group(student_id, group_id)
     except SQLAlchemyError:
+        raise HTTPException(status_code=500, detail="Internal server error.")
+
+
+@router.post("/join_private_group", response_model=str)
+def join_private_group(student_id: uuid.UUID, group_id: uuid.UUID) -> str:
+    try:
+        # Use the create_request method from request_crud to create a new join request
+        request_crud.create_request(student_id, group_id)
+
+        # Instead of returning the Request object, return a success message
+        return "Join request submitted successfully."
+    except SQLAlchemyError:
+        # Generic SQLAlchemy error handling
         raise HTTPException(status_code=500, detail="Internal server error.")
