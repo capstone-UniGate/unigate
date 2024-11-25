@@ -6,10 +6,13 @@ from sqlalchemy import exc
 from sqlmodel import select
 from unigate.models import Group, Join, Request
 from loguru import logger
+
 from .base_crud import CRUDBase
 from .group_crud import group_crud
+from .request_crud import request_crud
 from .student_crud import student_crud
 from unigate.utils.mail import Mailer
+from .super_student_crud import super_student_crud
 
 
 class CRUDJoin(CRUDBase[Join, Join, Join]):
@@ -30,7 +33,7 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
         return "Insert successful"
 
     def check_double_enrollment(
-        self, student_id: uuid.UUID, category: str | None = None
+            self, student_id: uuid.UUID, category: str | None = None
     ) -> bool:
         db_session = self.get_db()
         try:
@@ -46,8 +49,8 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
             return False
 
     def join_private_group(self, student_id: uuid.UUID, group_id: uuid.UUID) -> str:
-        group = self.group_crud.get(id=group_id)
-        student = self.student_crud.get(id=student_id)
+        group = group_crud.get(id=group_id)
+        student = student_crud.get(id=student_id)
 
         if group is None or student is None:
             return "Either the group or the student doesn't exist"
@@ -55,18 +58,19 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
         if not self.check_double_enrollment(student_id, group.category):
             return "You are already enrolled in a team for the same course"
 
-        self.request_crud.create_request(
-            Request(
-                student_id=student_id,
-                group_id=group_id,
-            )
+        request_crud.create_request(
+            student_id=student_id,
+            group_id=group_id,
         )
 
         # Fetch the super student (group admin) for the group
-        super_student = self.super_student_crud.get_by_group_id(group_id)
+        super_student = super_student_crud.get_by_group_id(group_id=group_id)
+        print(super_student)
         if super_student:
-            admin_student = self.student_crud.get(id=super_student.student_id)
+            print('first if')
+            admin_student = student_crud.get(id=super_student.student_id)
             if admin_student and admin_student.email:  # Ensure the admin has an email address
+                print('second if')
                 self.send_join_request_email(
                     admin_email=admin_student.email,  # This ensures the super student's email is used
                     student_name=student.name,
@@ -75,9 +79,9 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
 
         return "Join request submitted successfully"
 
-    def send_join_request_email(admin_email: str, student_name: str, group_name: str) -> None:
+    def send_join_request_email(self, admin_email: str, student_name: str, group_name: str) -> None:
 
-        to =admin_email
+        to = admin_email
         subject = f"Join Request for {group_name}"
         content = (
             f"Hello,\n\n"
