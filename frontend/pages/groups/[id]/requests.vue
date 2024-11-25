@@ -20,7 +20,9 @@
               alt="Profile"
             />
             <div>
-              <p class="text-lg font-semibold text-gray-900">{{ request.name }}</p>
+              <p class="text-lg font-semibold text-gray-900">
+                {{ request.name }}
+              </p>
               <p class="text-sm text-gray-500">Requesting access</p>
             </div>
           </div>
