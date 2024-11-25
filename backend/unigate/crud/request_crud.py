@@ -47,7 +47,6 @@ class CRUDRequest(CRUDBase[Request, Request, Request]):
         self.db_session.refresh(new_request)
         return new_request
 
-
     def get_all_requests_for_group(self, group_id: uuid.UUID) -> list[Request]:
         group = group_crud.get(id=group_id)
         if not group:
