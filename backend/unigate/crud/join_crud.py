@@ -6,13 +6,12 @@ from loguru import logger
 from sqlalchemy import exc
 from sqlmodel import select
 from unigate.models import Group, Join
-from loguru import logger
+from unigate.utils.mail import Mailer
 
 from .base_crud import CRUDBase
 from .group_crud import group_crud
 from .request_crud import request_crud
 from .student_crud import student_crud
-from unigate.utils.mail import Mailer
 from .super_student_crud import super_student_crud
 
 
@@ -34,7 +33,7 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
         return "Insert successful"
 
     def check_double_enrollment(
-            self, student_id: uuid.UUID, category: str | None = None
+        self, student_id: uuid.UUID, category: str | None = None
     ) -> bool:
         db_session = self.get_db()
         try:
@@ -68,8 +67,10 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
         super_student = super_student_crud.get_by_group_id(group_id=group_id)
         if super_student:
             admin_student = student_crud.get(id=super_student.student_id)
-            if admin_student and admin_student.email:  # Ensure the admin has an email address
-                print('second if')
+            if (
+                admin_student and admin_student.email
+            ):  # Ensure the admin has an email address
+                print("second if")
                 self.send_join_request_email(
                     admin_email=admin_student.email,  # This ensures the super student's email is used
                     student_name=student.name,
@@ -78,8 +79,9 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
 
         return "Join request submitted successfully"
 
-    def send_join_request_email(self, admin_email: str, student_name: str, group_name: str) -> None:
-
+    def send_join_request_email(
+        self, admin_email: str, student_name: str, group_name: str
+    ) -> None:
         to = admin_email
         subject = f"Join Request for {group_name}"
         content = (
