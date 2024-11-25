@@ -1,39 +1,45 @@
 <template>
   <div>
-    <div v-if="requests" class="mx-auto max-w-5xl mt-10">
-      <ul role="list" class="divide-y divide-gray-100">
+    <!-- Title Section -->
+    <div class="text-center mt-10 mb-6">
+      <h1 class="text-3xl font-bold text-gray-900">Join Requests</h1>
+    </div>
+
+    <div v-if="requests" class="mx-auto max-w-5xl pb-20">
+      <ul role="list" class="space-y-6">
         <li
           v-for="request in requests"
           :key="request.id"
-          class="flex items-center justify-between gap-x-6 py-5"
+          class="flex items-center justify-between gap-x-12 bg-white rounded-lg shadow-md p-6 hover:shadow-lg hover:scale-105 transition-transform duration-300"
         >
-          <div class="flex min-w-0 gap-x-4 items-center">
+          <!-- Profile Section -->
+          <div class="flex items-center gap-x-6">
             <img
-              class="size-12 flex-none rounded-full bg-gray-50"
+              class="w-16 h-16 rounded-full"
               :src="request.imageUrl"
-              alt=""
+              alt="Profile"
             />
-            <div class="min-w-0 flex-auto">
-              <p class="text-sm/6 font-semibold text-gray-900">
-                {{ request.name }}
-              </p>
+            <div>
+              <p class="text-lg font-semibold text-gray-900">{{ request.name }}</p>
+              <p class="text-sm text-gray-500">Requesting access</p>
             </div>
           </div>
-          <div class="flex">
+
+          <!-- Buttons Section -->
+          <div class="flex gap-x-4">
             <!--<div v-if="request.status == 'PENDING'">-->
             <button
               @click="reject(request.id)"
-              class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20 mr-10"
+              class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition"
             >
               Reject
             </button>
             <button
               @click="approve(request.id)"
-              class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20"
+              class="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-lg hover:bg-green-600 transition"
             >
               Approve
             </button>
-
             <!--</div>-->
 
             <!--
@@ -202,5 +208,3 @@ function reject(requestId: number) {
   }
 }
 </script>
-
-*
