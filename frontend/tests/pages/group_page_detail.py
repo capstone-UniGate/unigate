@@ -5,15 +5,19 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 
 class GroupPageDetail:
-    URL_TEMPLATE = "http://localhost:3000/groups/{group_id}"
+    URL = "http://localhost:3000/groups/{group_id}"
+    JOIN_GROUP_BUTTON = (By.XPATH, "//button[contains(text(), 'Join Group')]")
 
     def __init__(self, driver: WebDriver, group_id: str) -> None:
         self.driver = driver
         self.group_id = group_id
 
+    def navigate(self) -> None:
+        self.driver.get(self.URL)
+
     def load(self) -> None:
         """Load the group page."""
-        self.driver.get(self.URL_TEMPLATE.format(group_id=self.group_id))
+        self.driver.get(self.URL.format(group_id=self.group_id))
 
     def is_manage_requests_section_visible(self) -> bool:
         """Check if the Manage Join Requests section is visible."""
@@ -64,3 +68,7 @@ class GroupPageDetail:
         )
         toast_message = self.driver.find_element(By.CLASS_NAME, "toast-success")
         return toast_message.text
+
+    def click_join(self) -> None:
+        create_button = self.driver.find_element(*self.JOIN_GROUP_BUTTON)
+        create_button.click()
