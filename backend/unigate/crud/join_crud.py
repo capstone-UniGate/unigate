@@ -78,6 +78,7 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
 
         return "Join request submitted successfully"
 
+    @staticmethod
     def send_join_request_email(
         admin_email: str, student_name: str, group_name: str
     ) -> None:
