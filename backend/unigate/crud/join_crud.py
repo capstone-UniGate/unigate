@@ -48,6 +48,10 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
         except exc.MultipleResultsFound:
             return False
 
+    def get_student_groups(self, student_id: uuid.UUID) -> list[Group]:
+        statement = select(Group).join(Join).where(Join.student_id == student_id)
+        return self.get_multi(query=statement)
+
     def join_private_group(self, student_id: uuid.UUID, group_id: uuid.UUID) -> str:
         group = group_crud.get(id=group_id)
         student = student_crud.get(id=student_id)
