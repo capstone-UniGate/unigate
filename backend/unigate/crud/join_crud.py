@@ -70,7 +70,6 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
             if (
                 admin_student and admin_student.email
             ):  # Ensure the admin has an email address
-                print("second if")
                 self.send_join_request_email(
                     admin_email=admin_student.email,  # This ensures the super student's email is used
                     student_name=student.name,
