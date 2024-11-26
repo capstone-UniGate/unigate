@@ -6,7 +6,7 @@ from selenium.common.exceptions import TimeoutException
 from tests.pages.request_page import RequestPage
 
 
-class TestGroupPageJoinRequests:
+class TestGroupPrivateJoinRequestsResponse:
     @fixture(autouse=True)
     def setup(self, driver: webdriver.Chrome) -> None:
         self.page = RequestPage(driver)
