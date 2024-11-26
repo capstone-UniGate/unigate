@@ -19,7 +19,7 @@ class TestGroupCreate(BaseTest):
     def test_create_group_form(self, page: CreateGroupPage) -> None:
         page.fill_form(TestData.VALID_GROUP)
         page.click_create()
-        self.wait.until(EC.url_to_be(Urls.GROUP_PAGE))
+        self.wait.until(EC.url_to_be(url=Urls.GROUP_PAGE))
 
     def test_form_validation(self, page: CreateGroupPage) -> None:
         # Define expected validation messages
@@ -40,4 +40,4 @@ class TestGroupCreate(BaseTest):
     def test_cancel_button(self, page: CreateGroupPage) -> None:
         time.sleep(1)
         page.click_cancel()
-        self.wait.until(EC.url_to_be(Urls.GROUP_PAGE))
+        self.wait.until(EC.url_to_be(url=Urls.GROUP_PAGE))

@@ -1,161 +1,160 @@
 <template>
-  <div class="p-6 md:p-10 flex flex-col lg:flex-row">
-    <!-- Left Side: Group Details -->
-    <div class="flex-grow mb-6 lg:mb-0">
-      <div class="flex items-center gap-4 mb-6">
-        <Avatar class="cursor-pointer" @click="showModal = true">
-          <AvatarImage
-            src="https://github.com/radix-vue.png"
-            alt="@radix-vue"
-          />
-          <AvatarFallback>GN</AvatarFallback>
-        </Avatar>
-        <h1 class="text-3xl font-bold text-gray-800">
-          {{ group.name || "Group..." }}
+  <Toaster />
+
+  <div
+    class="p-6 md:p-10 flex flex-col lg:flex-row items-center lg:items-start text-center lg:text-left gap-10"
+  >
+    <!-- Left Side: Group Details or Members -->
+    <div class="flex-grow w-full lg:w-2/3">
+      <!-- Show members if in the "members" section -->
+      <div v-if="isViewingMembers">
+        <h1 class="text-2xl font-semibold text-gray-800 mb-6">
+          Members of
+          <span class="text-primary-600">{{ group.name || "Group" }}</span>
         </h1>
-      </div>
-
-      <!-- Modal for Enlarged Avatar -->
-      <div
-        v-if="showModal"
-        class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-      >
-        <div class="bg-white p-6 rounded-lg shadow-lg">
-          <img
-            src="https://github.com/radix-vue.png"
-            alt="Enlarged Avatar"
-            class="w-64 h-64 object-cover rounded-full"
-          />
-          <button
-            @click="showModal = false"
-            class="mt-4 bg-red-500 text-white px-4 py-2 rounded-md"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-
-      <!-- Other Group Details -->
-      <div class="text-gray-600 mb-6">
-        <p>{{ group.description || "Group description..." }}</p>
-      </div>
-
-      <!-- Display Number of Members with "Members" as a Link -->
-      <div class="mb-6">
-        <p class="text-lg text-gray-700">
-          Number of
-          <NuxtLink
-            :to="`/group/${groupId}/members`"
-            class="text-blue-500 hover:underline"
-            >members</NuxtLink
-          >: {{ group.members.length }}
-        </p>
-      </div>
-
-      <!-- Show Join Button Only if User is Not a Member or Superstudent -->
-      <div v-if="!isMember && !isSuperstudent" class="text-center mt-6">
-        <Button
-          @click="joinGroup"
-          class="bg-blue-500 text-white px-4 py-2 rounded-md"
-          >Join Group</Button
+        <ScrollArea
+          class="h-[300px] lg:h-[400px] bg-white border border-gray-200 p-4 rounded-lg shadow-sm"
         >
+          <ul>
+            <li
+              v-for="member in group.members"
+              :key="member.id"
+              class="flex items-center gap-4 mb-4"
+            >
+              <Avatar class="w-10 h-10">
+                <AvatarImage
+                  src="https://via.placeholder.com/50"
+                  alt="Member Avatar"
+                />
+                <AvatarFallback>NA</AvatarFallback>
+              </Avatar>
+              <router-link
+                :to="`/groups/${groupId}`"
+                class="text-gray-700 hover:text-primary-500 font-medium"
+              >
+                {{ member.name }}
+              </router-link>
+            </li>
+          </ul>
+        </ScrollArea>
+        <Button
+          :to="`/groups/${groupId}`"
+          class="ml-auto bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-semibold py-1 px-2 rounded-lg shadow-lg hover:from-blue-500 hover:to-blue-600 hover:shadow-xl active:scale-95 transition-all"
+        >
+          Back to Group Details
+        </Button>
+      </div>
+
+      <!-- Group Details (if not viewing members) -->
+      <div v-else>
+        <div
+          class="flex items-center gap-4 mb-6 justify-center lg:justify-start"
+        >
+          <Avatar
+            class="cursor-pointer w-20 h-20 rounded-full border border-gray-300"
+          >
+            <AvatarImage
+              src="https://github.com/radix-vue.png"
+              alt="Group Avatar"
+            />
+            <AvatarFallback>GN</AvatarFallback>
+          </Avatar>
+          <div>
+            <h1 class="text-3xl font-bold text-gray-800">
+              {{ group.name || "Group" }}
+            </h1>
+            <p class="text-sm text-gray-500 mt-1">Course</p>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <p class="text-gray-600">
+            Number of
+            <NuxtLink
+              :to="`/groups/${groupId}/members`"
+              class="text-blue-500 hover:underline"
+            >
+              members
+            </NuxtLink>
+            : <span class="font-semibold">{{ group.members.length }}</span>
+          </p>
+        </div>
+
+        <div class="text-left mb-6">
+          <p class="text-sm text-gray-500">Description</p>
+          <p
+            class="text-gray-700 text-base bg-gray-50 border border-gray-200 rounded-lg p-4"
+          >
+            {{ group.description || "No description available." }}
+          </p>
+        </div>
+
+        <div class="text-left mb-6">
+          <p class="text-sm text-gray-500">Tags</p>
+          <p
+            class="text-gray-700 text-base bg-gray-50 border border-gray-200 rounded-lg p-4"
+          >
+            [tag1], [tag2]
+          </p>
+        </div>
+
+        <!-- Join Group Button -->
+        <div v-if="!isMember && !isSuperstudent" class="text-center mt-6">
+          <Button
+            @click="joinGroup"
+            class="ml-auto mt-4 bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-semibold py-1 px-2 rounded-lg shadow-lg hover:from-blue-500 hover:to-blue-600 hover:shadow-xl active:scale-95 transition-all"
+          >
+            Join Group
+          </Button>
+        </div>
       </div>
     </div>
 
-    <!-- Right Side: Superstudent Join Requests Section as a Scroll Area -->
+    <!-- Right Side: Superstudent Join Requests Section -->
     <div
-      v-if="isSuperstudent && group.isPrivate"
-      class="w-full lg:w-80 lg:ml-6"
+      v-if="!isViewingMembers && isSuperstudent && group.isPrivate"
+      class="w-full lg:w-80"
     >
-      <ScrollArea
-        class="h-[300px] lg:h-[400px] bg-gray-100 p-4 rounded-lg shadow-md"
+      <Button
+        @click="navigateToRequests"
+        class="ml-auto mt-4 bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-semibold py-1 px-2 rounded-lg shadow-lg hover:from-blue-500 hover:to-blue-600 hover:shadow-xl active:scale-95 transition-all"
       >
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">
-          Manage Join Requests
-        </h2>
-        <TooltipProvider>
-          <ul>
-            <li
-              v-for="request in joinRequests"
-              :key="request.id"
-              class="flex items-center justify-between mb-2"
-            >
-              <span>{{ request.name }}</span>
-              <div class="flex space-x-2">
-                <!-- Approve Button with Tooltip -->
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      class="bg-green-500 text-white w-8 h-8 rounded-full hover:bg-green-600"
-                    >
-                      <Avatar src="/icons/check.svg" alt="Approve" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Accept</TooltipContent>
-                </Tooltip>
-
-                <!-- Reject Button with Tooltip -->
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      class="bg-red-500 text-white w-8 h-8 rounded-full hover:bg-red-600"
-                    >
-                      <Avatar src="/icons/x.svg" alt="Reject" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Reject</TooltipContent>
-                </Tooltip>
-
-                <!-- Block Button with Tooltip -->
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      class="bg-gray-500 text-white w-8 h-8 rounded-full hover:bg-gray-600"
-                    >
-                      <Avatar src="/icons/ban.svg" alt="Block" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Block</TooltipContent>
-                </Tooltip>
-              </div>
-            </li>
-          </ul>
-        </TooltipProvider>
-      </ScrollArea>
+        Manage Requests
+      </Button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { Toaster } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/toast/use-toast";
 import { ref, computed } from "vue";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Tooltip,
-  TooltipProvider,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
+const router = useRouter();
+const toast = useToast();
+
 const groupId = route.params.id;
 const currentUserId = 3;
-const showModal = ref(false);
 
+// Mock data to represent the groups and their members
 const groupsData = [
   {
     id: "1",
     name: "Group 1",
-    description:
-      "This is a sample description for Group 1. This is a sample description for Group 1.",
+    description: "This is a sample description for Group 1.",
     isPrivate: true,
     creatorId: 3,
     members: [
       { id: 1, name: "Alice" },
       { id: 2, name: "Bob" },
     ],
+    rejectedUsers: [4],
+    blockedUsers: [5],
   },
   {
     id: "2",
@@ -169,6 +168,7 @@ const groupsData = [
     ],
   },
 ];
+
 const group = groupsData.find((g) => g.id === groupId) || {
   name: "Group...",
   description: "",
@@ -177,47 +177,16 @@ const group = groupsData.find((g) => g.id === groupId) || {
   members: [],
 };
 
+const isViewingMembers = computed(() => route.path.endsWith("/members"));
+const isSuperstudent = computed(() => group.creatorId === currentUserId);
 const isMember = computed(() =>
   group.members.some((member) => member.id === currentUserId),
 );
-const isSuperstudent = computed(() => group.creatorId === currentUserId);
-
-const joinRequests = ref([
-  { id: 5, name: "New Member 1" },
-  { id: 6, name: "New Member 2" },
-]);
-
-function approveRequest(requestId: number) {
-  alert(`Approved request for user ID: ${requestId}`);
-}
-
-function rejectRequest(requestId: number) {
-  alert(`Rejected request for user ID: ${requestId}`);
-}
-
-function blockRequest(requestId: number) {
-  alert(`Blocked request for user ID: ${requestId}`);
-}
 
 const joinGroup = () => {
   alert("Join group clicked");
 };
+const navigateToRequests = () => router.push(`/groups/${groupId}/requests`);
 </script>
 
-<style scoped>
-.p-6 {
-  padding: 1.5rem;
-}
-.md\:p-10 {
-  padding: 2.5rem;
-}
-.bg-white {
-  background-color: #ffffff;
-}
-.shadow-md {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-.cursor-pointer {
-  cursor: pointer;
-}
-</style>
+<style scoped></style>

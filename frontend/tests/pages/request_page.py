@@ -9,11 +9,14 @@ from tests.constants import Urls
 from tests.pages.base_page import BasePage
 
 
-class GroupPage(BasePage):
-    URL = Urls.GROUP_PAGE
+class RequestPage(BasePage):
+    URL = Urls.JOIN_REQUESTS_PAGE
     # Locators using standard CSS selectors
     PAGE_HEADING = (By.CSS_SELECTOR, "h1")
-    GROUP_CARDS = (By.CSS_SELECTOR, ".grid > div")
+    LIST_REQUESTS = (By.CSS_SELECTOR, "<ul role='list'")
+    APPROVE_BUTTON = (By.CLASS_NAME, "bg-green-500")
+    REJECT_BUTTON = (By.CLASS_NAME, "bg-red-500")
+    FIRST_REQUEST = (By.XPATH, "//ul[@role='list']/li[1]")
 
     def __init__(self, driver: webdriver.Chrome) -> None:
         super().__init__(driver)
@@ -34,10 +37,10 @@ class GroupPage(BasePage):
         except (TimeoutException, NoSuchElementException):
             return False
 
-    def get_group_cards(self) -> list[WebElement]:
+    def get_requests_list(self) -> list[WebElement]:
         try:
-            self.wait.until(EC.presence_of_element_located(self.GROUP_CARDS))
-            return self.driver.find_elements(*self.GROUP_CARDS)
+            self.wait.until(EC.presence_of_element_located(self.LIST_REQUESTS))
+            return self.driver.find_elements(*self.LIST_REQUESTS)
         except (TimeoutException, NoSuchElementException):
             return []
 
@@ -49,11 +52,13 @@ class GroupPage(BasePage):
         except Exception:  # noqa: BLE001
             return False
 
-    def click_create_group(self) -> None:
-        # Option 1: Wait for element to be clickable
-        button = self.wait.until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, "[data-testid='create-group-button']")
-            )
-        )
+    def select_request(self) -> WebElement:
+        return self.driver.find_element(*self.FIRST_REQUEST)
+
+    def click_approve(self, child: WebElement) -> None:
+        button = child.find_element(*self.APPROVE_BUTTON)
+        button.click()
+
+    def click_reject(self, child: WebElement) -> None:
+        button = child.find_element(*self.REJECT_BUTTON)
         button.click()

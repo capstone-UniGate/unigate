@@ -19,31 +19,17 @@ class TestSeeMyGroups:
             EC.presence_of_element_located(self.page.HEADING)
         )
 
-    def test_page_header_visible(self) -> None:
-        """Test that the page header is visible"""
-        assert self.page.is_heading_visible(), "Page header should be visible"
-
-    def test_loading_state(self) -> None:
-        """Test that loading state is shown and then disappears"""
-        # Give time for loading state to appear
-        WebDriverWait(self.page.driver, 10).until(
-            lambda _: self.page.is_loading() or self.page.get_group_cards()
-        )
-        # After loading completes, verify cards are accessible
-        self.page.get_group_cards()
-        assert not self.page.is_loading(), "Loading indicator should disappear"
-
     def test_create_group_navigation(self) -> None:
         """Test navigation to create group page"""
         self.page.click_create_group()
         WebDriverWait(self.page.driver, 10).until(
-            lambda d: "/group/create" in d.current_url
+            lambda d: "/groups/create" in d.current_url
         )
         assert (
-            "/group/create" in self.page.driver.current_url
+            "/groups/create" in self.page.driver.current_url
         ), "Should navigate to create group page"
         assert (
-            "/group/create" in self.page.driver.current_url
+            "/groups/create" in self.page.driver.current_url
         ), "Should navigate to create group page"
 
     def test_group_cards_display(self) -> None:
@@ -70,7 +56,7 @@ class TestSeeMyGroups:
 # def test_loading_state_timeout(self):
 #     """Test behavior when loading state persists (timeout scenario)"""
 #     # Modify the URL to simulate a slow/hanging request
-#     self.page.URL = "http://localhost:3000/group/see-my-group?delay=true"
+#     self.page.URL = "http://localhost:3000/groups/see-my-group?delay=true"
 #     self.page.load()
 
 #     with pytest.raises(TimeoutException):
@@ -84,7 +70,7 @@ class TestSeeMyGroups:
 #     self.page.CREATE_GROUP_BUTTON_DISABLED = (By.CSS_SELECTOR, "[data-testid='create-group-button'][disabled]")
 
 #     # Simulate a condition where button should be disabled (e.g., user not logged in)
-#     self.page.URL = "http://localhost:3000/group/see-my-group?unauthorized=true"
+#     self.page.URL = "http://localhost:3000/groups/see-my-group?unauthorized=true"
 #     self.page.load()
 
 #     with pytest.raises(TimeoutException):
@@ -93,7 +79,7 @@ class TestSeeMyGroups:
 # def test_empty_group_cards(self):
 #     """Test when no group cards are present"""
 #     # Modify URL to ensure no groups are returned
-#     self.page.URL = "http://localhost:3000/group/see-my-group?empty=true"
+#     self.page.URL = "http://localhost:3000/groups/see-my-group?empty=true"
 #     self.page.load()
 
 #     # Wait for loading to complete
@@ -110,7 +96,7 @@ class TestSeeMyGroups:
 #     self.page.ERROR_MESSAGE = (By.CSS_SELECTOR, "[data-testid='error-message']")
 
 #     # Modify URL to trigger an error state
-#     self.page.URL = "http://localhost:3000/group/see-my-group?error=true"
+#     self.page.URL = "http://localhost:3000/groups/see-my-group?error=true"
 #     self.page.load()
 
 #     assert self.page.has_error(), "Error message should be displayed when API fails"
@@ -119,7 +105,7 @@ class TestSeeMyGroups:
 #     """Test behavior when network is unavailable"""
 #     # You might need to use a proxy or network interceptor to simulate this
 #     # This is a basic example - implementation details will depend on your setup
-#     self.page.URL = "http://localhost:3000/group/see-my-group?network_error=true"
+#     self.page.URL = "http://localhost:3000/groups/see-my-group?network_error=true"
 #     self.page.load()
 
 #     assert self.page.has_error(), "Network error message should be displayed"

@@ -16,6 +16,15 @@ frontend_python := frontend_venv + python
 @_default:
     just --list
 
+drop-database:
+    docker compose exec postgres psql -U $POSTGRES_USER -c "DROP DATABASE IF EXISTS ${POSTGRES_DB};"
+
+create-database:
+    docker compose exec postgres psql -U $POSTGRES_USER -c "CREATE DATABASE ${POSTGRES_DB};"
+
+init-database: drop-database create-database
+    cd backend && ../{{ backend_venv}}/alembic upgrade head
+
 backend-deps:
     cd backend && uv sync
 
@@ -29,7 +38,7 @@ backend-fix: backend-deps
     {{ backend_venv }}/ruff check backend --config backend/pyproject.toml
     {{ backend_venv }}/ruff format backend --config backend/pyproject.toml
 
-backend-test: backend-deps
+backend-test: backend-deps init-database
     cd backend && ../{{ backend_venv }}/pytest tests/
 
 pre-commit: backend-deps
@@ -59,5 +68,5 @@ frontend-fix:
     cd frontend && npx prettier . --write
     cd frontend && npx eslint --fix
 
-frontend-test:
+frontend-test: init-database
     cd frontend && ../{{ frontend_venv }}/pytest tests/
