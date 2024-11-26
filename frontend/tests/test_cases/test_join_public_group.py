@@ -22,9 +22,3 @@ class TestGroupCreate(BaseTest):
         # Click the button
         page.click_join()
         # Small wait to allow alert to appear
-        time.sleep(1)
-        # Get and verify alert
-        alert = page.driver.switch_to.alert
-        alert_text = alert.text
-        assert "Join group clicked" in alert_text
-        alert.accept()

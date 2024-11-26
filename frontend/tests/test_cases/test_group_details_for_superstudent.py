@@ -34,7 +34,7 @@ def test_group_details_for_superstudent(driver: webdriver.Chrome) -> None:
     driver.implicitly_wait(5)  # Implicit wait, adjust based on page load time
 
     # Then: The page should display a list of current group members with their names and profile pictures
-    member_list = driver.find_elements(By.CSS_SELECTOR, "[data-testid]")
+    member_list = driver.find_elements(By.CSS_SELECTOR, "[data-testid='member']")
 
     assert len(member_list) > 0, "No members are listed on the members page."
 
