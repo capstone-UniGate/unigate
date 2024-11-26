@@ -141,10 +141,10 @@ def join_public_group(student_id: uuid.UUID, group_id: uuid.UUID) -> str:
 def join_private_group(student_id: uuid.UUID, group_id: uuid.UUID) -> str:
     try:
         # Use the create_request method from request_crud to create a new join request
-        join_crud.join_private_group(student_id, group_id)
+        return join_crud.join_private_group(student_id, group_id)
 
         # Instead of returning the Request object, return a success message
-        return "Join request submitted successfully."
+        # return "Join request submitted successfully."
     except HTTPException:
         # Reraise HTTPException to return appropriate error message
         raise
