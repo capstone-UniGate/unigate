@@ -1,4 +1,3 @@
-import random
 import secrets
 import string
 from unittest.mock import MagicMock
@@ -39,8 +38,8 @@ def create_student(student_id: str, email_par: str) -> None:
 
         student = Student(
             id=UUID(student_id),
-            hashed_password="hashedpassword123",
-            number=random.randint(10000, 99999),
+            hashed_password="hashedpassword123",  # noqa: S106
+            number=secrets.choice(range(10000, 99999)),
             email=email_par,
             name="mirco",
             surname="alessandrini",
