@@ -1,5 +1,4 @@
 import pytest
-from loguru import logger
 from pytest import fixture
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
@@ -43,7 +42,7 @@ class TestGroupPageJoinRequests:
 
     #     except TimeoutException:
     #         pytest.fail("Group cards did not load within the expected timeout")
-    #     except Exception as e:  # noqa: BLE001
+    #     except Exception as e:
     #         pytest.fail(f"Unexpected error while checking group cards: {e!s}")
 
     def test_click_approve(self) -> None:

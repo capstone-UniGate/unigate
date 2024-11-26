@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from tests.constants import Urls
 from tests.pages.base_page import BasePage
 
+
 class RequestPage(BasePage):
     URL = Urls.JOIN_REQUESTS_PAGE
     # Locators using standard CSS selectors
@@ -54,10 +55,10 @@ class RequestPage(BasePage):
     def select_request(self) -> WebElement:
         return self.driver.find_element(*self.FIRST_REQUEST)
 
-    def click_approve(self, child:WebElement) -> None:
+    def click_approve(self, child: WebElement) -> None:
         button = child.find_element(*self.APPROVE_BUTTON)
         button.click()
 
-    def click_reject(self, child:WebElement) -> None:
+    def click_reject(self, child: WebElement) -> None:
         button = child.find_element(*self.REJECT_BUTTON)
         button.click()
