@@ -1,8 +1,8 @@
+import random
 import secrets
 import string
 from unittest.mock import MagicMock
 from uuid import UUID
-import random
 
 import pytest
 from fastapi.testclient import TestClient
@@ -50,20 +50,19 @@ def create_student(student_id: str, email_par: str) -> None:
 
 
 def create_private_group(group_id: str, student_id: str) -> None:
+    group_payload = {
+        "id": group_id,
+        "name": f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}",
+        "description": "A test group description",
+        "category": "Test Category",
+        "type": "Private",
+        "creator_id": student_id,
+    }
+    response = client.post("/groups/create", json=group_payload)
+    return response.json()
 
-            group_payload = {
-                "id": group_id,
-                "name": f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}",
-                "description": "A test group description",
-                "category": "Test Category",
-                "type": "Private",
-                "creator_id": student_id,
-            }
-            response = client.post("/groups/create", json=group_payload)
-            return response.json()
 
 def test_join_private_group_success() -> None:
-
     creator_id = "508fc8f8-8e52-4adb-aa02-e9c9c41a0b19"
     group_id = "12345678-1234-5678-1234-567812345679"
     user_id = "b94e5917-ddbf-4fef-969d-fb67f78d0bd7"
@@ -93,14 +92,15 @@ def test_join_private_group_success() -> None:
     join_request = next(
         (req for req in requests_data if req["student_id"] == user_id), None
     )
-    assert join_request is not None, f"Join request not found. Requests data: {requests_data}"
+    assert (
+        join_request is not None
+    ), f"Join request not found. Requests data: {requests_data}"
     assert join_request["status"] == "PENDING"
 
     approve_path = f"/requests/{join_request['id']}/approve"
 
     approve_response = client.post(approve_path)
     assert approve_response.status_code == 200
-
 
     response = client.get(
         f"/groups/{group_id}/requests",
@@ -113,7 +113,3 @@ def test_join_private_group_success() -> None:
         (req for req in requests_data if req["student_id"] == user_id), None
     )
     assert join_request["status"] == "APPROVED"
-
-
-
-
