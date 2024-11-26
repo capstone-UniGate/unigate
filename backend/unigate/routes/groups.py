@@ -39,23 +39,6 @@ def get_groups() -> list[Group]:
         raise HTTPException(status_code=500, detail="Unable to load groups.")
 
 
-@router.get("/{id}", response_model=Group)
-def get_group(id: uuid.UUID) -> Group:
-    group = group_crud.get(id=id)
-    if not group:
-        raise HTTPException(status_code=404, detail="Group not found.")
-    return group
-
-
-@router.get("/{group_id}/requests", response_model=list[Request])
-def get_group_requests(group_id: uuid.UUID) -> list[Request]:
-    group = group_crud.get(id=group_id)
-    if not group:
-        raise HTTPException(status_code=404, detail="Group not found.")
-
-    return request_crud.get_all_requests_for_group(group_id=group_id)
-
-
 @router.post(
     "/create",
     response_model=Group,
@@ -69,7 +52,7 @@ def get_group_requests(group_id: uuid.UUID) -> list[Request]:
 def create_group(
     group_data: Group,
     session: Session = Depends(get_session),
-) -> None:
+) -> Group:
     """
     Creates a new group in the system.
 
@@ -83,7 +66,6 @@ def create_group(
     """
     try:
         return group_crud.create_group(session=session, group_data=group_data)
-
     except HTTPException:
         raise  # Re-raise any HTTPExceptions for client handling
     except Exception:
@@ -148,5 +130,50 @@ def join_public_group(student_id: uuid.UUID, group_id: uuid.UUID) -> str:
 
     try:
         return join_crud.join_public_group(student_id, group_id)
+    except HTTPException:
+        # Reraise HTTPException to return appropriate error message
+        raise
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Internal server error.")
+
+
+@router.post("/join_private_group", response_model=str)
+def join_private_group(student_id: uuid.UUID, group_id: uuid.UUID) -> str:
+    try:
+        # Use the create_request method from request_crud to create a new join request
+        join_crud.join_private_group(student_id, group_id)
+
+        # Instead of returning the Request object, return a success message
+        return "Join request submitted successfully."
+    except HTTPException:
+        # Reraise HTTPException to return appropriate error message
+        raise
+    except SQLAlchemyError:
+        # Generic SQLAlchemy error handling
+        raise HTTPException(status_code=500, detail="Internal server error.")
+
+
+@router.post("/get_student_groups", response_model=list[Group])
+def get_student_groups(student_id: uuid.UUID) -> list[Group]:
+    try:
+        return join_crud.get_student_groups(student_id)
+    except SQLAlchemyError:
+        # Generic SQLAlchemy error handling
+        raise HTTPException(status_code=500, detail="Internal server error.")
+
+
+@router.get("/{id}", response_model=Group)
+def get_group(id: uuid.UUID) -> Group:
+    group = group_crud.get(id=id)
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found.")
+    return group
+
+
+@router.get("/{group_id}/requests", response_model=list[Request])
+def get_group_requests(group_id: uuid.UUID) -> list[Request]:
+    group = group_crud.get(id=group_id)
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found.")
+
+    return request_crud.get_all_requests_for_group(group_id=group_id)

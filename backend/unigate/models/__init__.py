@@ -9,8 +9,8 @@ from unigate.models.super_student import SuperStudent
 __all__ = [
     "Group",
     "GroupType",
-    "Request",
     "Join",
-    "SuperStudent",
+    "Request",
     "Student",
+    "SuperStudent",
 ]

@@ -11,6 +11,42 @@ from .group_crud import group_crud
 
 
 class CRUDRequest(CRUDBase[Request, Request, Request]):
+    def create_request(self, student_id: uuid.UUID, group_id: uuid.UUID) -> Request:
+        group = group_crud.get(id=group_id)
+        if not group:
+            raise HTTPException(status_code=404, detail="Group not found.")
+
+        existing_request = self.db_session.exec(
+            select(Request).where(
+                (Request.student_id == student_id) & (Request.group_id == group_id)
+            )
+        ).first()
+        if existing_request:
+            raise HTTPException(
+                status_code=400, detail="A request already exists for this student."
+            )
+
+        # Create the new request
+        new_request = Request(
+            id=uuid.uuid4(),
+            student_id=student_id,
+            group_id=group_id,
+            date=datetime.datetime.now(tz=pytz.timezone("Europe/Rome")).date(),
+            status="PENDING",
+        )
+
+        self.db_session.add(new_request)
+        try:
+            self.db_session.commit()
+        except Exception as e:
+            self.db_session.rollback()
+            raise HTTPException(
+                status_code=500, detail=f"Failed to create request: {e!s}"
+            )
+
+        self.db_session.refresh(new_request)
+        return new_request
+
     def get_all_requests_for_group(self, group_id: uuid.UUID) -> list[Request]:
         group = group_crud.get(id=group_id)
         if not group:

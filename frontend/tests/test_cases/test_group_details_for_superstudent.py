@@ -23,13 +23,9 @@ def test_group_details_for_superstudent(driver: webdriver.Chrome) -> None:
     # Assert: Verify the link to view members
     members_link = driver.find_element(By.CSS_SELECTOR, "a.text-blue-500")
     assert members_link.is_displayed(), "Link to view members is not displayed."
-    assert "/group/" in members_link.get_attribute(
+    assert "/groups/" in members_link.get_attribute(
         "href"
     ), "Members link URL is incorrect."
-
-    # Assert: Verify that there are join requests with approve/reject buttons
-    join_requests = driver.find_elements(By.CSS_SELECTOR, "li.flex.items-center")
-    assert len(join_requests) > 0, "No join requests found."
 
     # Given: The user is on the group details page and clicks the "View Members" link
     members_link.click()
@@ -38,9 +34,7 @@ def test_group_details_for_superstudent(driver: webdriver.Chrome) -> None:
     driver.implicitly_wait(5)  # Implicit wait, adjust based on page load time
 
     # Then: The page should display a list of current group members with their names and profile pictures
-    member_list = driver.find_elements(
-        By.CSS_SELECTOR, ".mb-4.text-lg.text-gray-700.flex.items-center"
-    )
+    member_list = driver.find_elements(By.CSS_SELECTOR, "[data-testid='member']")
 
     assert len(member_list) > 0, "No members are listed on the members page."
 

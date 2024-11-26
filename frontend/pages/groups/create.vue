@@ -276,13 +276,13 @@ const onSubmit = handleSubmit((values) => {
 
   // Redirect to the /group page after a brief delay
   setTimeout(() => {
-    router.push("/group");
+    router.push("/groups");
   }, 1500);
 });
 
 // Cancel button handler
 const onCancel = () => {
-  router.push("/group");
+  router.push("/groups");
 };
 </script>
 
