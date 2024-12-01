@@ -104,7 +104,10 @@
             </p>
           </div>
 
-          <div v-if="group.is_super_student && group.type == 'Private'" class="text-left mb-6">
+          <div
+            v-if="group.is_super_student && group.type == 'Private'"
+            class="text-left mb-6"
+          >
             <Button
               @click="navigateToRequests"
               class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-blue-600 hover:shadow-xl active:scale-95 transition-all"
@@ -176,11 +179,10 @@ const toast = useToast();
 const groupId = route.params.id;
 const isLoading = ref(false);
 const isError = ref(false);
-const group = ref()
+const group = ref();
 
-const isViewingMembers = ref(false)
+const isViewingMembers = ref(false);
 const isAvatarModalOpen = ref(false);
-
 
 async function loadGroup() {
   try {
@@ -194,11 +196,9 @@ async function loadGroup() {
   }
 }
 
-
 onMounted(() => {
   loadGroup();
 });
-
 
 const openAvatarModal = () => {
   isAvatarModalOpen.value = true;
@@ -212,13 +212,13 @@ const navigateToRequests = () => router.push(`/groups/${groupId}/requests`);
 
 const askToJoinGroup = () => {
   // TODO: To be done done
-}
+};
 
 const joinGroup = () => {
   // TODO: To be done done
-}
+};
 
 const leaveGroup = () => {
   // TODO: To be done done
-}
+};
 </script>

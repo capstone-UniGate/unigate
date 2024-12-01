@@ -50,8 +50,8 @@ def get_groups() -> list[Group]:
     },
 )
 def create_group(
-        group_data: Group,
-        session: Session = Depends(get_session),
+    group_data: Group,
+    session: Session = Depends(get_session),
 ) -> Group:
     """
     Creates a new group in the system.
@@ -92,7 +92,6 @@ def create_group(
 )
 def get_members(group_id: uuid.UUID, student_id: uuid.UUID | None) -> list[Student]:
     try:
-
         return student_crud.get_members(group_id=group_id, student_id=student_id)
 
     except SQLAlchemyError:

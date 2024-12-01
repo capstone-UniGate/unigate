@@ -1,22 +1,19 @@
 import datetime
+import random
 import uuid
 
-from faker import Faker
-import random
-
 import pytz
+from faker import Faker
 from loguru import logger
 from sqlmodel import Session
-from unigate.core.database import (
-    engine
-)
-
+from unigate.core.database import engine
 from unigate.models import (
     Group,
+    GroupType,
     Join,
     Request,
     Student,
-    SuperStudent, GroupType,
+    SuperStudent,
 )
 
 
@@ -28,16 +25,40 @@ def create_dummy_data() -> None:
 
 def generate_group_name():
     subjects = [
-        "Math", "Science", "History", "Literature", "Biology",
-        "Physics", "Chemistry", "Art", "Philosophy", "Computer Science"
+        "Math",
+        "Science",
+        "History",
+        "Literature",
+        "Biology",
+        "Physics",
+        "Chemistry",
+        "Art",
+        "Philosophy",
+        "Computer Science",
     ]
     adjectives = [
-        "Brilliant", "Curious", "Eager", "Energetic", "Intelligent",
-        "Focused", "Ambitious", "Dynamic", "Inquisitive", "Resourceful"
+        "Brilliant",
+        "Curious",
+        "Eager",
+        "Energetic",
+        "Intelligent",
+        "Focused",
+        "Ambitious",
+        "Dynamic",
+        "Inquisitive",
+        "Resourceful",
     ]
     mascots = [
-        "Scholars", "Thinkers", "Minds", "Learners", "Innovators",
-        "Explorers", "Creators", "Wizards", "Strategists", "Analysts"
+        "Scholars",
+        "Thinkers",
+        "Minds",
+        "Learners",
+        "Innovators",
+        "Explorers",
+        "Creators",
+        "Wizards",
+        "Strategists",
+        "Analysts",
     ]
 
     subject = random.choice(subjects)
@@ -48,8 +69,18 @@ def generate_group_name():
 
 
 def generate_group_category():
-    categories = ["Math", "Science", "History", "Literature", "Biology",
-                  "Physics", "Chemistry", "Art", "Philosophy", "Computer Science"]
+    categories = [
+        "Math",
+        "Science",
+        "History",
+        "Literature",
+        "Biology",
+        "Physics",
+        "Chemistry",
+        "Art",
+        "Philosophy",
+        "Computer Science",
+    ]
     return random.choice(categories)
 
 
@@ -74,7 +105,7 @@ def create_group_and_members():
             name=generate_group_name(),
             description=fake.sentence(20),
             category=generate_group_category(),
-            type=random.choice(['PUBLIC', 'PRIVATE']),
+            type=random.choice(["PUBLIC", "PRIVATE"]),
             creator_id=student.id,
         )
 
@@ -100,7 +131,7 @@ def create_group_and_members():
                     number=fake.random_int(1000, 100000),
                     email=fake.email(),
                     name=fake.name(),
-                    surname=fake.last_name()
+                    surname=fake.last_name(),
                 )
 
                 session.add(student)
@@ -128,7 +159,7 @@ def create_group_and_members():
                     number=fake.random_int(1000, 100000),
                     email=fake.email(),
                     name=fake.name(),
-                    surname=fake.last_name()
+                    surname=fake.last_name(),
                 )
                 session.add(student)
                 session.commit()
@@ -136,7 +167,7 @@ def create_group_and_members():
                 # create the request for the students
                 request = Request(
                     id=uuid.uuid4(),
-                    status=random.choice(['PENDING', 'APPROVED', 'REJECTED']),
+                    status=random.choice(["PENDING", "APPROVED", "REJECTED"]),
                     student_id=student.id,
                     group_id=group.id,
                 )
@@ -144,7 +175,7 @@ def create_group_and_members():
                 session.add(request)
                 session.commit()
 
-                if request.status == 'APPROVED':
+                if request.status == "APPROVED":
                     join = Join(
                         student_id=student.id,
                         group_id=group.id,
