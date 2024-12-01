@@ -54,6 +54,7 @@ def upgrade() -> None:
             "type", sa.Enum("PUBLIC", "PRIVATE", name="group_type"), nullable=True
         ),
         sa.Column("creator_id", sa.Uuid(), nullable=False),
+        sa.Column('members_count', sa.Integer(), nullable=False, default=0),
         sa.ForeignKeyConstraint(["creator_id"], ["students.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )

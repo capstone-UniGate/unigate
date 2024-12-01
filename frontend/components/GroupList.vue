@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { userGroupData } from "@/composables/userGroupData";
 
-const groups = ref([]);
-const isLoading = ref(true);
+const groups = ref();
+const isLoading = ref(false);
 const isError = ref(false);
 
 async function loadGroups() {
   try {
     isError.value = false;
     isLoading.value = true;
-    groups.value = userGroupData();
+    groups.value = await useApiFetch('groups/get');
+ 
   } catch (error) {
     isError.value = true;
   } finally {

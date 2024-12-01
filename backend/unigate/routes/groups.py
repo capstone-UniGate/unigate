@@ -50,8 +50,8 @@ def get_groups() -> list[Group]:
     },
 )
 def create_group(
-    group_data: Group,
-    session: Session = Depends(get_session),
+        group_data: Group,
+        session: Session = Depends(get_session),
 ) -> Group:
     """
     Creates a new group in the system.
@@ -76,9 +76,8 @@ def create_group(
         )
 
 
-@router.post(
+@router.get(
     "/get_members",
-    response_model=list[Student],
     status_code=status.HTTP_200_OK,
     responses={
         200: {
@@ -91,23 +90,11 @@ def create_group(
         500: {"description": "An error occurred while creating the group"},
     },
 )
-def get_memebrs(group_id: uuid.UUID, student_id: uuid.UUID | None) -> list[Student]:
-    """
-    Get a list of all memebers of a group
-
-    Args:
-        group_id (UUID): group's user ID
-        student_id (UUID): student's user ID
-
-    Returns:
-        list[Students]: list of all students in that group
-
-    Raises:
-        HTTPException: Raises a 500 error if the query fails.
-    """
-
+def get_members(group_id: uuid.UUID, student_id: uuid.UUID | None) -> list[Student]:
     try:
+
         return student_crud.get_members(group_id=group_id, student_id=student_id)
+
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Internal server error.")
 
@@ -162,12 +149,16 @@ def get_student_groups(student_id: uuid.UUID) -> list[Group]:
         raise HTTPException(status_code=500, detail="Internal server error.")
 
 
-@router.get("/{id}", response_model=Group)
-def get_group(id: uuid.UUID) -> Group:
+@router.get("/{id}", response_model=dict)
+def get_group(id: uuid.UUID) -> dict:
     group = group_crud.get(id=id)
+
+    group_dict = group.dict()
+    group_dict["is_super_student"] = group.is_super_student
+    group_dict["is_member_of"] = group.is_member_of
     if not group:
         raise HTTPException(status_code=404, detail="Group not found.")
-    return group
+    return group_dict
 
 
 @router.get("/{group_id}/requests", response_model=list[Request])

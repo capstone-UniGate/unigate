@@ -80,6 +80,10 @@ class CRUDRequest(CRUDBase[Request, Request, Request]):
         )
         self.db_session.add(join_entry)
 
+        group = group_crud.get(id=request.group_id)
+        group.member_count = group.member_count + 1
+        self.db_session.commit()
+
         # Commit the transaction
         try:
             self.db_session.commit()
