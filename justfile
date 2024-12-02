@@ -59,6 +59,9 @@ burndown *ARGS: burndown-deps
 burndown-sprint1: burndown-deps
     {{ burndown_python }} scripts/burndown/main.py --start-date 2024-11-10 --end-date 2024-11-27 --milestone eos1 --org capstone-UniGate --project-number 5
 
+burndown-sprint2: burndown-deps
+    {{ burndown_python }} scripts/burndown/main.py --start-date 2024-12-02 --end-date 2024-12-19 --milestone eos2 --org capstone-UniGate --project-number 5
+
 frontend-deps:
     cd frontend && pnpm install
     cd frontend && uv sync
