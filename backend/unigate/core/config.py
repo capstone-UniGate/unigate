@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     UNIGATE_DB: str = "unigate"
     AUTH_DB: str = "auth"
     SENDGRID_API_KEY: str
+    JWT_SECRET: str
+    JWT_EXPIRATION: int = 60 * 60 * 24
+    JWT_ALGORITHM: str = "HS256"
 
     @computed_field  # type: ignore
     @property

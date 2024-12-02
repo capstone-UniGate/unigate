@@ -40,5 +40,11 @@ class CRUDStudent(CRUDBase[Student, Student, Student]):
         result = db_session.exec(statement)
         return result.one_or_none() is not None
 
+    def get_by_number(self, *, number: int) -> Student | None:
+        db_session = self.get_db()
+        statement = select(self.model).where(self.model.number == number)
+        result = db_session.exec(statement)
+        return result.one_or_none()
+
 
 student_crud = CRUDStudent(Student)

@@ -1,5 +1,6 @@
 from sqlmodel import SQLModel  # type: ignore  # noqa: F401
 
+from unigate.models.auth import User
 from unigate.models.group import Group, GroupType
 from unigate.models.join import Join
 from unigate.models.request import Request, RequestStatus
@@ -14,4 +15,5 @@ __all__ = [
     "RequestStatus",
     "Student",
     "SuperStudent",
+    "User",
 ]
