@@ -1,5 +1,5 @@
 import datetime
-import random
+import secrets
 import uuid
 
 import pytz
@@ -12,6 +12,7 @@ from unigate.models import (
     GroupType,
     Join,
     Request,
+    RequestStatus,
     Student,
     SuperStudent,
 )
@@ -23,7 +24,7 @@ def create_dummy_data() -> None:
         create_group_and_members()
 
 
-def generate_group_name():
+def generate_group_name() -> str:
     subjects = [
         "Math",
         "Science",
@@ -61,14 +62,14 @@ def generate_group_name():
         "Analysts",
     ]
 
-    subject = random.choice(subjects)
-    adjective = random.choice(adjectives)
-    mascot = random.choice(mascots)
+    subject = secrets.choice(subjects)
+    adjective = secrets.choice(adjectives)
+    mascot = secrets.choice(mascots)
 
     return f"{adjective} {subject} {mascot}"
 
 
-def generate_group_category():
+def generate_group_category() -> str:
     categories = [
         "Math",
         "Science",
@@ -81,10 +82,10 @@ def generate_group_category():
         "Philosophy",
         "Computer Science",
     ]
-    return random.choice(categories)
+    return secrets.choice(categories)
 
 
-def create_group_and_members():
+def create_group_and_members() -> None:
     fake = Faker()
     with Session(engine) as session:
         student = Student(
@@ -101,11 +102,11 @@ def create_group_and_members():
 
         # Seed groups
         group = Group(
-            id=fake.uuid4(),
+            id=uuid.uuid4(),
             name=generate_group_name(),
             description=fake.sentence(20),
             category=generate_group_category(),
-            type=random.choice(["PUBLIC", "PRIVATE"]),
+            type=secrets.choice(list(GroupType)),
             creator_id=student.id,
         )
 
@@ -124,7 +125,7 @@ def create_group_and_members():
         # In case the group is public add 10 students to the group
         # Create 10 more students and assign them to the group as members
         if group.type == GroupType.PUBLIC:
-            for i in range(10):
+            for _ in range(10):
                 student = Student(
                     id=uuid.uuid4(),
                     hashed_password=fake.password(),
@@ -152,7 +153,7 @@ def create_group_and_members():
         logger.debug(group.type)
 
         if group.type == GroupType.PRIVATE:
-            for i in range(10):
+            for _ in range(10):
                 student = Student(
                     id=uuid.uuid4(),
                     hashed_password=fake.password(),
@@ -167,7 +168,7 @@ def create_group_and_members():
                 # create the request for the students
                 request = Request(
                     id=uuid.uuid4(),
-                    status=random.choice(["PENDING", "APPROVED", "REJECTED"]),
+                    status=secrets.choice(list(RequestStatus)),
                     student_id=student.id,
                     group_id=group.id,
                 )
