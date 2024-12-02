@@ -151,12 +151,12 @@ def get_student_groups(student_id: uuid.UUID) -> list[Group]:
 @router.get("/{id}", response_model=dict)
 def get_group(id: uuid.UUID) -> dict:
     group = group_crud.get(id=id)
-
-    group_dict = group.dict()
-    group_dict["is_super_student"] = group.is_super_student
-    group_dict["is_member_of"] = group.is_member_of
     if not group:
         raise HTTPException(status_code=404, detail="Group not found.")
+    group_dict = group.model_dump()
+    group_dict["is_super_student"] = group.is_super_student
+    group_dict["is_member_of"] = group.is_member_of
+
     return group_dict
 
 

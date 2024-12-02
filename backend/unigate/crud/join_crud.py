@@ -32,7 +32,7 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
         )
 
         # increase the number of members
-        group.member_count = group.member_count + 1
+        group.members_count = group.members_count + 1
         self.db_session.commit()
 
         return "Insert successful"
