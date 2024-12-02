@@ -131,6 +131,7 @@
             v-if="isMember || isSuperstudent"
             @click="leaveGroup"
             class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-red-600 hover:shadow-xl active:scale-95 transition-all"
+            id="leave-group-button"
           >
             Leave Group
           </Button>
@@ -138,6 +139,7 @@
             v-else-if="!group.isPrivate"
             @click="joinGroup"
             class="bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-indigo-600 hover:shadow-xl active:scale-95 transition-all"
+            id="join-group-button"
           >
             Join Group
           </Button>
@@ -145,6 +147,7 @@
             v-else
             @click="askToJoinGroup"
             class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-yellow-600 hover:shadow-xl active:scale-95 transition-all"
+            id="ask-to-join-button"
           >
             Ask to Join
           </Button>
@@ -165,7 +168,7 @@ import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
-const toast = useToast();
+const { toast } = useToast();
 
 const groupId = route.params.id;
 const currentUserId = 3;
@@ -221,6 +224,27 @@ const openAvatarModal = () => {
 const closeAvatarModal = () => {
   isAvatarModalOpen.value = false;
 };
+
+const leaveGroup = () => {
+  toast({
+    variant: "success",
+    description: "You have left the group",
+    duration: 1000,
+  })
+
+  setTimeout(() => {
+    router.push("/groups");
+  }, 1500);
+};
+
+const joinGroup = () => {
+  // Send a request to the group creator
+};
+
+const askToJoinGroup = () => {
+  // Send a request to the group creator
+};
+
 
 const navigateToRequests = () => router.push(`/groups/${groupId}/requests`);
 </script>
