@@ -25,6 +25,9 @@ create-database:
 init-database: drop-database create-database
     cd backend && ../{{ backend_venv}}/alembic upgrade head
 
+seed-database:
+    {{ backend_python }} backend/unigate/alembic/seeders/seeder.py
+
 backend-deps:
     cd backend && uv sync
 
