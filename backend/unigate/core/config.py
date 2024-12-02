@@ -14,19 +14,32 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int = 5432
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
-    POSTGRES_DB: str = "unigate"
+    UNIGATE_DB: str = "unigate"
+    AUTH_DB: str = "auth"
     SENDGRID_API_KEY: str
 
     @computed_field  # type: ignore
     @property
-    def DATABASE_URI(self) -> PostgresDsn:  # noqa: N802
+    def UNIGATE_DB_URI(self) -> PostgresDsn:  # noqa: N802
         return MultiHostUrl.build(
             scheme="postgresql+psycopg",
             username=self.POSTGRES_USER,
             password=self.POSTGRES_PASSWORD,
             host=self.POSTGRES_HOST,
             port=self.POSTGRES_PORT,
-            path=self.POSTGRES_DB,
+            path=self.UNIGATE_DB,
+        )
+
+    @computed_field  # type: ignore
+    @property
+    def AUTH_DB_URI(self) -> PostgresDsn:  # noqa: N802
+        return MultiHostUrl.build(
+            scheme="postgresql+psycopg",
+            username=self.POSTGRES_USER,
+            password=self.POSTGRES_PASSWORD,
+            host=self.POSTGRES_HOST,
+            port=self.POSTGRES_PORT,
+            path=self.AUTH_DB,
         )
 
 

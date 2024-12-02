@@ -1,5 +1,6 @@
 from collections.abc import Generator
 
+from sqlalchemy.engine import Engine
 from sqlmodel import (
     Session,  # type: ignore
     SQLModel,  # type: ignore  # noqa: F401
@@ -13,7 +14,8 @@ from unigate.core.config import settings
 # make sure all SQLModel models are imported (unigate.models) before initializing DB
 # otherwise, SQLModel might fail to initialize relationships properly
 
-engine = create_engine(str(settings.DATABASE_URI))
+engine = create_engine(str(settings.UNIGATE_DB_URI))
+auth_engine = create_engine(str(settings.AUTH_DB_URI))
 
 
 def init_db() -> None:
@@ -32,9 +34,13 @@ def init_db() -> None:
     pass
 
 
-def get_session() -> Generator[Session, None, None]:
+def get_session(engine: Engine = engine) -> Generator[Session, None, None]:
     with Session(engine) as session:
         try:
             yield session
         finally:
             session.close()
+
+
+def get_auth_session() -> Generator[Session, None, None]:
+    return get_session(auth_engine)

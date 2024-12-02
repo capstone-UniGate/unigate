@@ -16,13 +16,12 @@ frontend_python := frontend_venv + python
 @_default:
     just --list
 
-drop-database:
-    docker compose exec postgres psql -U $POSTGRES_USER -c "DROP DATABASE IF EXISTS ${POSTGRES_DB};"
+reset-database:
+    docker compose exec postgres-unigate psql -U $POSTGRES_USER -d $POSTGRES_DB -c "DO \$\$ BEGIN EXECUTE 'DROP SCHEMA public CASCADE'; EXECUTE 'CREATE SCHEMA public'; END \$\$;"
+    docker compose exec postgres-unigate psql -U $POSTGRES_USER -d $UNIGATE_DB -c "DO \$\$ BEGIN EXECUTE 'DROP SCHEMA public CASCADE'; EXECUTE 'CREATE SCHEMA public'; END \$\$;"
+    docker compose exec postgres-unigate psql -U $POSTGRES_USER -d $AUTH_DB -c "DO \$\$ BEGIN EXECUTE 'DROP SCHEMA public CASCADE'; EXECUTE 'CREATE SCHEMA public'; END \$\$;"
 
-create-database:
-    docker compose exec postgres psql -U $POSTGRES_USER -c "CREATE DATABASE ${POSTGRES_DB};"
-
-init-database: drop-database create-database
+init-database: reset-database
     cd backend && ../{{ backend_venv}}/alembic upgrade head
 
 backend-deps:
