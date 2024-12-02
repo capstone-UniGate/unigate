@@ -30,6 +30,11 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
                 group_id=group_id,
             )
         )
+
+        # increase the number of members
+        group.members_count = group.members_count + 1
+        self.db_session.commit()
+
         return "Insert successful"
 
     def check_double_enrollment(
