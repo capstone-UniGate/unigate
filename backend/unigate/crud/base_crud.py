@@ -31,7 +31,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     def get_db(self) -> Session:
         return next(get_session())
 
-    def get(self, *, id: UUID | str) -> ModelType | None:
+    def get(self, *, id: UUID | int | str) -> ModelType | None:
         query = select(self.model).where(self.model.id == id)
         response = self.db_session.exec(query)
         return response.one_or_none()

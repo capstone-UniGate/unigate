@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from unigate.routes import (
+from .routes import (
+    auth,
     groups,
     requests,
 )
@@ -28,6 +29,7 @@ def main() -> dict[str, str]:
 # Include the groups router under /groups
 app.include_router(groups.router, prefix="/groups")
 app.include_router(requests.router, prefix="/requests")
+app.include_router(auth.router, prefix="/auth")
 
 if __name__ == "__main__":
     import uvicorn
