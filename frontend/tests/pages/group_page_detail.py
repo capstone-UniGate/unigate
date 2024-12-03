@@ -1,7 +1,6 @@
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webdriver import WebDriver
-from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.support.ui import WebDriverWait
 
 
 class GroupPageDetail:
@@ -62,16 +61,20 @@ class GroupPageDetail:
 
     def get_toast_message(self) -> str:
         """Retrieve the text from the success toast message."""
-        #WebDriverWait(self.driver, 10).until(
+        # WebDriverWait(self.driver, 10).until(
         #    ec.visibility_of_element_located((By.CLASS_NAME, "toast-success"))
-        #)
-        toast_message = self.driver.find_element(By.CSS_SELECTOR, '[data-state="open"][data-swipe-direction="right"]')
+        # )
+        toast_message = self.driver.find_element(
+            By.CSS_SELECTOR, '[data-state="open"][data-swipe-direction="right"]'
+        )
         return toast_message.text
 
     def click_join(self) -> None:
         create_button = self.driver.find_element(By.ID, "join-group-button")
+
         create_button.click()
 
     def click_leave(self) -> None:
         leave_button = self.driver.find_element(By.ID, "leave-group-button")
+        leave_button.send_keys(Keys.ENTER)
         leave_button.click()
