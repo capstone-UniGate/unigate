@@ -139,6 +139,7 @@
               v-if="group.is_member_of || group.is_super_student"
               @click="leaveGroup"
               class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-red-600 hover:shadow-xl active:scale-95 transition-all"
+              id="leave-group-button"
             >
               Leave Group
             </Button>
@@ -146,6 +147,7 @@
               v-else-if="group.type != 'Private'"
               @click="joinGroup"
               class="bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-indigo-600 hover:shadow-xl active:scale-95 transition-all"
+              id="join-group-button"
             >
               Join Group
             </Button>
@@ -153,6 +155,7 @@
               v-else
               @click="askToJoinGroup"
               class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-yellow-600 hover:shadow-xl active:scale-95 transition-all"
+              id="ask-to-join-button"
             >
               Ask to Join
             </Button>
@@ -174,7 +177,7 @@ import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
-const toast = useToast();
+const { toast } = useToast();
 
 const groupId = route.params.id;
 const isLoading = ref(false);
@@ -208,17 +211,25 @@ const closeAvatarModal = () => {
   isAvatarModalOpen.value = false;
 };
 
-const navigateToRequests = () => router.push(`/groups/${groupId}/requests`);
+const leaveGroup = () => {
+  toast({
+    variant: "success",
+    description: "You have left the group",
+    duration: 1000,
+  });
 
-const askToJoinGroup = () => {
-  // TODO: To be done done
+  setTimeout(() => {
+    router.push("/groups");
+  }, 1500);
 };
 
 const joinGroup = () => {
-  // TODO: To be done done
+  // Send a request to the group creator
 };
 
-const leaveGroup = () => {
-  // TODO: To be done done
+const askToJoinGroup = () => {
+  // Send a request to the group creator
 };
+
+const navigateToRequests = () => router.push(`/groups/${groupId}/requests`);
 </script>
