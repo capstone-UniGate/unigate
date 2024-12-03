@@ -17,7 +17,18 @@ class Group(SQLModel, table=True):
     description: str | None = Field(default=None)
     category: str | None = Field(default=None, max_length=255)
     type: GroupType = Field(sa_column=Column(Enum(GroupType, name="group_type")))
+    members_count: int = Field(default=0)
 
     creator_id: uuid.UUID = Field(
         foreign_key="students.id", nullable=False, ondelete="CASCADE"
     )
+
+    @property
+    def is_super_student(self) -> bool:
+        # TODO: It should be dynamic after login implementation
+        return False
+
+    @property
+    def is_member_of(self) -> bool:
+        # TODO: It should be dynamic after login implementation
+        return False

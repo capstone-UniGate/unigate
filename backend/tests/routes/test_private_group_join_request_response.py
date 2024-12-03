@@ -3,7 +3,7 @@ import string
 import uuid
 
 from fastapi.testclient import TestClient
-from sqlmodel import Session
+from sqlmodel import Session, select
 from unigate.core.database import engine
 from unigate.main import app
 from unigate.models import Student
@@ -16,7 +16,9 @@ group_id = uuid.uuid4()
 
 def create_student(student_id: uuid.UUID, email_par: str) -> None:
     with Session(engine) as session:
-        existing_student = session.query(Student).filter_by(id=student_id).first()
+        existing_student = session.exec(
+            select(Student).where(Student.id == student_id)
+        ).first()
         if existing_student:
             return
 

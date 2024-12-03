@@ -33,7 +33,7 @@ class MissingConfigError(Exception):
 
 
 def get_url() -> str:
-    return str(settings.DATABASE_URI)
+    return str(settings.UNIGATE_DB_URI)
 
 
 def run_migrations_offline() -> None:

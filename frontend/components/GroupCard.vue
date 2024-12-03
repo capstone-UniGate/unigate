@@ -9,7 +9,7 @@ interface Group {
   id: string;
   description: string;
   recentActivity: string;
-  enrollmentCount: number;
+  members_count: number;
 }
 
 // Define props with TypeScript, ensuring `group` matches the Group interface
@@ -55,7 +55,7 @@ const goToGroupPage = () => {
             {{ group.description }}
           </p>
           <p class="text-xs text-muted-foreground">
-            Members: {{ group.enrollmentCount }}
+            Members: {{ group.members_count }}
           </p>
         </CardContent>
       </div>

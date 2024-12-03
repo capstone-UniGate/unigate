@@ -1,16 +1,51 @@
 services:
-  postgres:
-    container_name: postgres
+  postgres-unigate:
+    container_name: postgres-unigate
     image: postgres:17-bookworm
     ports:
-      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+      - "${POSTGRES_PORT}:5432"
     env_file:
       - .env
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
+      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+      - POSTGRES_PORT=${POSTGRES_PORT?Variable not set}
     volumes:
+      - ./postgres/create-databases.sh:/docker-entrypoint-initdb.d/create-databases.sh
       - pgdata:/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    restart: always
+
+  pgadmin-unigate:
+    container_name: pgadmin-unigate
+    image: dpage/pgadmin4:8.13
+    entrypoint:
+      - /custom-entrypoint.sh
+    ports:
+      - "${PGADMIN_PORT}:80"
+    env_file:
+      - .env
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL?Variable not set}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD?Variable not set}
+      - PGADMIN_PORT=${PGADMIN_PORT?Variable not set}
+      - PGADMIN_CONFIG_SERVER_MODE=False
+      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
+      - PGADMIN_SERVER_JSON_FILE=/tmp/servers.json
+    volumes:
+      - ./pgadmin/entrypoint.sh:/custom-entrypoint.sh
+      - pgadmin_data:/var/lib/pgadmin:rw
+    depends_on:
+      - postgres-unigate
     restart: always
 
 volumes:
   pgdata:
+  pgadmin_data:

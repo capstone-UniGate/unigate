@@ -230,7 +230,7 @@ const leaveGroup = () => {
     variant: "success",
     description: "You have left the group",
     duration: 1000,
-  })
+  });
 
   setTimeout(() => {
     router.push("/groups");
@@ -244,7 +244,6 @@ const joinGroup = () => {
 const askToJoinGroup = () => {
   // Send a request to the group creator
 };
-
 
 const navigateToRequests = () => router.push(`/groups/${groupId}/requests`);
 </script>

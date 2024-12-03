@@ -5,7 +5,7 @@ from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
+from sqlmodel import Session, select
 from unigate.core.database import engine
 from unigate.main import app
 from unigate.models import Group, Student
@@ -28,7 +28,9 @@ def create_student(student_id: str) -> None:
     """
     with Session(engine) as session:
         # Check if the student already exists
-        existing_student = session.query(Student).filter_by(id=UUID(student_id)).first()
+        existing_student = session.exec(
+            select(Student).where(Student.id == UUID(student_id))
+        ).first()
         if existing_student:
             return
 
@@ -45,7 +47,7 @@ def create_student(student_id: str) -> None:
         session.commit()
 
 
-def create_group(student_id: str, group_id: str) -> dict[str, str]:
+def create_group(student_id: str, group_id: str) -> dict[str, str | None | bool]:
     group_payload = {
         "id": group_id,
         "name": f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}",
@@ -56,7 +58,9 @@ def create_group(student_id: str, group_id: str) -> dict[str, str]:
     }
 
     with Session(engine) as session:
-        existing_group = session.query(Group).filter_by(id=UUID(group_id)).first()
+        existing_group = session.exec(
+            select(Group).where(Group.id == UUID(group_id))
+        ).first()
         if existing_group is not None:
             return {
                 "id": str(existing_group.id),
@@ -65,10 +69,15 @@ def create_group(student_id: str, group_id: str) -> dict[str, str]:
                 "category": existing_group.category,
                 "type": str(existing_group.type.value),
                 "creator_id": str(student_id),
+                "is_member_of": False,
+                "is_super_student": False,
             }
 
     response = client.post("/groups/create", json=group_payload)
-    return response.json()
+    r = response.json()
+    r["is_member_of"] = False
+    r["is_super_student"] = False
+    return r
 
 
 def test_get_group_info() -> None:
