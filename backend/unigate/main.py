@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routes import (
-    groups,  # Import the new groups router
+from unigate.routes import (
+    groups,
     requests,
 )
 
