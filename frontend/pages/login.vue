@@ -11,6 +11,7 @@
               v-model="form.username"
               placeholder="Enter your username"
               :type="'text'"
+              @input="validateInput"
             />
           </FormField>
   
@@ -22,10 +23,15 @@
               v-model="form.password"
               placeholder="Enter your password"
               :type="'password'"
+              @input="validateInput"
             />
           </FormField>
   
-          <Button type="submit" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white">
+          <Button 
+            type="submit" 
+            class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white" 
+            :disabled="!isFormValid"
+          >
             Login
           </Button>
         </Form>
@@ -34,17 +40,15 @@
   </template>
   
   <script>
-  import { ref } from "vue";
+  import { ref, computed } from "vue";
   import { Form, FormField, FormLabel } from "@/components/ui/form";
   import Button from "@/components/ui/button/Button.vue";
-  import FormInput from "@/components/ui/FormInput.vue";
   
   export default {
     components: {
       Form,
       FormField,
       FormLabel,
-      FormInput,
       Button,
     },
     setup() {
@@ -53,11 +57,22 @@
         password: "",
       });
   
+      const isFormValid = computed(() => {
+        return form.value.username.trim() !== "" && form.value.password.trim() !== "";
+      });
+  
+      const validateInput = () => {
+        // This function can be expanded for more complex validation if needed
+      };
+  
       const handleLogin = () => {
+        // Handle login logic here
       };
   
       return {
         form,
+        isFormValid,
+        validateInput,
         handleLogin,
       };
     },
