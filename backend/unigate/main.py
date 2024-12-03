@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .routes import (
     auth,
-    groups,  # Import the new groups router
+    groups,
     requests,
 )
 
