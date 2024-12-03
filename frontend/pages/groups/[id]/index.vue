@@ -125,33 +125,6 @@
             </p>
           </div>
 
-<<<<<<< HEAD
-        <div class="text-center mt-6">
-          <Button
-            v-if="isMember || isSuperstudent"
-            @click="leaveGroup"
-            class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-red-600 hover:shadow-xl active:scale-95 transition-all"
-            id="leave-group-button"
-          >
-            Leave Group
-          </Button>
-          <Button
-            v-else-if="!group.isPrivate"
-            @click="joinGroup"
-            class="bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-indigo-600 hover:shadow-xl active:scale-95 transition-all"
-            id="join-group-button"
-          >
-            Join Group
-          </Button>
-          <Button
-            v-else
-            @click="askToJoinGroup"
-            class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-yellow-600 hover:shadow-xl active:scale-95 transition-all"
-            id="ask-to-join-button"
-          >
-            Ask to Join
-          </Button>
-=======
           <div class="text-left mb-6">
             <p class="text-sm text-gray-500">Tags</p>
             <p
@@ -166,6 +139,7 @@
               v-if="group.is_member_of || group.is_super_student"
               @click="leaveGroup"
               class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-red-600 hover:shadow-xl active:scale-95 transition-all"
+              id="leave-group-button"
             >
               Leave Group
             </Button>
@@ -173,6 +147,7 @@
               v-else-if="group.type != 'Private'"
               @click="joinGroup"
               class="bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-indigo-600 hover:shadow-xl active:scale-95 transition-all"
+              id="join-group-button"
             >
               Join Group
             </Button>
@@ -180,11 +155,11 @@
               v-else
               @click="askToJoinGroup"
               class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-yellow-600 hover:shadow-xl active:scale-95 transition-all"
+              id="ask-to-join-button"
             >
               Ask to Join
             </Button>
           </div>
->>>>>>> 855ee3cb9cfaf12345488dc014b32958ae195f86
         </div>
       </div>
     </div>
@@ -257,16 +232,4 @@ const askToJoinGroup = () => {
 };
 
 const navigateToRequests = () => router.push(`/groups/${groupId}/requests`);
-
-const askToJoinGroup = () => {
-  // TODO: To be done done
-};
-
-const joinGroup = () => {
-  // TODO: To be done done
-};
-
-const leaveGroup = () => {
-  // TODO: To be done done
-};
 </script>
