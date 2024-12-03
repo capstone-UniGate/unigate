@@ -19,8 +19,17 @@
               class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               type="button"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </button>
           </div>
@@ -42,18 +51,29 @@
               class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               type="button"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </button>
           </div>
-          <p v-if="passwordError" class="text-red-500 text-sm mt-2">{{ passwordError }}</p>
+          <p v-if="passwordError" class="text-red-500 text-sm mt-2">
+            {{ passwordError }}
+          </p>
         </FormField>
 
-        <Button 
+        <Button
           @click="handleLogin"
           type="button"
-          class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white" 
+          class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white"
           :disabled="!isFormValid"
         >
           Login
@@ -75,7 +95,7 @@ export default {
     FormField,
     FormLabel,
     Button,
-    Input
+    Input,
   },
   setup() {
     const form = ref({
@@ -86,7 +106,9 @@ export default {
     const passwordError = ref("");
 
     const isFormValid = computed(() => {
-      return form.value.username.trim() !== "" && form.value.password.trim() !== "";
+      return (
+        form.value.username.trim() !== "" && form.value.password.trim() !== ""
+      );
     });
 
     const isPasswordStrong = (password) => {
@@ -95,10 +117,11 @@ export default {
 
     const handleLogin = () => {
       if (!isPasswordStrong(form.value.password)) {
-        passwordError.value = "Password is not strong enough. It must be at least 8 characters long and contain both letters and numbers.";
+        passwordError.value =
+          "Password is not strong enough. It must be at least 8 characters long and contain both letters and numbers.";
         return;
       }
-      passwordError.value = ""; 
+      passwordError.value = "";
     };
 
     const clearInput = (field) => {
