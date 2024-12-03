@@ -90,7 +90,7 @@ def create_group_and_members() -> None:
     with Session(engine) as session:
         student = Student(
             id=uuid.uuid4(),
-            hashed_password=fake.password(),
+            # hashed_password=fake.password(),
             number=fake.random_int(1000, 100000),
             email=fake.email(),
             name=fake.name(),

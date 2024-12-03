@@ -1,6 +1,5 @@
 from collections.abc import Generator
 
-from sqlalchemy.engine import Engine
 from sqlmodel import (
     Session,  # type: ignore
     SQLModel,  # type: ignore  # noqa: F401
@@ -34,7 +33,7 @@ def init_db() -> None:
     pass
 
 
-def get_session(engine: Engine = engine) -> Generator[Session, None, None]:
+def get_session() -> Generator[Session, None, None]:
     with Session(engine) as session:
         try:
             yield session
@@ -43,4 +42,8 @@ def get_session(engine: Engine = engine) -> Generator[Session, None, None]:
 
 
 def get_auth_session() -> Generator[Session, None, None]:
-    return get_session(auth_engine)
+    with Session(auth_engine) as session:
+        try:
+            yield session
+        finally:
+            session.close()
