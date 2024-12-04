@@ -6,30 +6,24 @@ import { useRoute, useRouter } from "vue-router";
 const route = useRoute();
 const router = useRouter();
 const groupId = route.params.id;
+const members = await useApiFetch(`groups/${groupId}/get_members`);
 
-// Mock members (call API)
-const groupMembers = [
-  { id: 1, name: "Alice" },
-  { id: 2, name: "Bob" },
-  { id: 3, name: "Charlie" },
-  { id: 4, name: "David" },
-];
 </script>
 
 <template>
   <div class="p-6 bg-gray-50 min-h-screen">
     <!-- Header -->
     <h1 class="text-3xl font-semibold text-gray-800 ml-8 mt-4">
-      Members of Group {{ groupId }}
+      Group Members 
     </h1>
 
     <!-- Scrollable Area -->
-    <ScrollArea
+    <ScrollArea 
       class="h-96 w-full rounded-lg border border-gray-300 bg-white shadow-sm p-4 m-4"
     >
       <!-- Member List -->
-      <div
-        v-for="member in groupMembers"
+      <div 
+        v-for="member in members"
         :key="member.id"
         class="py-3 px-4 bg-gray-100 rounded-md mb-2 flex items-center hover:bg-gray-200 transition duration-200"
         data-testid="member"
@@ -43,8 +37,8 @@ const groupMembers = [
         </Avatar>
 
         <!-- Member Name -->
-        <span class="text-gray-800 font-bold">{{ member.name }}</span>
-      </div>
+        <span class="text-gray-800 font-bold">{{ member.name }} {{ member.surname}}</span>
+      </div> 
     </ScrollArea>
 
     <NuxtLink

@@ -75,9 +75,8 @@ def create_group(
             detail="An error occurred while creating the group.",
         )
 
-
 @router.get(
-    "/get_members",
+    "/{group_id}/get_members",
     status_code=status.HTTP_200_OK,
     responses={
         200: {
@@ -90,9 +89,11 @@ def create_group(
         500: {"description": "An error occurred while creating the group"},
     },
 )
-def get_members(group_id: uuid.UUID, student_id: uuid.UUID | None) -> list[Student]:
+def get_members(group_id: uuid.UUID) -> list[Student]:
     try:
-        return student_crud.get_members(group_id=group_id, student_id=student_id)
+        # Todo: it should be the authenticated user
+        auth_user = uuid.uuid4()
+        return student_crud.get_members(group_id=group_id, student_id=auth_user)
 
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Internal server error.")
