@@ -10,6 +10,13 @@ class GroupType(str, Enum):
     PRIVATE = "PRIVATE"
 
 
+# TODO: to use as a better way to handle roles
+class UserRole(str, Enum):
+    STUDENT = "student"
+    SUPERST = "superstudent"
+    TEACHER = "teacher"
+
+
 class Student(SQLModel, table=True):
     __tablename__ = "students"  # type: ignore
 

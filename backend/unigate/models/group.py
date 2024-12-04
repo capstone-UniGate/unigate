@@ -19,6 +19,7 @@ class Group(SQLModel, table=True):
     type: GroupType = Field(sa_column=Column(Enum(GroupType, name="group_type")))
     members_count: int = Field(default=0)
 
+    # TODO: Probably better to have a GroupCreate w/o this field (has to be injected by the log of the user)
     creator_id: uuid.UUID = Field(
         foreign_key="students.id", nullable=False, ondelete="CASCADE"
     )

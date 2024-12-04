@@ -9,6 +9,8 @@ from unigate.crud.join_crud import join_crud
 from unigate.crud.request_crud import request_crud
 from unigate.crud.student_crud import student_crud
 from unigate.models import Group, Request, Student
+from unigate.models.auth import User
+from unigate.routes.auth import get_current_user
 
 router = APIRouter()
 
@@ -52,6 +54,7 @@ def get_groups() -> list[Group]:
 def create_group(
     group_data: Group,
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ) -> Group:
     """
     Creates a new group in the system.
@@ -65,7 +68,9 @@ def create_group(
     This endpoint checks for duplicate group names before creating a new group.
     """
     try:
-        return group_crud.create_group(session=session, group_data=group_data)
+        # TODO: remove session & tweak the crud to handle the current_user
+        group = Group(**group_data.model_dump(), creator_id=current_user.number)
+        return group_crud.create_group(session=session, group_data=group)
     except HTTPException:
         raise  # Re-raise any HTTPExceptions for client handling
     except Exception:
