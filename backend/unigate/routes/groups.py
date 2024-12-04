@@ -75,6 +75,7 @@ def create_group(
             detail="An error occurred while creating the group.",
         )
 
+
 @router.get(
     "/{group_id}/get_members",
     status_code=status.HTTP_200_OK,

@@ -7,22 +7,21 @@ const route = useRoute();
 const router = useRouter();
 const groupId = route.params.id;
 const members = await useApiFetch(`groups/${groupId}/get_members`);
-
 </script>
 
 <template>
   <div class="p-6 bg-gray-50 min-h-screen">
     <!-- Header -->
     <h1 class="text-3xl font-semibold text-gray-800 ml-8 mt-4">
-      Group Members 
+      Group Members
     </h1>
 
     <!-- Scrollable Area -->
-    <ScrollArea 
+    <ScrollArea
       class="h-96 w-full rounded-lg border border-gray-300 bg-white shadow-sm p-4 m-4"
     >
       <!-- Member List -->
-      <div 
+      <div
         v-for="member in members"
         :key="member.id"
         class="py-3 px-4 bg-gray-100 rounded-md mb-2 flex items-center hover:bg-gray-200 transition duration-200"
@@ -37,8 +36,10 @@ const members = await useApiFetch(`groups/${groupId}/get_members`);
         </Avatar>
 
         <!-- Member Name -->
-        <span class="text-gray-800 font-bold">{{ member.name }} {{ member.surname}}</span>
-      </div> 
+        <span class="text-gray-800 font-bold"
+          >{{ member.name }} {{ member.surname }}</span
+        >
+      </div>
     </ScrollArea>
 
     <NuxtLink

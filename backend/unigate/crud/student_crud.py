@@ -19,7 +19,7 @@ class CRUDStudent(CRUDBase[Student, Student, Student]):
     ) -> list[Student]:
         group = group_crud.get(id=group_id)
         if group.type == GroupType.PRIVATE:
-            if not self.check_membership(group_id=group_id, student_id=student_id ):
+            if not self.check_membership(group_id=group_id, student_id=student_id):
                 return []
         statement = select(self.model).join(Join).where(Join.group_id == group_id)
         return self.get_multi(query=statement)
