@@ -136,7 +136,6 @@
 
           <div class="text-center mt-6">
             <Button
-              v-if="group.is_member_of || group.is_super_student"
               @click="leaveGroup"
               class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-red-600 hover:shadow-xl active:scale-95 transition-all"
               id="leave-group-button"
@@ -144,7 +143,6 @@
               Leave Group
             </Button>
             <Button
-              v-else-if="group.type != 'Private'"
               @click="joinGroup"
               class="bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-indigo-600 hover:shadow-xl active:scale-95 transition-all"
               id="join-group-button"
@@ -152,7 +150,6 @@
               Join Group
             </Button>
             <Button
-              v-else
               @click="askToJoinGroup"
               class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-yellow-600 hover:shadow-xl active:scale-95 transition-all"
               id="ask-to-join-button"
@@ -211,16 +208,41 @@ const closeAvatarModal = () => {
   isAvatarModalOpen.value = false;
 };
 
-const leaveGroup = () => {
-  toast({
-    variant: "success",
-    description: "You have left the group",
-    duration: 1000,
-  });
+async function leaveGroup() {
 
-  setTimeout(() => {
-    router.push("/groups");
-  }, 1500);
+  try {
+    isError.value = false;
+    isLoading.value = true;
+    let string_message = await useApiFetch(`/groups/${groupId}/leave`, {method: "POST", params:{"student_id": "24d06a00-d9b4-4e18-b1ff-20501cc762df",
+            "group_id": groupId,}});
+    console.log(string_message)
+    if(string_message === "The student has been removed successfully"){
+      toast({
+        variant: "success",
+        description: "You have left the group",
+        duration: 1000,
+      });
+      setTimeout(() => {
+        router.push("/groups");
+        }, 1500);
+    }else{
+      toast({
+        variant: "destructive",
+        description: string_message,
+        duration: 1000,
+      });
+    }
+  } catch (error) {
+    toast({
+      variant: "destructive",
+      description: "You have NOT left the group",
+      duration: 1000,
+    });
+    isError.value = true;
+  } finally {
+    isLoading.value = false;
+  }
+
 };
 
 const joinGroup = () => {
