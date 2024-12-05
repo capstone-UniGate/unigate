@@ -42,24 +42,6 @@
             >
               Approve
             </button>
-            <!--</div>-->
-
-            <!--
-            <div v-else>
-              <span
-                v-if="request.status == 'APPROVED'"
-                class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20"
-              >
-                Approved
-              </span>
-              <span
-                v-if="request.status == 'REJECTED'"
-                class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20"
-              >
-                Rejected
-              </span>
-            </div>
-            -->
           </div>
         </li>
       </ul>
