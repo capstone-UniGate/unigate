@@ -24,7 +24,7 @@ const members = await useApiFetch(`groups/${groupId}/get_members`);
       <div
         v-for="member in members"
         :key="member.id"
-        class="py-3 px-4 bg-gray-100 rounded-md mb-2 flex items-center hover:bg-gray-200 transition duration-200"
+        class="py-3 px-4 bg-gray-100 rounded-md mb-2 flex items-center justify-between hover:bg-gray-200 transition duration-200"
         data-testid="member"
       >
         <!-- Avatar with Default Image -->
@@ -35,10 +35,20 @@ const members = await useApiFetch(`groups/${groupId}/get_members`);
           />
         </Avatar>
 
-        <!-- Member Name -->
-        <span class="text-gray-800 font-bold"
-          >{{ member.name }} {{ member.surname }}</span
+        <!-- Member Info and Block Button -->
+        <div class="flex-grow">
+          <!-- Member Name -->
+          <span class="text-gray-800 font-bold"
+            >{{ member.name }} {{ member.surname }}</span
+          >
+        </div>
+
+        <!-- Block Button -->
+        <button
+          class="px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded-lg hover:bg-gray-600 transition"
         >
+          Block
+        </button>
       </div>
     </ScrollArea>
 
