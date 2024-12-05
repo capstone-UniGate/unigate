@@ -103,10 +103,17 @@ export default {
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen;
     },
+    logout() {
+      console.log("Logging out...");
+      localStorage.removeItem("authToken");
+      // Redirect to login page with a success message
+      this.$router.push({
+        path: "/login",
+        query: { message: "You have successfully logged out." },
+      });
+    },
   },
 };
 </script>
 
-<style scoped>
-/* Custom Styles */
-</style>
+<style scoped></style>
