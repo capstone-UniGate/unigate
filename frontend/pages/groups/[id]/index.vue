@@ -173,7 +173,7 @@
             </Button>
 
             <Button
-              v-if="
+              v-else-if="
                 userRequestStatus == null ||
                 userRequestStatus.includes('REJECTED')
               "
@@ -373,6 +373,4 @@ async function leaveGroup() {
     isLoading.value = false;
   }
 }
-
-const navigateToRequests = () => router.push(`/groups/${groupId}/requests`);
 </script>
