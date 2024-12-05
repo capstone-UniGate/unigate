@@ -6,21 +6,14 @@ import { useRoute, useRouter } from "vue-router";
 const route = useRoute();
 const router = useRouter();
 const groupId = route.params.id;
-
-// Mock members (call API)
-const groupMembers = [
-  { id: 1, name: "Alice" },
-  { id: 2, name: "Bob" },
-  { id: 3, name: "Charlie" },
-  { id: 4, name: "David" },
-];
+const members = await useApiFetch(`groups/${groupId}/get_members`);
 </script>
 
 <template>
   <div class="p-6 bg-gray-50 min-h-screen">
     <!-- Header -->
     <h1 class="text-3xl font-semibold text-gray-800 ml-8 mt-4">
-      Members of Group {{ groupId }}
+      Group Members
     </h1>
 
     <!-- Scrollable Area -->
@@ -29,7 +22,7 @@ const groupMembers = [
     >
       <!-- Member List -->
       <div
-        v-for="member in groupMembers"
+        v-for="member in members"
         :key="member.id"
         class="py-3 px-4 bg-gray-100 rounded-md mb-2 flex items-center justify-between hover:bg-gray-200 transition duration-200"
         data-testid="member"
@@ -45,9 +38,11 @@ const groupMembers = [
         <!-- Member Info and Block Button -->
         <div class="flex-grow">
           <!-- Member Name -->
-          <span class="text-gray-800 font-bold">{{ member.name }}</span>
+          <span class="text-gray-800 font-bold"
+            >{{ member.name }} {{ member.surname }}</span
+          >
         </div>
-        
+
         <!-- Block Button -->
         <button
           class="px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded-lg hover:bg-gray-600 transition"
@@ -65,6 +60,5 @@ const groupMembers = [
     </NuxtLink>
   </div>
 </template>
-
 
 <style scoped></style>
