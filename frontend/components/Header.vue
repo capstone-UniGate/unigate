@@ -35,6 +35,14 @@
           >
         </nav>
 
+        <!-- Logout Button (Desktop) -->
+        <button
+          @click="logout"
+          class="hidden md:block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+        >
+          Logout
+        </button>
+
         <!-- Mobile Menu Button -->
         <button @click="toggleMenu" class="md:hidden text-blue-800">
           <svg
@@ -68,6 +76,13 @@
         <router-link to="/contact" class="block hover:text-blue-500 transition"
           >Contact</router-link
         >
+        <!-- Logout Button (Mobile) -->
+        <button
+          @click="logout"
+          class="block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-center"
+        >
+          Logout
+        </button>
       </div>
     </header>
 
