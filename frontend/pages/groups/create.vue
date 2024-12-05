@@ -171,10 +171,8 @@ import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import * as z from "zod";
 
-// Toast setup
 const { toast } = useToast();
 
-// Define the schema for validation
 const formSchema = toTypedSchema(
   z.object({
     name: z.string().min(2, "Name must be at least 2 characters long").max(50),
@@ -189,18 +187,14 @@ const { handleSubmit, errors, setFieldValue } = useForm({
   validationSchema: formSchema,
 });
 
-// Error message reference
 const errorMessage = ref("");
 
-// Router for navigation
 const router = useRouter();
 
-// Reactive references for tags
 const tags = ref<string[]>([]);
 const tagInput = ref("");
 const filteredSuggestions = ref<string[]>([]);
 
-// Tag suggestions
 const allSuggestions = [
   "JavaScript",
   "Vue.js",
@@ -214,12 +208,11 @@ const allSuggestions = [
   "Rollup",
 ];
 
-// Methods to handle tag input
 const addTag = () => {
   const newTag = tagInput.value.trim();
   if (newTag && !tags.value.includes(newTag)) {
     tags.value.push(newTag);
-    setFieldValue("tags", tags.value); // Synchronize with form
+    setFieldValue("tags", tags.value);
   }
   tagInput.value = "";
   filteredSuggestions.value = [];
@@ -227,7 +220,7 @@ const addTag = () => {
 
 const removeTag = (index: number) => {
   tags.value.splice(index, 1);
-  setFieldValue("tags", tags.value); // Synchronize with form
+  setFieldValue("tags", tags.value);
 };
 
 const removeLastTag = (event: KeyboardEvent) => {
@@ -237,7 +230,7 @@ const removeLastTag = (event: KeyboardEvent) => {
     (event.key === "Backspace" || event.key === "Delete")
   ) {
     tags.value.pop();
-    setFieldValue("tags", tags.value); // Synchronize with form
+    setFieldValue("tags", tags.value);
   }
 };
 
@@ -250,37 +243,31 @@ const filterSuggestions = () => {
   );
 };
 
-// Select a suggestion from the dropdown
 const selectSuggestion = (suggestion: string) => {
   if (!tags.value.includes(suggestion)) {
     tags.value.push(suggestion);
-    setFieldValue("tags", tags.value); // Synchronize with form
+    setFieldValue("tags", tags.value);
   }
   tagInput.value = "";
   filteredSuggestions.value = [];
 };
 
-// Check for form errors
 const formHasErrors = computed(() => Object.keys(errors.value).length > 0);
 
-// Form submission handler
 const onSubmit = handleSubmit((values) => {
-  // Include tags in the form values
   values.tags = tags.value;
 
-  // Display success toast
   toast({
     variant: "success",
     description: "Group created successfully",
+    duration: 1000,
   });
 
-  // Redirect to the /group page after a brief delay
   setTimeout(() => {
     router.push("/groups");
   }, 1500);
 });
 
-// Cancel button handler
 const onCancel = () => {
   router.push("/groups");
 };
@@ -307,7 +294,6 @@ const onCancel = () => {
   padding-top: 6px;
 }
 
-/* Tags Input Styles */
 .tags-input-container {
   position: relative;
   border: 1px solid #ddd;

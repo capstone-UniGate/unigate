@@ -79,7 +79,7 @@
         <!-- Logout Button (Mobile) -->
         <button
           @click="logout"
-          class="block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition w-full text-center"
+          class="block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-center"
         >
           Logout
         </button>
