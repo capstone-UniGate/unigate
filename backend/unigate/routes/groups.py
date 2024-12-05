@@ -169,3 +169,8 @@ def get_group_requests(group_id: uuid.UUID) -> list[Request]:
         raise HTTPException(status_code=404, detail="Group not found.")
 
     return request_crud.get_all_requests_for_group(group_id=group_id)
+
+
+@router.post("/{group_id}/leave", response_model=str)
+def leave_group(group_id: uuid.UUID, student_id: uuid.UUID) -> str:
+    return join_crud.remove_student(group_id=group_id, student_id=student_id)
