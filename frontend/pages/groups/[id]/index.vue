@@ -209,14 +209,18 @@ const closeAvatarModal = () => {
 };
 
 async function leaveGroup() {
-
   try {
     isError.value = false;
     isLoading.value = true;
-    let string_message = await useApiFetch(`/groups/${groupId}/leave`, {method: "POST", params:{"student_id": "24d06a00-d9b4-4e18-b1ff-20501cc762df",
-            "group_id": groupId,}});
-    console.log(string_message)
-    if(string_message === "The student has been removed successfully"){
+    let string_message = await useApiFetch(`/groups/${groupId}/leave`, {
+      method: "POST",
+      params: {
+        student_id: "24d06a00-d9b4-4e18-b1ff-20501cc762df",
+        group_id: groupId,
+      },
+    });
+    console.log(string_message);
+    if (string_message === "The student has been removed successfully") {
       toast({
         variant: "success",
         description: "You have left the group",
@@ -224,8 +228,8 @@ async function leaveGroup() {
       });
       setTimeout(() => {
         router.push("/groups");
-        }, 1500);
-    }else{
+      }, 1500);
+    } else {
       toast({
         variant: "destructive",
         description: string_message,
@@ -242,8 +246,7 @@ async function leaveGroup() {
   } finally {
     isLoading.value = false;
   }
-
-};
+}
 
 const joinGroup = () => {
   // Send a request to the group creator

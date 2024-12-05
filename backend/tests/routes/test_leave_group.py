@@ -117,7 +117,7 @@ def test_valid_leave() -> None:
         },
     )
 
-    group["members_count"] = group["members_count"]-1
+    group["members_count"] = group["members_count"] - 1
 
     assert response.status_code == 200
     assert response.json() == "The student has been removed successfully"
