@@ -4,15 +4,16 @@ import uuid
 import pytz
 from fastapi import HTTPException
 from sqlmodel import select
+
 from unigate.models import Join, Request
 
 from .base_crud import CRUDBase
-from .group_crud import group_crud
+from .group_crud import group
 
 
 class CRUDRequest(CRUDBase[Request, Request, Request]):
     def create_request(self, student_id: uuid.UUID, group_id: uuid.UUID) -> Request:
-        group = group_crud.get(id=group_id)
+        group = group.get(id=group_id)
         if not group:
             raise HTTPException(status_code=404, detail="Group not found.")
 
@@ -48,7 +49,7 @@ class CRUDRequest(CRUDBase[Request, Request, Request]):
         return new_request
 
     def get_all_requests_for_group(self, group_id: uuid.UUID) -> list[Request]:
-        group = group_crud.get(id=group_id)
+        group = group.get(id=group_id)
         if not group:
             raise HTTPException(status_code=404, detail="Group not found.")
 
@@ -80,7 +81,7 @@ class CRUDRequest(CRUDBase[Request, Request, Request]):
         )
         self.db_session.add(join_entry)
 
-        group = group_crud.get(id=request.group_id)
+        group = group.get(id=request.group_id)
         group.members_count = group.members_count + 1
         self.db_session.commit()
 

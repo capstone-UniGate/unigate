@@ -5,7 +5,6 @@ description = ""
 requires-python = ">=3.12"
 dependencies = [
     "faker>=33.1.0",
-    "fastapi-pagination>=0.12.31",
     "fastapi[all,standard]>=0.115.4",
     "loguru>=0.7.2",
     "passlib[bcrypt]>=1.7.4",

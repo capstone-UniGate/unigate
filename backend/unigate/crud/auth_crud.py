@@ -1,6 +1,7 @@
 from typing import TypeVar
 
 from sqlmodel import SQLModel, select
+
 from unigate.models import User
 
 from .base_crud import CRUDBase

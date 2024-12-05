@@ -8,9 +8,10 @@ from loguru import logger
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError
+
 from unigate.core.config import settings
 from unigate.crud.auth_crud import user_read
-from unigate.crud.student_crud import student_crud
+from unigate.crud.student_crud import student
 from unigate.models.auth import User
 from unigate.utils.jwt import create_access_token
 
@@ -31,7 +32,7 @@ class TokenData(BaseModel):
 
 
 def get_user(number: int) -> User:
-    student = student_crud.get_by_number(number=number)
+    student = student.get_by_number(number=number)
     if student is None:
         raise HTTPException(status_code=404, detail="Student not found.")
 

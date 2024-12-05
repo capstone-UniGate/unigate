@@ -5,20 +5,21 @@ import pytz
 from loguru import logger
 from sqlalchemy import exc
 from sqlmodel import select
+
 from unigate.models import Group, Join
 from unigate.utils.mail import Mailer
 
 from .base_crud import CRUDBase
-from .group_crud import group_crud
+from .group_crud import group
 from .request_crud import request_crud
-from .student_crud import student_crud
+from .student_crud import student
 from .super_student_crud import super_student_crud
 
 
 class CRUDJoin(CRUDBase[Join, Join, Join]):
     def join_public_group(self, student_id: uuid.UUID, group_id: uuid.UUID) -> str:
-        group = group_crud.get(id=group_id)
-        if group is None or student_crud.get(id=student_id) is None:
+        group = group.get(id=group_id)
+        if group is None or student.get(id=student_id) is None:
             return "Either the group or the student don't exist"
         if not self.check_double_enrollment(student_id, group.category):
             return "You are already enrolled in a team for the same course"
@@ -40,7 +41,7 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
     def check_double_enrollment(
         self, student_id: uuid.UUID, category: str | None = None
     ) -> bool:
-        db_session = self.get_db()
+        db_session = self.get_db_session()
         try:
             statement = (
                 select(Group)
@@ -58,8 +59,8 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
         return self.get_multi(query=statement)
 
     def join_private_group(self, student_id: uuid.UUID, group_id: uuid.UUID) -> str:
-        group = group_crud.get(id=group_id)
-        student = student_crud.get(id=student_id)
+        group = group.get(id=group_id)
+        student = student.get(id=student_id)
 
         if group is None or student is None:
             return "Either the group or the student doesn't exist"
@@ -75,7 +76,7 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
         # Fetch the super student (group admin) for the group
         super_student = super_student_crud.get_by_group_id(group_id=group_id)
         if super_student:
-            admin_student = student_crud.get(id=super_student.student_id)
+            admin_student = student.get(id=super_student.student_id)
             if (
                 admin_student and admin_student.email
             ):  # Ensure the admin has an email address

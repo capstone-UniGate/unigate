@@ -2,18 +2,16 @@ from typing import Any, Generic, TypeVar
 from uuid import UUID
 
 from fastapi import HTTPException
-from fastapi_pagination import Page, Params
-from fastapi_pagination.ext.sqlmodel import paginate
 from pydantic import BaseModel
 from sqlalchemy import exc
 from sqlmodel import Session, SQLModel, func, select
 from sqlmodel.sql.expression import Select
+
 from unigate.core.database import get_session
 
 ModelType = TypeVar("ModelType", bound=SQLModel)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
-SchemaType = TypeVar("SchemaType", bound=BaseModel)
 T = TypeVar("T", bound=SQLModel)
 
 
@@ -28,22 +26,29 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.model = model
         self.db_session = next(get_session())
 
-    def get_db(self) -> Session:
+    def get_db_session(self) -> Session:
         return next(get_session())
 
-    def get(self, *, id: UUID | int | str) -> ModelType | None:
-        query = select(self.model).where(self.model.id == id)
-        response = self.db_session.exec(query)
+    def get(
+        self, *, id: UUID | str, db_session: Session | None = None
+    ) -> ModelType | None:
+        db_session = db_session or self.db_session
+        query = select(self.model).where(self.model.id == id)  # type: ignore
+        response = db_session.exec(query)
         return response.one_or_none()
 
-    def get_by_ids(self, *, list_ids: list[UUID | str]) -> list[ModelType]:
-        response = self.db_session.exec(
-            select(self.model).where(self.model.id.in_(list_ids))
+    def get_by_ids(
+        self, *, list_ids: list[UUID | str], db_session: Session | None = None
+    ) -> list[ModelType]:
+        db_session = db_session or self.db_session
+        response = db_session.exec(
+            select(self.model).where(self.model.id.in_(list_ids))  # type: ignore
         )
-        return response.scalars().all()
+        return response.all()  # type: ignore
 
-    def get_count(self) -> int:
-        response = self.db_session.exec(
+    def get_count(self, db_session: Session | None = None) -> int:
+        db_session = db_session or self.db_session
+        response = db_session.exec(
             select(func.count()).select_from(select(self.model).subquery())
         )
         return response.one()
@@ -54,39 +59,13 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         skip: int = 0,
         limit: int = 100,
         query: T | Select[T] | None = None,
+        db_session: Session | None = None,
     ) -> list[ModelType]:
+        db_session = db_session or self.db_session
         if query is None:
-            query = select(self.model).offset(skip).limit(limit).order_by(self.model.id)
-        response = self.db_session.exec(query)
-        return response.all()
-
-    def get_multi_paginated(
-        self,
-        *,
-        params: Params | None = Params(),
-        query: T | Select[T] | None = None,
-    ) -> Page[ModelType]:
-        if query is None:
-            query = select(self.model)
-        return paginate(self.db_session, query, params)
-
-    def get_multi_paginated_ordered(
-        self,
-        *,
-        params: Params | None = Params(),
-        order_by: str | None = None,
-        order: str = "asc",
-        query: T | Select[T] | None = None,
-    ) -> Page[ModelType]:
-        columns = self.model.__table__.columns
-        order_by_column = columns.get(order_by, columns["id"])
-
-        if query is None:
-            query = select(self.model).order_by(
-                order_by_column.asc() if order == "asc" else order_by_column.desc()
-            )
-
-        return paginate(self.db_session, query, params)
+            query = select(self.model).offset(skip).limit(limit).order_by(self.model.id)  # type: ignore
+        response = db_session.exec(query)  # type: ignore
+        return response.all()  # type: ignore
 
     def get_multi_ordered(
         self,
@@ -95,43 +74,47 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         limit: int = 100,
         order_by: str | None = None,
         order: str = "asc",
+        db_session: Session | None = None,
     ) -> list[ModelType]:
-        columns = self.model.__table__.columns
-        order_by_column = columns.get(order_by, columns["id"])
+        db_session = db_session or self.db_session
+        columns = self.model.__table__.columns  # type: ignore
+        order_by_column = columns.get(order_by, columns["id"])  # type: ignore
 
         query = (
             select(self.model)
             .offset(skip)
             .limit(limit)
             .order_by(
-                order_by_column.asc() if order == "asc" else order_by_column.desc()
+                order_by_column.asc() if order == "asc" else order_by_column.desc()  # type: ignore
             )
         )
 
-        response = self.db_session.exec(query)
-        return response.scalars().all()
+        response = db_session.exec(query)
+        return response.all()  # type: ignore
 
     def create(
         self,
         *,
         obj_in: CreateSchemaType | ModelType,
         created_by_id: UUID | str | None = None,
+        db_session: Session | None = None,
     ) -> ModelType:
+        db_session = db_session or self.db_session
         db_obj = self.model.model_validate(obj_in)  # type: ignore
 
         if created_by_id:
             db_obj.created_by_id = created_by_id
 
         try:
-            self.db_session.add(db_obj)
-            self.db_session.commit()
+            db_session.add(db_obj)
+            db_session.commit()
         except exc.IntegrityError:
             self.db_session.rollback()
             raise HTTPException(
                 status_code=409,
                 detail="Resource already exists",
             )
-        self.db_session.refresh(db_obj)
+        db_session.refresh(db_obj)
         return db_obj
 
     def update(
@@ -139,21 +122,26 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         *,
         obj_current: ModelType,
         obj_new: UpdateSchemaType | dict[str, Any] | ModelType,
+        db_session: Session | None = None,
     ) -> ModelType:
+        db_session = db_session or self.db_session
         update_data = (
-            obj_new if isinstance(obj_new, dict) else obj_new.dict(exclude_unset=True)
+            obj_new
+            if isinstance(obj_new, dict)
+            else obj_new.model_dump(exclude_unset=True)
         )
         for field in update_data:
             setattr(obj_current, field, update_data[field])
 
-        self.db_session.add(obj_current)
-        self.db_session.commit()
-        self.db_session.refresh(obj_current)
+        db_session.add(obj_current)
+        db_session.commit()
+        db_session.refresh(obj_current)
         return obj_current
 
-    def remove(self, *, id: UUID | str) -> ModelType:
-        response = self.db_session.exec(select(self.model).where(self.model.id == id))
-        obj = response.scalar_one()
+    def remove(self, *, id: UUID | str, db_session: Session | None) -> ModelType:
+        db_session = db_session or self.db_session
+        response = db_session.exec(select(self.model).where(self.model.id == id))  # type: ignore
+        obj = response.one()
         self.db_session.delete(obj)
         self.db_session.commit()
         return obj
