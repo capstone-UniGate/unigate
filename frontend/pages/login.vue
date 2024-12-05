@@ -1,7 +1,7 @@
 <template>
-    <!-- Success Message --> 
+  <!-- Success Message -->
   <div class="justify-center bg-gray-100">
-   <p
+    <p
       v-if="$route.query.message"
       class="mb-4 p-3 bg-blue-100 text-blue-800 border border-blue-300 rounded-lg text-center shadow"
     >
