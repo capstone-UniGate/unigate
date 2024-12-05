@@ -42,6 +42,14 @@
             >
               Approve
             </button>
+
+            <button
+              @click="block(request.id)"
+              class="px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded-lg hover:bg-gray-600 transition"
+            >
+              Block
+            </button>
+
             <!--</div>-->
 
             <!--
@@ -207,6 +215,24 @@ function reject(requestId: number) {
 
     // Notify the superstudent of the rejection
     //TODO: Implement notification logic
+  }
+}
+
+function block(requestId: number) {
+  // Find the request with the given ID
+  const requestIndex = requests.findIndex((req) => req.id === requestId);
+
+  if (requestIndex !== -1) {
+    // Remove the request from the list
+    const blockedUser = requests[requestIndex];
+    requests.splice(requestIndex, 1);
+
+    // Optionally, add a way to mark the user as "blocked" for private groups
+    // For example: Store their blocked status in a database or local state
+    if (!group.blockedUsers) {
+      group.blockedUsers = [];
+    }
+    group.blockedUsers.push(blockedUser.id);
   }
 }
 </script>
