@@ -151,15 +151,6 @@ def create_group_and_members() -> None:
                 session.add(join)
                 session.commit()
 
-                # Randomly block some students in this group
-                if secrets.randbelow(2):  # 50% chance
-                    blocked = Blocked(
-                        student_id=student.id,
-                        group_id=group.id,
-                    )
-                    session.add(blocked)
-                    session.commit()
-
         logger.debug(group.type)
 
         if group.type == GroupType.PRIVATE:
@@ -198,7 +189,7 @@ def create_group_and_members() -> None:
                     session.add(join)
                     session.commit()
 
-                    # Randomly block some students in this group
+                # Randomly block some students in this group
                 if secrets.randbelow(3):  # ~33% chance
                     blocked = Blocked(
                         student_id=student.id,
