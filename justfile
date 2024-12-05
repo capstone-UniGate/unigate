@@ -40,7 +40,7 @@ backend-fix: backend-deps
     {{ backend_venv }}/ruff check backend --config backend/pyproject.toml
     {{ backend_venv }}/ruff format backend --config backend/pyproject.toml
 
-backend-test: backend-deps init-database seed-database
+backend-test: backend-deps init-database
     cd backend && ../{{ backend_venv }}/pytest tests/
 
 pre-commit: backend-deps
