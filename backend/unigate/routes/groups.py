@@ -9,6 +9,7 @@ from unigate.crud.join_crud import join_crud
 from unigate.crud.request_crud import request_crud
 from unigate.crud.student_crud import student_crud
 from unigate.models import Group, Request, Student
+from unigate.models.request_response_model import RequestResponse
 
 router = APIRouter()
 
@@ -160,8 +161,8 @@ def get_group(id: uuid.UUID) -> dict:
     return group_dict
 
 
-@router.get("/{group_id}/requests", response_model=list[Request])
-def get_group_requests(group_id: uuid.UUID) -> list[Request]:
+@router.get("/{group_id}/requests", response_model=list[RequestResponse])
+def get_group_requests(group_id: uuid.UUID) -> list[RequestResponse]:
     group = group_crud.get(id=group_id)
     if not group:
         raise HTTPException(status_code=404, detail="Group not found.")
