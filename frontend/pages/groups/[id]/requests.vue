@@ -59,7 +59,6 @@ const requests = ref([]); // Initialize as empty array
 async function fetchRequests() {
   try {
     requests.value = await useApiFetch(`groups/${groupId}/requests`);
-    console.log("Fetched requests:", requests.value);
   } catch (error) {
     console.error("Error fetching requests:", error);
   }
@@ -70,10 +69,8 @@ function approve(id) {
   useApiFetch(`requests/${id}/approve`, {
     method: "post",
   }).then(() => {
-    console.log("Before filtering:", requests.value);
     if (requests.value) {
       requests.value = requests.value.filter((request) => request.id !== id);
-      console.log("After filtering:", requests.value);
     }
   });
 }
@@ -84,10 +81,8 @@ function reject(id) {
   useApiFetch(`requests/${id}/reject`, {
     method: "post",
   }).then(() => {
-    console.log("Before filtering:", requests.value);
     if (requests.value) {
       requests.value = requests.value.filter((request) => request.id !== id);
-      console.log("After filtering:", requests.value);
     }
   });
 }
