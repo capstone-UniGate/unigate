@@ -2,7 +2,11 @@ import uuid
 from enum import Enum
 
 from pydantic import EmailStr
-from sqlmodel import Field, SQLModel  # type: ignore
+from sqlmodel import Field, SQLModel, Relationship  # type: ignore
+from typing import TYPE_CHECKING, List
+
+if TYPE_CHECKING:
+    from .request import Request  # noqa: F401
 
 
 class GroupType(str, Enum):
@@ -19,3 +23,6 @@ class Student(SQLModel, table=True):
     email: EmailStr = Field(unique=True, index=True, max_length=255)
     name: str = Field(max_length=255)
     surname: str = Field(default=None, max_length=255)
+
+    # Reverse relationship to Request
+    requests: List["Request"] = Relationship(back_populates="student")
