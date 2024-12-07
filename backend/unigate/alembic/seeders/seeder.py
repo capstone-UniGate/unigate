@@ -8,6 +8,7 @@ from loguru import logger
 from sqlmodel import Session
 from unigate.core.database import engine
 from unigate.models import (
+    Blocked,
     Group,
     GroupType,
     Join,
@@ -186,6 +187,15 @@ def create_group_and_members() -> None:
                     group.members_count = group.members_count + 1
 
                     session.add(join)
+                    session.commit()
+
+                # Randomly block some students in this group
+                if secrets.randbelow(3):  # ~33% chance
+                    blocked = Blocked(
+                        student_id=student.id,
+                        group_id=group.id,
+                    )
+                    session.add(blocked)
                     session.commit()
 
 
