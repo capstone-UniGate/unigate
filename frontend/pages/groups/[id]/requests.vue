@@ -40,6 +40,33 @@
               class="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-lg hover:bg-green-600 transition">
               Approve
             </button>
+<<<<<<< HEAD
+=======
+
+            <button
+              @click="block(request.id)"
+              class="px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded-lg hover:bg-gray-600 transition"
+            >
+              Block
+            </button>
+
+            <!--</div>-->
+
+            <!--
+            <div v-else>
+              <span
+                v-if="request.status == 'APPROVED'"
+                class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20"
+              >
+                Approved
+              </span>
+              <span
+                v-if="request.status == 'REJECTED'"
+                class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20"
+              >
+                Rejected
+              </span>
+>>>>>>> main
             </div>
           </div>
         </li>
@@ -90,4 +117,21 @@ function reject(id) {
 
 
 
+function block(requestId: number) {
+  // Find the request with the given ID
+  const requestIndex = requests.findIndex((req) => req.id === requestId);
+
+  if (requestIndex !== -1) {
+    // Remove the request from the list
+    const blockedUser = requests[requestIndex];
+    requests.splice(requestIndex, 1);
+
+    // Optionally, add a way to mark the user as "blocked" for private groups
+    // For example: Store their blocked status in a database or local state
+    if (!group.blockedUsers) {
+      group.blockedUsers = [];
+    }
+    group.blockedUsers.push(blockedUser.id);
+  }
+}
 </script>

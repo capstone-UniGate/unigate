@@ -78,7 +78,7 @@ def create_group(
 
 
 @router.get(
-    "/get_members",
+    "/{group_id}/get_members",
     status_code=status.HTTP_200_OK,
     responses={
         200: {
@@ -91,9 +91,11 @@ def create_group(
         500: {"description": "An error occurred while creating the group"},
     },
 )
-def get_members(group_id: uuid.UUID, student_id: uuid.UUID | None) -> list[Student]:
+def get_members(group_id: uuid.UUID) -> list[Student]:
     try:
-        return student_crud.get_members(group_id=group_id, student_id=student_id)
+        # Todo: it should be the authenticated user
+        auth_user = uuid.uuid4()
+        return student_crud.get_members(group_id=group_id, student_id=auth_user)
 
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Internal server error.")
@@ -168,3 +170,8 @@ def get_group_requests(group_id: uuid.UUID) -> list[RequestResponse]:
         raise HTTPException(status_code=404, detail="Group not found.")
 
     return request_crud.get_all_requests_for_group(group_id=group_id)
+
+
+@router.post("/{group_id}/leave", response_model=str)
+def leave_group(group_id: uuid.UUID, student_id: uuid.UUID) -> str:
+    return join_crud.remove_student(group_id=group_id, student_id=student_id)

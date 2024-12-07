@@ -104,5 +104,24 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
         mail.send()
         logger.info("Email sent successfully to the admin.")
 
+    def remove_student(self, group_id: uuid.UUID, student_id: uuid.UUID) -> str:
+        group = group_crud.get(id=group_id)
+        if group is None:
+            return "The group doesn't exist"
+        response = self.db_session.exec(
+            select(self.model)
+            .where(self.model.student_id == student_id)
+            .where(self.model.group_id == group_id)
+        )
+        response = response.one_or_none()
+        if response is None:
+            return "The student is not part of the group"
+        self.delete(response)
+        group.members_count = group.members_count - 1
+        self.db_session.commit()
+        if group.members_count == 0:
+            group_crud.delete(obj=group)
+        return "The student has been removed successfully"
+
 
 join_crud = CRUDJoin(Join)
