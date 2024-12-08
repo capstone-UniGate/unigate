@@ -1,12 +1,11 @@
 import enum
 import uuid
-
-
-from sqlmodel import Column, Enum, Field, SQLModel, Relationship  # type: ignore
 from typing import TYPE_CHECKING, Optional
-if TYPE_CHECKING:
-    from  .student import Student  # noqa: F401
 
+from sqlmodel import Column, Enum, Field, Relationship, SQLModel  # type: ignore
+
+if TYPE_CHECKING:
+    from .student import Student
 
 
 class RequestStatus(str, enum.Enum):
