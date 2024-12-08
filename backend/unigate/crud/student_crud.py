@@ -1,7 +1,6 @@
 import uuid
 
 from sqlmodel import select
-
 from unigate.crud.group_crud import group_crud
 from unigate.models import Group, GroupType, Join, Student
 

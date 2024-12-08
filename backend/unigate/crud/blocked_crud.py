@@ -1,7 +1,6 @@
 import uuid
 
 from sqlmodel import select
-
 from unigate.models import Blocked, Group
 from unigate.models.student import Student
 
