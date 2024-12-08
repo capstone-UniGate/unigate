@@ -59,7 +59,9 @@ class CRUDRequest(CRUDBase[Request, Request, Request]):
             select(Request)
             .where(Request.group_id == group_id)
             .where(Request.status == RequestStatus.PENDING)
-            .options(selectinload(Request.student))  # Ensure the student relationship is loaded
+            .options(
+                selectinload(Request.student)
+            )  # Ensure the student relationship is loaded
         )
         return self.db_session.exec(statement).all()
 

@@ -1,15 +1,14 @@
 <template>
-
-  <div  v-if="requests.length > 0 ">
+  <div v-if="requests.length > 0">
     <!-- Title Section -->
     <div class="text-center mt-10 mb-6">
       <h1 class="text-3xl font-bold text-gray-900">Join Requests</h1>
     </div>
 
     <div class="mx-auto max-w-5xl pb-20">
-      <ul role="list" class="space-y-6" >
+      <ul role="list" class="space-y-6">
         <li
-          v-for="request in requests" 
+          v-for="request in requests"
           :key="request.id"
           class="flex items-center justify-between gap-x-12 bg-white rounded-lg shadow-md p-6 hover:shadow-lg hover:scale-105 transition-transform duration-300"
         >
@@ -22,7 +21,7 @@
             />
             <div>
               <p class="text-lg font-semibold text-gray-900">
-                {{ request.student.name }}  {{ request.student.surname }}
+                {{ request.student.name }} {{ request.student.surname }}
               </p>
             </div>
           </div>
@@ -30,38 +29,39 @@
           <!-- Buttons Section -->
           <div class="flex gap-x-4">
             <div v-if="request.status == 'PENDING'">
-            <button
-              @click="reject(request.id)"
-              class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition mr-5">
-              Reject
-            </button>
-            <button
-              @click="approve(request.id)"
-              class="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-lg hover:bg-green-600 transition">
-              Approve
-            </button>
+              <button
+                @click="reject(request.id)"
+                class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition mr-5"
+              >
+                Reject
+              </button>
+              <button
+                @click="approve(request.id)"
+                class="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-lg hover:bg-green-600 transition"
+              >
+                Approve
+              </button>
 
-            <button
-              @click="block(request.id)"
-              class="px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded-lg hover:bg-gray-600 transition ml-5"
-            >
-              Block
-            </button>
+              <button
+                @click="block(request.id)"
+                class="px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded-lg hover:bg-gray-600 transition ml-5"
+              >
+                Block
+              </button>
             </div>
           </div>
         </li>
-      </ul>  
+      </ul>
     </div>
   </div>
-  <NoJoinRequest v-else/>
+  <NoJoinRequest v-else />
 </template>
 
 <script setup lang="ts">
-
 const route = useRoute();
 const groupId = route.params.id;
 const placeholderImage = "https://via.placeholder.com/150?text=Profile";
-const requests = ref([]); 
+const requests = ref([]);
 
 // Fetch requests
 async function fetchRequests() {
@@ -94,9 +94,6 @@ function reject(id) {
   });
 }
 
-
-
-
 function block(requestId: number) {
   // Find the request with the given ID
   const requestIndex = requests.findIndex((req) => req.id === requestId);
@@ -114,5 +111,4 @@ function block(requestId: number) {
     group.blockedUsers.push(blockedUser.id);
   }
 }
-
 </script>

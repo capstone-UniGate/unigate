@@ -8,7 +8,7 @@ from unigate.crud.group_crud import group_crud
 from unigate.crud.join_crud import join_crud
 from unigate.crud.request_crud import request_crud
 from unigate.crud.student_crud import student_crud
-from unigate.models import Group, Request, Student
+from unigate.models import Group, Student
 from unigate.models.request_response_model import RequestResponse
 
 router = APIRouter()
