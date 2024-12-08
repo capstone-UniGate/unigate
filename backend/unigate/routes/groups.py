@@ -179,9 +179,8 @@ def leave_group(group_id: uuid.UUID, student_id: uuid.UUID) -> str:
     return join_crud.remove_student(group_id=group_id, student_id=student_id)
 
 
-# TODO: return name and surnames instead of id
-@router.get("/{group_id}/blocked_users", response_model=list[uuid.UUID])
-def get_blocked_users(group_id: uuid.UUID) -> list[uuid.UUID]:
+@router.get("/{group_id}/blocked_users", response_model=list[dict])
+def get_blocked_users(group_id: uuid.UUID) -> list[dict]:
     """
     Retrieve a list of blocked users for a specific group.
 
@@ -189,7 +188,7 @@ def get_blocked_users(group_id: uuid.UUID) -> list[uuid.UUID]:
         group_id (UUID): The ID of the group.
 
     Returns:
-        list[UUID]: A list of student IDs representing the blocked users.
+        list[dict]: A list of dictionaries containing the names and surnames of the blocked students.
 
     Raises:
         HTTPException: If the group does not exist or if there is an internal server error.
