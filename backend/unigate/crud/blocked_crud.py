@@ -2,6 +2,7 @@ import uuid
 
 from sqlmodel import select
 from unigate.models import Blocked, Group
+from unigate.models.student import Student
 
 from .base_crud import CRUDBase
 from .group_crud import group_crud
@@ -43,7 +44,8 @@ class CRUDBlocked(CRUDBase[Blocked, Blocked, Blocked]):
             return "The student is not blocked in this group"
 
         # Delete the block entry
-        self.delete(block_entry)
+        db_session.delete(block_entry)
+        db_session.commit()
         return "Student successfully unblocked"
 
     def is_student_blocked(self, student_id: uuid.UUID, group_id: uuid.UUID) -> bool:
@@ -62,12 +64,19 @@ class CRUDBlocked(CRUDBase[Blocked, Blocked, Blocked]):
         statement = select(Group).join(Blocked).where(Blocked.student_id == student_id)
         return self.get_multi(query=statement)
 
-    def get_blocked_students(self, group_id: uuid.UUID) -> list[uuid.UUID]:
+    def get_blocked_students(self, group_id: uuid.UUID) -> list[dict]:
         # Get all students blocked in the group
         db_session = self.get_db()
-        statement = select(self.model.student_id).where(self.model.group_id == group_id)
+        statement = (
+            select(Student.name, Student.surname)
+            .join(self.model, self.model.student_id == Student.id)
+            .where(self.model.group_id == group_id)
+        )
+
         result = db_session.exec(statement)
-        return result.all()
+        return [
+            {"name": student.name, "surname": student.surname} for student in result
+        ]
 
 
 blocked_crud = CRUDBlocked(Blocked)

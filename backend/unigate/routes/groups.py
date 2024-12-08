@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session
 from unigate.core.database import get_session
+from unigate.crud.blocked_crud import blocked_crud
 from unigate.crud.group_crud import group_crud
 from unigate.crud.join_crud import join_crud
 from unigate.crud.request_crud import request_crud
@@ -175,3 +176,61 @@ def get_group_requests(group_id: uuid.UUID) -> list[RequestResponse]:
 @router.post("/{group_id}/leave", response_model=str)
 def leave_group(group_id: uuid.UUID, student_id: uuid.UUID) -> str:
     return join_crud.remove_student(group_id=group_id, student_id=student_id)
+
+
+@router.get("/{group_id}/blocked_users", response_model=list[dict])
+def get_blocked_users(group_id: uuid.UUID) -> list[dict]:
+    """
+    Retrieve a list of blocked users for a specific group.
+
+    Args:
+        group_id (UUID): The ID of the group.
+
+    Returns:
+        list[dict]: A list of dictionaries containing the names and surnames of the blocked students.
+
+    Raises:
+        HTTPException: If the group does not exist or if there is an internal server error.
+    """
+    try:
+        # Check if the group exists
+        group = group_crud.get(id=group_id)
+        if not group:
+            raise HTTPException(status_code=404, detail="Group not found.")
+
+        # Fetch blocked students for the group
+        return blocked_crud.get_blocked_students(group_id=group_id)
+    except SQLAlchemyError:
+        raise HTTPException(status_code=500, detail="Internal server error.")
+
+
+@router.post("/{group_id}/unblock_user", response_model=str)
+def unblock_user(group_id: uuid.UUID, student_id: uuid.UUID) -> str:
+    """
+    Unblock a student from a group.
+
+    Args:
+        group_id (UUID): The ID of the group.
+        student_id (UUID): The ID of the student to unblock.
+
+    Returns:
+        str: A message indicating the success or failure of the operation.
+
+    Raises:
+        HTTPException: If the group does not exist, if the student is not blocked, or if there is an internal server error.
+    """
+    try:
+        # Check if the group exists
+        group = group_crud.get(id=group_id)
+        if not group:
+            raise HTTPException(status_code=404, detail="Group not found.")
+
+        # Check if the student exists
+        student = student_crud.get_by_id(id=student_id)
+        if not student:
+            raise HTTPException(status_code=404, detail="Student not found.")
+
+        # Unblock the student
+        return blocked_crud.unblock_student(student_id=student_id, group_id=group_id)
+    except SQLAlchemyError:
+        raise HTTPException(status_code=500, detail="Internal server error.")
