@@ -40,33 +40,13 @@
               class="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-lg hover:bg-green-600 transition">
               Approve
             </button>
-<<<<<<< HEAD
-=======
 
             <button
               @click="block(request.id)"
-              class="px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded-lg hover:bg-gray-600 transition"
+              class="px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded-lg hover:bg-gray-600 transition ml-5"
             >
               Block
             </button>
-
-            <!--</div>-->
-
-            <!--
-            <div v-else>
-              <span
-                v-if="request.status == 'APPROVED'"
-                class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20"
-              >
-                Approved
-              </span>
-              <span
-                v-if="request.status == 'REJECTED'"
-                class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20"
-              >
-                Rejected
-              </span>
->>>>>>> main
             </div>
           </div>
         </li>
@@ -77,10 +57,11 @@
 </template>
 
 <script setup lang="ts">
+
 const route = useRoute();
 const groupId = route.params.id;
 const placeholderImage = "https://via.placeholder.com/150?text=Profile";
-const requests = ref([]); // Initialize as empty array
+const requests = ref([]); 
 
 // Fetch requests
 async function fetchRequests() {
@@ -90,6 +71,7 @@ async function fetchRequests() {
     console.error("Error fetching requests:", error);
   }
 }
+
 fetchRequests();
 
 function approve(id) {
@@ -101,8 +83,6 @@ function approve(id) {
     }
   });
 }
-
-
 
 function reject(id) {
   useApiFetch(`requests/${id}/reject`, {
@@ -134,4 +114,5 @@ function block(requestId: number) {
     group.blockedUsers.push(blockedUser.id);
   }
 }
+
 </script>
