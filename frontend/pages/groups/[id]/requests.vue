@@ -9,7 +9,7 @@
     <div class="mx-auto max-w-5xl pb-20">
       <ul role="list" class="space-y-6" >
         <li
-          v-for="request in requests" 
+          v-for="request in requests"
           :key="request.id"
           class="flex items-center justify-between gap-x-12 bg-white rounded-lg shadow-md p-6 hover:shadow-lg hover:scale-105 transition-transform duration-300"
         >
@@ -70,7 +70,7 @@
             </div>
           </div>
         </li>
-      </ul>  
+      </ul>
     </div>
   </div>
   <NoJoinRequest v-else/>

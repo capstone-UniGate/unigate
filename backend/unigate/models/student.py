@@ -1,12 +1,12 @@
 import uuid
 from enum import Enum
+from typing import TYPE_CHECKING
 
 from pydantic import EmailStr
-from sqlmodel import Field, SQLModel, Relationship  # type: ignore
-from typing import TYPE_CHECKING, List
+from sqlmodel import Field, Relationship, SQLModel  # type: ignore
 
 if TYPE_CHECKING:
-    from .request import Request  # noqa: F401
+    from .request import Request
 
 
 class GroupType(str, Enum):
@@ -25,4 +25,4 @@ class Student(SQLModel, table=True):
     surname: str = Field(default=None, max_length=255)
 
     # Reverse relationship to Request
-    requests: List["Request"] = Relationship(back_populates="student")
+    requests: list["Request"] = Relationship(back_populates="student")
