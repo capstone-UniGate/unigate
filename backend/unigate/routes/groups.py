@@ -133,7 +133,8 @@ def join_private_group(student_id: uuid.UUID, group_id: uuid.UUID) -> str:
         # Check if the student is blocked in the group
         if blocked_crud.is_student_blocked(student_id, group_id):
             raise HTTPException(
-                status_code=403, detail="The student is blocked from joining this group."
+                status_code=403,
+                detail="The student is blocked from joining this group.",
             )
         # Proceed with creating the join request if the student is not blocked
         return join_crud.join_private_group(student_id, group_id)
@@ -238,18 +239,15 @@ def unblock_user(group_id: uuid.UUID, student_id: uuid.UUID) -> str:
 
 
 @router.post("/{group_id}/block_user", response_model=dict)
-def block_student(student_id: uuid.UUID,group_id: uuid.UUID,):
-
+def block_student(student_id: uuid.UUID, group_id: uuid.UUID):
     try:
         result = blocked_crud.block_student(student_id=student_id, group_id=group_id)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    if result == "The group doesn't exist":
+    if result == "The group doesn't exist" or result == "The student doesn't exist":
         raise HTTPException(status_code=404, detail=result)
-    elif result == "The student doesn't exist":
-        raise HTTPException(status_code=404, detail=result)
-    elif result == "The student is already blocked in this group":
+    if result == "The student is already blocked in this group":
         raise HTTPException(status_code=409, detail=result)
 
     return {"message": result}

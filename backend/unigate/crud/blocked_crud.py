@@ -1,7 +1,6 @@
 import uuid
 
-from fastapi_pagination import request
-from sqlmodel import select,delete
+from sqlmodel import delete, select
 from unigate.models import Blocked, Group
 from unigate.models.join import Join
 from unigate.models.request import Request
@@ -28,16 +27,14 @@ class CRUDBlocked(CRUDBase[Blocked, Blocked, Blocked]):
         db_session = self.get_db()
         try:
             # Remove from Join table
-            delete_join_statement =delete(Join).where(
-                Join.student_id == student_id,
-                Join.group_id == group_id
+            delete_join_statement = delete(Join).where(
+                Join.student_id == student_id, Join.group_id == group_id
             )
             db_session.exec(delete_join_statement)
 
             # Remove from Request table
             delete_request_statement = delete(Request).where(
-                Request.student_id == student_id,
-                Request.group_id == group_id
+                Request.student_id == student_id, Request.group_id == group_id
             )
             db_session.exec(delete_request_statement)
 
@@ -55,7 +52,6 @@ class CRUDBlocked(CRUDBase[Blocked, Blocked, Blocked]):
             )
         )
         return "Student successfully blocked"
-
 
     def unblock_student(self, student_id: uuid.UUID, group_id: uuid.UUID) -> str:
         # Find the block entry
