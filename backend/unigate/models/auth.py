@@ -1,8 +1,10 @@
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field
+
+from unigate.models.base import UUIDBase
 
 
-class User(SQLModel, table=True):
+class AuthUser(UUIDBase, table=True):
     __tablename__ = "users"  # type: ignore
 
-    number: int = Field(primary_key=True, index=True)
-    hashed_password: str
+    number: int = Field(unique=True, index=True, nullable=False, max_length=7)
+    hashed_password: str = Field(nullable=False, index=True)
