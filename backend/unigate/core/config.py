@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     AUTH_DB: str = "auth"
     SENDGRID_API_KEY: str
     JWT_SECRET: str
-    JWT_EXPIRATION: int = 60 * 60 * 24
+    JWT_EXPIRATION_SECONDS: int = 60 * 60 * 24  # 1 day
     JWT_ALGORITHM: str = "HS256"
 
     @computed_field  # type: ignore

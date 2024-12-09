@@ -22,7 +22,6 @@ class GroupBase(SQLModel):
     category: str | None = None
     type: GroupType
     creator_id: uuid.UUID
-    # members count
 
 
 class GroupTest(SQLModel):
