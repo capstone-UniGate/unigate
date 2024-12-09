@@ -130,16 +130,17 @@ def join_public_group(student_id: uuid.UUID, group_id: uuid.UUID) -> str:
 @router.post("/join_private_group", response_model=str)
 def join_private_group(student_id: uuid.UUID, group_id: uuid.UUID) -> str:
     try:
-        # Use the create_request method from request_crud to create a new join request
+        # Check if the student is blocked in the group
+        if blocked_crud.is_student_blocked(student_id, group_id):
+            raise HTTPException(
+                status_code=403, detail="The student is blocked from joining this group."
+            )
+        # Proceed with creating the join request if the student is not blocked
         return join_crud.join_private_group(student_id, group_id)
 
-        # Instead of returning the Request object, return a success message
-        # return "Join request submitted successfully."
     except HTTPException:
-        # Reraise HTTPException to return appropriate error message
         raise
     except SQLAlchemyError:
-        # Generic SQLAlchemy error handling
         raise HTTPException(status_code=500, detail="Internal server error.")
 
 
@@ -234,3 +235,21 @@ def unblock_user(group_id: uuid.UUID, student_id: uuid.UUID) -> str:
         return blocked_crud.unblock_student(student_id=student_id, group_id=group_id)
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Internal server error.")
+
+
+@router.post("/{group_id}/block_user", response_model=dict)
+def block_student(student_id: uuid.UUID,group_id: uuid.UUID,):
+
+    try:
+        result = blocked_crud.block_student(student_id=student_id, group_id=group_id)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    if result == "The group doesn't exist":
+        raise HTTPException(status_code=404, detail=result)
+    elif result == "The student doesn't exist":
+        raise HTTPException(status_code=404, detail=result)
+    elif result == "The student is already blocked in this group":
+        raise HTTPException(status_code=409, detail=result)
+
+    return {"message": result}
