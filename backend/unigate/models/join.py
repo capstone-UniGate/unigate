@@ -3,8 +3,10 @@ import uuid
 
 from sqlmodel import Field, SQLModel  # type: ignore
 
+from unigate.models.base import DBUnigateBase
 
-class Join(SQLModel, table=True):
+
+class Join(DBUnigateBase, SQLModel, table=True):
     __tablename__ = "joins"  # type: ignore
 
     date: datetime.date | None = Field(default_factory=datetime.date.today)

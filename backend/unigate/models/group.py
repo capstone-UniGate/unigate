@@ -2,9 +2,9 @@ import enum
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlmodel import Field, Relationship, SQLModel  # type: ignore
+from sqlmodel import Column, Enum, Field, Relationship, SQLModel  # type: ignore
 
-from unigate.models.base import UUIDBase
+from unigate.models.base import DBUnigateBase, UUIDBase
 from unigate.models.join import Join
 
 if TYPE_CHECKING:
@@ -20,14 +20,16 @@ class GroupBase(SQLModel):
     name: str
     description: str | None = None
     category: str | None = None
-    type: GroupType
+    type: GroupType = Field(sa_column=Column(Enum(GroupType, name="group_type")))
     creator_id: uuid.UUID
     members_count: int = Field(default=0, nullable=False)
+
 
 class GroupTest(SQLModel):
     name: str
 
-class Group(UUIDBase, GroupBase, table=True):
+
+class Group(DBUnigateBase, UUIDBase, GroupBase, table=True):
     __tablename__ = "groups"  # type: ignore
 
     creator_id: uuid.UUID = Field(

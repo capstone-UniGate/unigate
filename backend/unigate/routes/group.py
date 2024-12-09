@@ -1,8 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from unigate import crud
 from unigate.models import Group
 from unigate.models.group import GroupTest
+from unigate.routes.deps import CurrentUser, get_current_user
 
 router = APIRouter()
 
@@ -11,13 +12,15 @@ router = APIRouter()
 @router.get(
     "",
     response_model=list[GroupTest],
+    dependencies=[Depends(get_current_user)],
     # status_code=status.HTTP_200_OK,
     # responses={
     # 200: {"description": "A list of all available groups", "model": list[Group]},
     # 500: {"description": "Unable to load groups due to a server error"},
     # },
 )
-def get_groups() -> list[Group]:
+def get_groups(current_user: CurrentUser) -> list[Group]:
+    print(current_user)
     return crud.group.get_multi()
 
 

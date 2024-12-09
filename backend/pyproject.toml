@@ -10,6 +10,7 @@ dependencies = [
     "passlib[bcrypt]>=1.7.4",
     "psycopg[binary]>=3.2.3",
     "pyjwt>=2.10.1",
+    "python-dotenv>=1.0.1",
     "pytz>=2024.2",
     "sendgrid>=6.11.0",
     "sqlmodel>=0.0.22",

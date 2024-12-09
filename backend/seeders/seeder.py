@@ -5,7 +5,7 @@ import uuid
 import pytz
 from faker import Faker
 from loguru import logger
-from sqlalchemy import text, create_engine
+from sqlalchemy import create_engine, text
 from sqlmodel import Session
 from unigate.core.database import engine
 from unigate.models import (

@@ -13,13 +13,13 @@ class ReadAuthUser(CRUDBase[AuthUser, AuthUser, AuthUser]):
         self.model = model
         self.db_session = next(get_auth_session())
 
-    def get_db(self) -> Session:
+    def get_db_session(self) -> Session:
         return next(get_auth_session())
 
     def get_by_number(
         self, *, number: int, db_session: Session | None = None
     ) -> AuthUser | None:
-        db_session = db_session or super().get_db_session()
+        db_session = db_session or self.get_db_session()
         statement = select(self.model).where(self.model.number == number)
         result = db_session.exec(statement)
         return result.one_or_none()

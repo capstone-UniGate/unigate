@@ -1,7 +1,16 @@
 import uuid
 
 from pydantic import EmailStr
+from sqlalchemy.orm import registry
 from sqlmodel import Field, SQLModel  # type: ignore
+
+
+class DBAuthBase(SQLModel, registry=registry()):
+    pass
+
+
+class DBUnigateBase(SQLModel, registry=registry()):
+    pass
 
 
 class UUIDBase(SQLModel):

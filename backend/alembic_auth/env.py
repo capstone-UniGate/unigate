@@ -1,7 +1,13 @@
 from logging.config import fileConfig
+from pathlib import Path
 
 from alembic import context
+from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
+
+ROOT_PATH = Path(__file__).parent.parent.parent
+
+load_dotenv(ROOT_PATH / ".env")
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -9,7 +15,7 @@ config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-fileConfig(config.config_file_name)
+fileConfig(config.config_file_name)  # type: ignore
 
 # add your model's MetaData object here
 # for 'autogenerate' support
@@ -18,9 +24,9 @@ fileConfig(config.config_file_name)
 # target_metadata = None
 
 from unigate.core.config import settings  # noqa: E402
-from unigate.models import SQLModel  # noqa: E402
+from unigate.models.base import DBAuthBase  # noqa: E402
 
-target_metadata = SQLModel.metadata
+target_metadata = DBAuthBase.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

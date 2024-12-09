@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class TokenPayload(BaseModel):
-    sub: int
+    sub: str
     role: str
 
 

@@ -3,6 +3,8 @@ import uuid
 
 from sqlmodel import Column, Enum, Field, SQLModel  # type: ignore
 
+from unigate.models.base import DBUnigateBase
+
 
 class RequestStatus(str, enum.Enum):
     PENDING = "PENDING"
@@ -10,7 +12,7 @@ class RequestStatus(str, enum.Enum):
     REJECTED = "REJECTED"
 
 
-class Request(SQLModel, table=True):
+class Request(DBUnigateBase, SQLModel, table=True):
     __tablename__ = "requests"  # type: ignore
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
