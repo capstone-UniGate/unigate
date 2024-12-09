@@ -1,6 +1,5 @@
 set dotenv-load
 
-
 venv := if os_family() == "windows" { ".venv/Scripts" } else { ".venv/bin" }
 python := if os_family() == "windows" { "/python.exe" } else { "/python3" }
 
@@ -22,10 +21,11 @@ reset-database:
     docker compose exec postgres-unigate psql -U $POSTGRES_USER -d $AUTH_DB -c "DO \$\$ BEGIN EXECUTE 'DROP SCHEMA public CASCADE'; EXECUTE 'CREATE SCHEMA public'; END \$\$;"
 
 init-database: reset-database
-    cd backend && ../{{ backend_venv}}/alembic upgrade head
+    cd backend/alembic_unigate && ../../{{ backend_venv }}/alembic upgrade head
+    cd backend/alembic_auth && ../../{{ backend_venv }}/alembic upgrade head
 
 seed-database:
-    {{ backend_python }} backend/unigate/alembic/seeders/seeder.py
+    {{ backend_python }} backend/seeders/seeder.py
 
 backend-deps:
     cd backend && uv sync

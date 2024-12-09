@@ -22,11 +22,10 @@ class GroupBase(SQLModel):
     category: str | None = None
     type: GroupType
     creator_id: uuid.UUID
-
+    members_count: int = Field(default=0, nullable=False)
 
 class GroupTest(SQLModel):
     name: str
-
 
 class Group(UUIDBase, GroupBase, table=True):
     __tablename__ = "groups"  # type: ignore
