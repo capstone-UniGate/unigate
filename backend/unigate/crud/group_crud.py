@@ -1,3 +1,4 @@
+import uuid
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -16,6 +17,7 @@ class CRUDGroup(CRUDBase[Group, Group, Group]):
         return result.first()
 
     def create_group(self, *, session: Session, group_data: Group) -> Group:
+
         # Validation: Check UUID format for group ID
         try:
             UUID(str(group_data.id))
@@ -46,13 +48,13 @@ class CRUDGroup(CRUDBase[Group, Group, Group]):
                 status_code=400, detail="A group with this ID already exists."
             )
 
-        # Validation 4: Check if creator_id exists in the students table
-        creator_exists = session.exec(
-            select(Student).where(Student.id == group_data.creator_id)
-        ).first()
-        if not creator_exists:
+        # Todo: it should be the authenticated user
+        auth_user_id =uuid.uuid4()
+
+        # Validation 4: Check if creator_id matches the authenticated user's ID
+        if group_data.creator_id != auth_user_id:
             raise HTTPException(
-                status_code=400, detail="Creator ID does not exist in students table."
+                status_code=400, detail="Creator ID does not match the authenticated user."
             )
 
         try:
@@ -63,6 +65,8 @@ class CRUDGroup(CRUDBase[Group, Group, Group]):
             return group_data
         except IntegrityError:
             session.rollback()
+            # Log the specific error message for more details
+            print(f"IntegrityError: {str(e.orig)}")
             raise HTTPException(
                 status_code=500, detail="An error occurred while creating the group."
             )

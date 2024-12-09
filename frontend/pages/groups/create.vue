@@ -46,7 +46,7 @@
               <label class="inline-flex items-center">
                 <input
                   type="radio"
-                  value="public"
+                  value="Public"
                   v-bind="componentField"
                   id="privacy-public"
                 />
@@ -55,7 +55,7 @@
               <label class="inline-flex items-center">
                 <input
                   type="radio"
-                  value="private"
+                  value="Private"
                   v-bind="componentField"
                   id="privacy-private"
                 />
@@ -177,7 +177,7 @@ const formSchema = toTypedSchema(
   z.object({
     name: z.string().min(2, "Name must be at least 2 characters long").max(50),
     course: z.string().nonempty("Course is required"),
-    isPublic: z.enum(["public", "private"]),
+    isPublic: z.enum(["Public", "Private"]),
     description: z.string().min(10, "The description is too short").max(300),
     tags: z.array(z.string()).min(1, "Please add at least one tag"),
   }),
@@ -254,19 +254,42 @@ const selectSuggestion = (suggestion: string) => {
 
 const formHasErrors = computed(() => Object.keys(errors.value).length > 0);
 
-const onSubmit = handleSubmit((values) => {
-  values.tags = tags.value;
 
-  toast({
-    variant: "success",
-    description: "Group created successfully",
-    duration: 1000,
-  });
+// Handle form submission
+const onSubmit = handleSubmit(async (values) => {
+  try {
+    const response = await useApiFetch("/groups/create", {
+      method: "POST",
+      body: {
+        name: values.name, 
+        description: values.description, 
+        category: values.course,
+        type: values.isPublic, 
+        creator_id: 1, 
+        tags: tags.value, 
+      },
+    });
 
-  setTimeout(() => {
-    router.push("/groups");
-  }, 1500);
+    toast({
+      variant: "success",
+      description: "Group created successfully!",
+      duration: 1500,
+    });
+
+    setTimeout(() => {
+      router.push("/groups");
+    }, 1500);
+  } catch (error) {
+  
+    console.error("Error creating group:", error);
+    toast({
+      variant: "destructive",
+      description: "Failed to create group. Please try again.",
+      duration: 1500,
+    });
+  }
 });
+
 
 const onCancel = () => {
   router.push("/groups");
