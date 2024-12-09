@@ -91,8 +91,6 @@ def test_student_non_existent() -> None:
 
 def test_valid_leave() -> None:
     create_student(student_id=student_id2, number=12349, mail="testsstudent")
-    group = client.get("/groups/" + group_id)
-
     client.post(
         "/groups/join_public_group",
         params={
@@ -108,6 +106,9 @@ def test_valid_leave() -> None:
         },
     )
 
+    group_json = client.get("/groups/" + group_id)
+    group = group_json.json()
+
     response = client.post(
         "/groups/" + group_id + "/leave",
         params={
@@ -116,13 +117,15 @@ def test_valid_leave() -> None:
         },
     )
 
+    group["members_count"] = group["members_count"] - 1
+
     assert response.status_code == 200
     assert response.json() == "The student has been removed successfully"
 
     r = client.get("/groups/" + group_id)
 
     assert r.status_code == 200
-    assert r.json() == group.json()
+    assert r.json() == group
 
 
 def test_valid_leave_no_members(client: TestClient) -> None:

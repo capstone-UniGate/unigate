@@ -1,4 +1,13 @@
 <template>
+  <!-- Success Message -->
+  <div class="justify-center bg-gray-100">
+    <p
+      v-if="$route.query.message"
+      class="mb-4 p-3 bg-blue-100 text-blue-800 border border-blue-300 rounded-lg text-center shadow"
+    >
+      {{ $route.query.message }}
+    </p>
+  </div>
   <div class="flex min-h-screen items-center justify-center bg-gray-100">
     <div class="w-full max-w-sm p-4 bg-white rounded-lg shadow-md">
       <h2 class="text-xl font-bold text-center text-gray-700 mb-4">Login</h2>

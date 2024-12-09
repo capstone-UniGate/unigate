@@ -3,8 +3,9 @@ import uuid
 
 import pytz
 from fastapi import HTTPException
+from sqlalchemy.orm import selectinload
 from sqlmodel import select
-from unigate.models import Join, Request
+from unigate.models import Join, Request, RequestStatus
 
 from .base_crud import CRUDBase
 from .group_crud import group_crud
@@ -48,13 +49,21 @@ class CRUDRequest(CRUDBase[Request, Request, Request]):
         return new_request
 
     def get_all_requests_for_group(self, group_id: uuid.UUID) -> list[Request]:
+        # Get the group from the database (assuming group_crud is implemented elsewhere)
         group = group_crud.get(id=group_id)
         if not group:
             raise HTTPException(status_code=404, detail="Group not found.")
 
-        return self.db_session.exec(
-            select(Request).where(Request.group_id == group_id)
-        ).all()
+        # Use selectinload to eagerly load the student relationship
+        statement = (
+            select(Request)
+            .where(Request.group_id == group_id)
+            .where(Request.status == RequestStatus.PENDING)
+            .options(
+                selectinload(Request.student)
+            )  # Ensure the student relationship is loaded
+        )
+        return self.db_session.exec(statement).all()
 
     def get_request(self, request_id: uuid.UUID) -> Request:
         request = self.db_session.exec(

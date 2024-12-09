@@ -117,10 +117,9 @@ class CRUDJoin(CRUDBase[Join, Join, Join]):
         if response is None:
             return "The student is not part of the group"
         self.delete(response)
-        remaining_members = self.get_multi(
-            query=select(Join).where(Join.group_id == group_id)
-        )
-        if len(remaining_members) == 0:
+        group.members_count = group.members_count - 1
+        self.db_session.commit()
+        if group.members_count == 0:
             group_crud.delete(obj=group)
         return "The student has been removed successfully"
 

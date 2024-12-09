@@ -8,6 +8,12 @@ from .base_crud import CRUDBase
 
 
 class CRUDStudent(CRUDBase[Student, Student, Student]):
+    def get_by_id(self, *, id: uuid.UUID) -> Student | None:
+        db_session = self.get_db()
+        statement = select(self.model).where(self.model.id == id)
+        result = db_session.exec(statement)
+        return result.one_or_none()
+
     def get_by_name(self, *, name: str) -> Student | None:
         db_session = self.get_db()
         statement = select(self.model).where(self.model.name == name)
