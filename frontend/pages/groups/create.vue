@@ -254,19 +254,18 @@ const selectSuggestion = (suggestion: string) => {
 
 const formHasErrors = computed(() => Object.keys(errors.value).length > 0);
 
-
 // Handle form submission
 const onSubmit = handleSubmit(async (values) => {
   try {
     const response = await useApiFetch("/groups/create", {
       method: "POST",
       body: {
-        name: values.name, 
-        description: values.description, 
+        name: values.name,
+        description: values.description,
         category: values.course,
-        type: values.isPublic, 
-        creator_id: 1, 
-        tags: tags.value, 
+        type: values.isPublic,
+        creator_id: 1,
+        tags: tags.value,
       },
     });
 
@@ -280,7 +279,6 @@ const onSubmit = handleSubmit(async (values) => {
       router.push("/groups");
     }, 1500);
   } catch (error) {
-  
     console.error("Error creating group:", error);
     toast({
       variant: "destructive",
@@ -289,7 +287,6 @@ const onSubmit = handleSubmit(async (values) => {
     });
   }
 });
-
 
 const onCancel = () => {
   router.push("/groups");

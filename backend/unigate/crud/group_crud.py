@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
-from unigate.models import Group, GroupType, Student
+from unigate.models import Group, GroupType
 
 from .base_crud import CRUDBase
 
@@ -17,7 +17,6 @@ class CRUDGroup(CRUDBase[Group, Group, Group]):
         return result.first()
 
     def create_group(self, *, session: Session, group_data: Group) -> Group:
-
         # Validation: Check UUID format for group ID
         try:
             UUID(str(group_data.id))
@@ -49,12 +48,13 @@ class CRUDGroup(CRUDBase[Group, Group, Group]):
             )
 
         # Todo: it should be the authenticated user
-        auth_user_id =uuid.uuid4()
+        auth_user_id = uuid.uuid4()
 
         # Validation 4: Check if creator_id matches the authenticated user's ID
         if group_data.creator_id != auth_user_id:
             raise HTTPException(
-                status_code=400, detail="Creator ID does not match the authenticated user."
+                status_code=400,
+                detail="Creator ID does not match the authenticated user.",
             )
 
         try:
@@ -66,7 +66,7 @@ class CRUDGroup(CRUDBase[Group, Group, Group]):
         except IntegrityError:
             session.rollback()
             # Log the specific error message for more details
-            print(f"IntegrityError: {str(e.orig)}")
+            print(f"IntegrityError: {e.orig!s}")
             raise HTTPException(
                 status_code=500, detail="An error occurred while creating the group."
             )
