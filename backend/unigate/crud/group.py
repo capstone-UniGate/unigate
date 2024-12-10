@@ -1,6 +1,6 @@
 from sqlmodel import Session, select
 
-from unigate.crud.base_crud import CRUDBase
+from unigate.crud.base import CRUDBase
 from unigate.models import Group
 from unigate.schemas.group import GroupCreate
 

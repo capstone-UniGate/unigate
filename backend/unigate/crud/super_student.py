@@ -4,7 +4,7 @@ from sqlmodel import select
 
 from unigate.models import SuperStudent
 
-from .base_crud import CRUDBase
+from .base import CRUDBase
 
 
 class SuperStudentCRUD(CRUDBase[SuperStudent, SuperStudent, SuperStudent]):

@@ -3,7 +3,7 @@ from sqlmodel import Session, select
 from unigate.models import Student
 from unigate.schemas.student import StudentCreate
 
-from .base_crud import CRUDBase
+from .base import CRUDBase
 
 
 class CRUDStudent(CRUDBase[Student, StudentCreate, Student]):

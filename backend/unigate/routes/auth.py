@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm
 from loguru import logger
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -10,7 +10,6 @@ from unigate.core.security import Role, create_access_token
 from unigate.schemas.token import Token
 
 router = APIRouter()
-
 
 
 def get_role_and_number(username: str) -> tuple[str, int]:

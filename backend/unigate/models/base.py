@@ -2,7 +2,9 @@ import uuid
 
 from pydantic import EmailStr
 from sqlalchemy.orm import registry
-from sqlmodel import Field, SQLModel  # type: ignore
+from sqlmodel import Column, Enum, Field, SQLModel  # type: ignore
+
+from unigate.enums import GroupType
 
 
 class DBAuthBase(SQLModel, registry=registry()):
@@ -26,3 +28,10 @@ class UserBase(SQLModel):
 
 class AuthUserBase(UserBase):
     hashed_password: str = Field(nullable=False, index=True)
+
+
+class GroupBase(SQLModel):
+    name: str
+    description: str | None = None
+    category: str | None = None
+    type: GroupType = Field(sa_column=Column(Enum(GroupType, name="group_type")))

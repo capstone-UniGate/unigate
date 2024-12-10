@@ -7,8 +7,8 @@ from sqlmodel import select
 
 from unigate.models import Join, Request
 
-from .base_crud import CRUDBase
-from .group_crud import group
+from .base import CRUDBase
+from .group import group
 
 
 class CRUDRequest(CRUDBase[Request, Request, Request]):

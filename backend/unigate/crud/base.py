@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from pydantic import BaseModel
 from sqlalchemy import exc
 from sqlmodel import Session, SQLModel, func, select
-from sqlmodel.sql.expression import Select
+from sqlmodel.sql.expression import SelectOfScalar
 
 from unigate.core.database import get_session
 
@@ -58,13 +58,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         *,
         skip: int = 0,
         limit: int = 100,
-        query: T | Select[T] | None = None,
+        query: SelectOfScalar[T] | None = None,
         db_session: Session | None = None,
     ) -> list[ModelType]:
         db_session = db_session or self.db_session
-        if query is None:
-            query = select(self.model).offset(skip).limit(limit).order_by(self.model.id)  # type: ignore
-        response = db_session.exec(query)  # type: ignore
+        statement = (
+            select(self.model).offset(skip).limit(limit) if query is None else query
+        )
+        response = db_session.exec(statement)
         return response.all()  # type: ignore
 
     def get_multi_ordered(

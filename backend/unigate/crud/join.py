@@ -9,11 +9,11 @@ from sqlmodel import select
 from unigate.models import Group, Join
 from unigate.utils.mail import Mailer
 
-from .base_crud import CRUDBase
-from .group_crud import group
-from .request_crud import request_crud
-from .student_crud import student
-from .super_student_crud import super_student_crud
+from .base import CRUDBase
+from .group import group
+from .request import request_crud
+from .student import student
+from .super_student import super_student_crud
 
 
 class CRUDJoin(CRUDBase[Join, Join, Join]):

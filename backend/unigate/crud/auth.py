@@ -3,10 +3,10 @@ from sqlmodel import Session, select
 from unigate.core.database import get_auth_session
 from unigate.core.security import Role, verify_password
 from unigate.models import AuthUser
-from unigate.utils.auth import get_user
 from unigate.schemas.auth import AuthUserCreate
+from unigate.utils.auth import get_user
 
-from .base_crud import CRUDBase
+from .base import CRUDBase
 
 
 class ReadAuthUser(CRUDBase[AuthUser, AuthUserCreate, AuthUser]):

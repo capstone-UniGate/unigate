@@ -8,12 +8,6 @@ from unigate.models.join import Join
 if TYPE_CHECKING:
     from unigate.models.group import Group
 
-# TODO: to use as a better way to handle roles
-# class UserRole(str, Enum):
-#     STUDENT = "student"
-#     SUPERST = "superstudent"
-#     TEACHER = "teacher"
-
 
 class Student(DBUnigateBase, UUIDBase, UserBase, table=True):
     __tablename__ = "students"  # type: ignore

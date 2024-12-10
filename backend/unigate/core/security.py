@@ -1,17 +1,10 @@
-import enum
 from datetime import UTC, datetime, timedelta
 
-import jwt
 import bcrypt
+import jwt
+
 from unigate.core.config import settings
-
-
-ALGORITHM = "HS256"
-
-
-class Role(enum.Enum):
-    STUDENT = "S"
-    PROFESSOR = "P"
+from unigate.enums import Role
 
 
 def create_access_token(
