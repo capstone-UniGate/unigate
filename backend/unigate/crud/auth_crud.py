@@ -4,11 +4,12 @@ from unigate.core.database import get_auth_session
 from unigate.core.security import Role, verify_password
 from unigate.models import AuthUser
 from unigate.utils.auth import get_user
+from unigate.schemas.auth import AuthUserCreate
 
 from .base_crud import CRUDBase
 
 
-class ReadAuthUser(CRUDBase[AuthUser, AuthUser, AuthUser]):
+class ReadAuthUser(CRUDBase[AuthUser, AuthUserCreate, AuthUser]):
     def __init__(self, model: type[AuthUser]) -> None:
         self.model = model
         self.db_session = next(get_auth_session())

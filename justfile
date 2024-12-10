@@ -24,8 +24,11 @@ init-database: reset-database
     cd backend/alembic_unigate && ../../{{ backend_venv }}/alembic upgrade head
     cd backend/alembic_auth && ../../{{ backend_venv }}/alembic upgrade head
 
-seed-database:
-    {{ backend_python }} backend/seeders/seeder.py
+seed-real:
+    {{ backend_python }} backend/seeders/real.py
+
+seed-fake:
+    {{ backend_python }} backend/seeders/fake.py
 
 backend-deps:
     cd backend && uv sync
@@ -40,7 +43,7 @@ backend-fix: backend-deps
     {{ backend_venv }}/ruff check backend --config backend/pyproject.toml
     {{ backend_venv }}/ruff format backend --config backend/pyproject.toml
 
-backend-test: backend-deps init-database seed-database
+backend-test: backend-deps init-database
     cd backend && ../{{ backend_venv }}/pytest tests/
 
 pre-commit: backend-deps
@@ -73,5 +76,5 @@ frontend-fix:
     cd frontend && npx prettier . --write
     cd frontend && npx eslint --fix
 
-frontend-test: init-database seed-database
+frontend-test: init-database
     cd frontend && ../{{ frontend_venv }}/pytest tests/

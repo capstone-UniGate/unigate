@@ -17,8 +17,12 @@ class UUIDBase(SQLModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
 
 
-class UserBase(UUIDBase):
-    number: int = Field(unique=True, index=True, nullable=False, max_length=7)
+class UserBase(SQLModel):
+    number: int = Field(unique=True, index=True, nullable=False, ge=0, le=9999999)
     email: EmailStr = Field(unique=True, index=True, nullable=False)
     name: str = Field(nullable=False)
     surname: str = Field(nullable=True)
+
+
+class AuthUserBase(UserBase):
+    hashed_password: str = Field(nullable=False, index=True)

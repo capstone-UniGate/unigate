@@ -2,9 +2,10 @@ from sqlmodel import Session, select
 
 from unigate.crud.base_crud import CRUDBase
 from unigate.models import Group
+from unigate.schemas.group import GroupCreate
 
 
-class CRUDGroup(CRUDBase[Group, Group, Group]):
+class CRUDGroup(CRUDBase[Group, GroupCreate, Group]):
     def get_by_name(
         self, *, name: str, db_session: Session | None = None
     ) -> Group | None:

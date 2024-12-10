@@ -96,14 +96,11 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self,
         *,
         obj_in: CreateSchemaType | ModelType,
-        created_by_id: UUID | str | None = None,
+        update: dict[str, Any] | None = None,
         db_session: Session | None = None,
     ) -> ModelType:
         db_session = db_session or self.db_session
-        db_obj = self.model.model_validate(obj_in)  # type: ignore
-
-        if created_by_id:
-            db_obj.created_by_id = created_by_id
+        db_obj = self.model.model_validate(obj_in, update=update)
 
         try:
             db_session.add(db_obj)

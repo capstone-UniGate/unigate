@@ -3,7 +3,6 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from loguru import logger
-from passlib.context import CryptContext
 from sqlalchemy.exc import SQLAlchemyError
 
 from unigate import crud
@@ -12,9 +11,6 @@ from unigate.schemas.token import Token
 
 router = APIRouter()
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def get_role_and_number(username: str) -> tuple[str, int]:

@@ -18,14 +18,11 @@ TokenDep = Annotated[str, Depends(oauth2_scheme)]
 
 def get_current_user(token: TokenDep) -> Student:
     try:
-        print(token)
         payload = jwt.decode(  # type: ignore
             token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM]
         )
-        print(payload)
         token_data = TokenPayload(**payload)
     except (jwt.InvalidTokenError, ValidationError) as e:
-        print(e)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",

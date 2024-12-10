@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Relationship  # type: ignore
 
-from unigate.models.base import DBUnigateBase, UserBase
+from unigate.models.base import DBUnigateBase, UserBase, UUIDBase
 from unigate.models.join import Join
 
 if TYPE_CHECKING:
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 #     TEACHER = "teacher"
 
 
-class Student(DBUnigateBase, UserBase, table=True):
+class Student(DBUnigateBase, UUIDBase, UserBase, table=True):
     __tablename__ = "students"  # type: ignore
 
     groups: list["Group"] = Relationship(

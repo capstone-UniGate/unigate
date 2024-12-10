@@ -21,9 +21,6 @@ class GroupBase(SQLModel):
     description: str | None = None
     category: str | None = None
     type: GroupType = Field(sa_column=Column(Enum(GroupType, name="group_type")))
-    creator_id: uuid.UUID
-    members_count: int = Field(default=0, nullable=False)
-
 
 class GroupTest(SQLModel):
     name: str

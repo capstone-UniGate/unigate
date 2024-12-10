@@ -2,11 +2,9 @@ import enum
 from datetime import UTC, datetime, timedelta
 
 import jwt
-from passlib.context import CryptContext
-
+import bcrypt
 from unigate.core.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 ALGORITHM = "HS256"
 
@@ -30,9 +28,17 @@ def create_access_token(
     return jwt.encode(to_encode, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)  # type: ignore
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+def verify_password(plain_password: str | bytes, hashed_password: str | bytes) -> bool:
+    if isinstance(plain_password, str):
+        plain_password = plain_password.encode()
+    if isinstance(hashed_password, str):
+        hashed_password = hashed_password.encode()
+
+    return bcrypt.checkpw(plain_password, hashed_password)
 
 
-def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+def get_password_hash(plain_password: str | bytes) -> str:
+    if isinstance(plain_password, str):
+        plain_password = plain_password.encode()
+
+    return bcrypt.hashpw(plain_password, bcrypt.gensalt()).decode()

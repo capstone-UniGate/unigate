@@ -22,14 +22,7 @@ def init_db() -> None:
     # if you don't use migrations, you can create them here
 
     # this works because the models are already imported and registered from app.models
-
-    # with Session(engine) as session:
-    #     session.execute(text("DROP TYPE IF EXISTS group_type CASCADE;"))  # type: ignore
-    #     session.execute(text("DROP TYPE IF EXISTS request_status CASCADE;"))  # type: ignore
-    #     session.commit()
-    # SQLModel.metadata.drop_all(engine)
     # SQLModel.metadata.create_all(engine)
-
     pass
 
 

@@ -1,11 +1,12 @@
 from sqlmodel import Session, select
 
 from unigate.models import Student
+from unigate.schemas.student import StudentCreate
 
 from .base_crud import CRUDBase
 
 
-class CRUDStudent(CRUDBase[Student, Student, Student]):
+class CRUDStudent(CRUDBase[Student, StudentCreate, Student]):
     def get_by_number(
         self, *, number: int, db_session: Session | None = None
     ) -> Student | None:
