@@ -77,6 +77,16 @@
           <p v-if="passwordError" class="text-red-500 text-sm mt-2">
             {{ passwordError }}
           </p>
+          <!-- Password Strength Progress Bar -->
+          <div class="mt-2">
+            <Progress
+              :modelValue="passwordStrength"
+              :colorClass="passwordStrengthColorClass"
+            />
+            <p class="text-sm mt-1" :class="passwordStrengthTextClass">
+              {{ passwordStrengthText }}
+            </p>
+          </div>
         </FormField>
 
         <Button
@@ -97,6 +107,7 @@ import { ref, computed } from "vue";
 import { Form, FormField, FormLabel } from "@/components/ui/form";
 import Button from "@/components/ui/button/Button.vue";
 import Input from "@/components/ui/input/Input.vue";
+import Progress from "@/components/ui/progress/Progress.vue";
 
 export default {
   components: {
@@ -105,6 +116,7 @@ export default {
     FormLabel,
     Button,
     Input,
+    Progress,
   },
   setup() {
     const form = ref({
@@ -120,14 +132,58 @@ export default {
       );
     });
 
-    const isPasswordStrong = (password) => {
-      return password.length >= 8 && /(?=.*[a-zA-Z])(?=.*\d)/.test(password);
-    };
+    const passwordStrength = computed(() => {
+      const password = form.value.password;
+      let strength = 0;
+      const hasLowercase = /[a-z]/.test(password);
+      const hasUppercase = /[A-Z]/.test(password);
+      const hasNumber = /\d/.test(password);
+      const hasSpecial = /[^a-zA-Z0-9]/.test(password);
+
+      if (password.length >= 8) strength += 20;
+      if (hasLowercase) strength += 20;
+      if (hasUppercase) strength += 20;
+      if (hasNumber) strength += 20;
+      if (hasSpecial) strength += 20;
+
+      return strength;
+    });
+
+    const passwordStrengthText = computed(() => {
+      if (passwordStrength.value < 40) return "Very Weak";
+      if (passwordStrength.value < 60) return "Weak";
+      if (passwordStrength.value < 80) return "Moderate";
+      if (passwordStrength.value < 100) return "Strong";
+      return "Very Strong";
+    });
+
+    const passwordStrengthTextClass = computed(() => {
+      if (passwordStrength.value < 40) return "text-red-500";
+      if (passwordStrength.value < 60) return "text-yellow-500";
+      if (passwordStrength.value < 80) return "text-blue-500";
+      if (passwordStrength.value < 100) return "text-green-500";
+      return "text-green-700";
+    });
+
+    const passwordStrengthColorClass = computed(() => {
+      if (passwordStrength.value < 40) return "bg-red-500";
+      if (passwordStrength.value < 60) return "bg-yellow-500";
+      if (passwordStrength.value < 80) return "bg-blue-500";
+      if (passwordStrength.value < 100) return "bg-green-500";
+      return "bg-green-700";
+    });
 
     const handleLogin = () => {
-      if (!isPasswordStrong(form.value.password)) {
+      const password = form.value.password;
+      if (
+        passwordStrength.value < 100 ||
+        !/[A-Z]/.test(password) ||
+        !/[a-z]/.test(password) ||
+        !/\d/.test(password) ||
+        !/[^a-zA-Z0-9]/.test(password)
+      ) {
         passwordError.value =
-          "Password is not strong enough. It must be at least 8 characters long and contain both letters and numbers.";
+          "Password must contain at least 8 characters, including uppercase, lowercase, a number, and a special character.";
         return;
       }
       passwordError.value = "";
@@ -143,6 +199,10 @@ export default {
       handleLogin,
       passwordError,
       clearInput,
+      passwordStrength,
+      passwordStrengthText,
+      passwordStrengthTextClass,
+      passwordStrengthColorClass,
     };
   },
 };
