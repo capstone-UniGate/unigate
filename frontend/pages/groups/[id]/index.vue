@@ -156,7 +156,7 @@
 
           <div class="text-center mt-6">
             <Button
-              v-if="group.is_member_of || group.is_super_student"
+              v-if="is_member_of || is_super_student"
               @click="leaveGroup"
               class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-red-600 hover:shadow-xl active:scale-95 transition-all"
               id="leave-group-button"
@@ -207,10 +207,13 @@ const groupId = route.params.id;
 const isLoading = ref(false);
 const isError = ref(false);
 const group = ref();
+const member_list = ref();
+const is_member_of = ref();
+const is_super_student = ref();
 
 const isViewingMembers = ref(false);
 const isAvatarModalOpen = ref(false);
-const studentId = "a00808e8-9447-4fa5-b9cd-87e355032c57";
+const studentId = "021b7a8a-0ffb-43d4-92ec-ee892739ab1f";
 const userRequestStatus = ref(null);
 const isLoadingStatus = ref(true);
 const isErrorStatus = ref(false);
@@ -220,6 +223,9 @@ async function loadGroup() {
     isError.value = false;
     isLoading.value = true;
     group.value = await useApiFetch(`/groups/${groupId}`);
+    member_list.value = await useApiFetch(`/groups/${groupId}/get_members`);
+    is_member_of.value = checkList();
+    is_super_student.value = studentId == group.value.creator_id;
   } catch (error) {
     isError.value = true;
   } finally {
@@ -240,6 +246,17 @@ const closeAvatarModal = () => {
   isAvatarModalOpen.value = false;
 };
 
+const checkList = () => {
+  for (var i = 0; i < member_list.value.length; i++) {
+    if (member_list.value[i].id == studentId) {
+      console.log(studentId);
+      console.log(member_list.value[i].id);
+      return true;
+    }
+  }
+  return false;
+};
+
 const navigateToRequests = () => router.push(`/groups/${groupId}/requests`);
 
 const askToJoinGroup = async () => {
@@ -254,22 +271,21 @@ const askToJoinGroup = async () => {
 
     // Check response string and display the appropriate toast
     if (response === "Join request submitted successfully") {
-      toast.toast({
+      toast({
         title: "Joined Group",
         description: response,
       });
     } else {
-      toast.toast({
+      toast({
         title: "Join Failed",
         description: response,
         variant: "destructive",
       });
     }
   } catch (error) {
-    const errorMessage = extractErrorMessage(error);
-    toast.toast({
+    toast({
       title: "Join Failed",
-      description: errorMessage,
+      description: error,
       variant: "destructive",
     });
   }
@@ -287,23 +303,27 @@ const joinGroup = async () => {
 
     // Check response string and display the appropriate toast
     if (response === "Insert successful") {
-      toast.toast({
+      toast({
+        variant: "success",
         title: "Joined Group",
         description: response,
+        duration: 1000,
       });
+      is_member_of.value = true;
     } else {
-      toast.toast({
+      toast({
         title: "Join Failed",
         description: response,
         variant: "destructive",
+        duration: 1000,
       });
     }
   } catch (error) {
-    const errorMessage = extractErrorMessage(error);
-    toast.toast({
+    toast({
       title: "Join Failed",
-      description: errorMessage,
+      description: error,
       variant: "destructive",
+      duration: 1000,
     });
   }
 };
@@ -325,9 +345,10 @@ async function fetchUserRequestStatus() {
     //
   } catch (error) {
     isErrorStatus.value = true;
-    toast.toast({
+    toast({
       title: "Error",
       description: "Failed to fetch request status. Please try again.",
+      duration: 1000,
     });
   } finally {
     isLoadingStatus.value = false;
@@ -341,17 +362,18 @@ async function leaveGroup() {
     let string_message = await useApiFetch(`/groups/${groupId}/leave`, {
       method: "POST",
       params: {
-        student_id: "24d06a00-d9b4-4e18-b1ff-20501cc762df",
+        student_id: studentId,
         group_id: groupId,
       },
     });
-    console.log(string_message);
     if (string_message === "The student has been removed successfully") {
       toast({
         variant: "success",
         description: "You have left the group",
         duration: 1000,
       });
+      is_member_of.value = false;
+      is_super_student.value = false;
       setTimeout(() => {
         router.push("/groups");
       }, 1500);
