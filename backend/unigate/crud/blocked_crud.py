@@ -1,7 +1,9 @@
 import uuid
 
-from sqlmodel import select
+from sqlmodel import delete, select
 from unigate.models import Blocked, Group
+from unigate.models.join import Join
+from unigate.models.request import Request
 from unigate.models.student import Student
 
 from .base_crud import CRUDBase
@@ -20,6 +22,27 @@ class CRUDBlocked(CRUDBase[Blocked, Blocked, Blocked]):
         # Check if already blocked
         if self.is_student_blocked(student_id, group_id):
             return "The student is already blocked in this group"
+
+            # Remove the student from Join and Request tables
+        db_session = self.get_db()
+        try:
+            # Remove from Join table
+            delete_join_statement = delete(Join).where(
+                Join.student_id == student_id, Join.group_id == group_id
+            )
+            db_session.exec(delete_join_statement)
+
+            # Remove from Request table
+            delete_request_statement = delete(Request).where(
+                Request.student_id == student_id, Request.group_id == group_id
+            )
+            db_session.exec(delete_request_statement)
+
+            # Commit deletions
+            db_session.commit()
+        except Exception as e:
+            db_session.rollback()
+            raise RuntimeError(f"Error while removing student from related tables: {e}")
 
         # Block the student
         self.create(

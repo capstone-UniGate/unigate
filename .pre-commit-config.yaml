@@ -18,7 +18,7 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.8.1"
+    rev: "v0.8.2"
     hooks:
       - id: ruff
         name: ruff-backend
@@ -61,7 +61,7 @@ repos:
           - eslint-plugin-prettier@5.2.1
 
   - repo: https://github.com/ComPWA/prettier-pre-commit
-    rev: "v3.4.1"
+    rev: "v3.4.2"
     hooks:
       - id: prettier
         args: [--write]
