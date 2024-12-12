@@ -73,5 +73,5 @@ frontend-fix:
     cd frontend && npx prettier . --write
     cd frontend && npx eslint --fix
 
-frontend-test: init-database seed-database
+frontend-test: #init-database seed-database
     cd frontend && ../{{ frontend_venv }}/pytest tests/
