@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from sqlalchemy import exc
 from sqlmodel import Session, SQLModel, func, select
 from sqlmodel.sql.expression import SelectOfScalar
-
+from fastapi import Depends
 from unigate.core.database import get_session
 
 ModelType = TypeVar("ModelType", bound=SQLModel)
@@ -20,35 +20,26 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         CRUD object with default methods to Create, Read, Update, Delete (CRUD).
         **Parameters**
-        * `model`: A SQLModel model class
-        * `db_session`: A SQLAlchemy Session instance
         """
         self.model = model
-        self.db_session = next(get_session())
-
-    def get_db_session(self) -> Session:
-        return next(get_session())
 
     def get(
-        self, *, id: UUID | str, db_session: Session | None = None
+        self, *, id: UUID | str, session: Session
     ) -> ModelType | None:
-        db_session = db_session or self.db_session
         query = select(self.model).where(self.model.id == id)  # type: ignore
-        response = db_session.exec(query)
+        response = session.exec(query)
         return response.one_or_none()
 
     def get_by_ids(
-        self, *, list_ids: list[UUID | str], db_session: Session | None = None
+        self, *, list_ids: list[UUID | str], session: Session
     ) -> list[ModelType]:
-        db_session = db_session or self.db_session
-        response = db_session.exec(
+        response = session.exec(
             select(self.model).where(self.model.id.in_(list_ids))  # type: ignore
         )
         return response.all()  # type: ignore
 
-    def get_count(self, db_session: Session | None = None) -> int:
-        db_session = db_session or self.db_session
-        response = db_session.exec(
+    def get_count(self, session: Session) -> int:
+        response = session.exec(
             select(func.count()).select_from(select(self.model).subquery())
         )
         return response.one()
@@ -59,13 +50,12 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         skip: int = 0,
         limit: int = 100,
         query: SelectOfScalar[T] | None = None,
-        db_session: Session | None = None,
+        session: Session,
     ) -> list[ModelType]:
-        db_session = db_session or self.db_session
         statement = (
             select(self.model).offset(skip).limit(limit) if query is None else query
         )
-        response = db_session.exec(statement)
+        response = session.exec(statement)
         return response.all()  # type: ignore
 
     def get_multi_ordered(
@@ -75,9 +65,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         limit: int = 100,
         order_by: str | None = None,
         order: str = "asc",
-        db_session: Session | None = None,
+        session: Session,
     ) -> list[ModelType]:
-        db_session = db_session or self.db_session
         columns = self.model.__table__.columns  # type: ignore
         order_by_column = columns.get(order_by, columns["id"])  # type: ignore
 
@@ -90,7 +79,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             )
         )
 
-        response = db_session.exec(query)
+        response = session.exec(query)
         return response.all()  # type: ignore
 
     def create(
@@ -98,21 +87,20 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         *,
         obj_in: CreateSchemaType | ModelType,
         update: dict[str, Any] | None = None,
-        db_session: Session | None = None,
+        session: Session,
     ) -> ModelType:
-        db_session = db_session or self.db_session
         db_obj = self.model.model_validate(obj_in, update=update)
 
         try:
-            db_session.add(db_obj)
-            db_session.commit()
+            session.add(db_obj)
+            session.commit()
         except exc.IntegrityError:
-            self.db_session.rollback()
+            session.rollback()
             raise HTTPException(
                 status_code=409,
                 detail="Resource already exists",
             )
-        db_session.refresh(db_obj)
+        session.refresh(db_obj)
         return db_obj
 
     def update(
@@ -120,9 +108,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         *,
         obj_current: ModelType,
         obj_new: UpdateSchemaType | dict[str, Any] | ModelType,
-        db_session: Session | None = None,
+        session: Session,
     ) -> ModelType:
-        db_session = db_session or self.db_session
         update_data = (
             obj_new
             if isinstance(obj_new, dict)
@@ -131,15 +118,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         for field in update_data:
             setattr(obj_current, field, update_data[field])
 
-        db_session.add(obj_current)
-        db_session.commit()
-        db_session.refresh(obj_current)
+        session.add(obj_current)
+        session.commit()
+        session.refresh(obj_current)
         return obj_current
 
-    def remove(self, *, id: UUID | str, db_session: Session | None) -> ModelType:
-        db_session = db_session or self.db_session
-        response = db_session.exec(select(self.model).where(self.model.id == id))  # type: ignore
+    def remove(self, *, id: UUID | str, session: Session) -> ModelType:
+        response = session.exec(select(self.model).where(self.model.id == id))  # type: ignore
         obj = response.one()
-        self.db_session.delete(obj)
-        self.db_session.commit()
+        session.delete(obj)
+        session.commit()
         return obj

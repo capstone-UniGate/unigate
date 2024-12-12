@@ -12,6 +12,10 @@ if TYPE_CHECKING:
 class Student(DBUnigateBase, UUIDBase, UserBase, table=True):
     __tablename__ = "students"  # type: ignore
 
+    created_groups: list["Group"] = Relationship(
+        back_populates="creator",  # type: ignore
+    )
+
     groups: list["Group"] = Relationship(
         back_populates="students",  # type: ignore
         link_model=Join,

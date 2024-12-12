@@ -1,5 +1,7 @@
 from collections.abc import Generator
+from typing import Annotated
 
+from fastapi import Depends
 from sqlmodel import (
     Session,  # type: ignore
     SQLModel,  # type: ignore  # noqa: F401
@@ -9,12 +11,16 @@ from sqlmodel import (
 
 import unigate.models  # type: ignore  # noqa: F401
 from unigate.core.config import settings
+from fastapi_async_sqlalchemy.middleware import create_middleware_and_session_proxy
 
 # make sure all SQLModel models are imported (unigate.models) before initializing DB
 # otherwise, SQLModel might fail to initialize relationships properly
 
-engine = create_engine(str(settings.UNIGATE_DB_URI))
+engine = create_engine(str(settings.UNIGATE_DB_URI), echo=True)
 auth_engine = create_engine(str(settings.AUTH_DB_URI))
+
+UnigateMiddleware, unigate_db = create_middleware_and_session_proxy()
+AuthMiddleware, auth_db = create_middleware_and_session_proxy()
 
 
 def init_db() -> None:
@@ -25,18 +31,14 @@ def init_db() -> None:
     # SQLModel.metadata.create_all(engine)
     pass
 
-
 def get_session() -> Generator[Session, None, None]:
     with Session(engine) as session:
-        try:
-            yield session
-        finally:
-            session.close()
-
+        yield session
 
 def get_auth_session() -> Generator[Session, None, None]:
     with Session(auth_engine) as session:
-        try:
-            yield session
-        finally:
-            session.close()
+        yield session
+
+
+SessionDep = Annotated[Session, Depends(get_session)]
+AuthSessionDep = Annotated[Session, Depends(get_auth_session)]

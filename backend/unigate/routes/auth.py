@@ -8,6 +8,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from unigate import crud
 from unigate.core.security import Role, create_access_token
 from unigate.schemas.token import Token
+from unigate.core.database import AuthSessionDep, SessionDep
+
 
 router = APIRouter()
 
@@ -23,11 +25,11 @@ def get_role_and_number(username: str) -> tuple[str, int]:
 @router.post(
     "/login",
 )
-def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
+def login(session: SessionDep, auth_session: AuthSessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
     try:
         role, number = get_role_and_number(form_data.username)
         user = crud.auth_user.authenticate(
-            number=number, role=role, password=form_data.password
+            session=session, auth_session=auth_session, number=number, role=role, password=form_data.password
         )
         if not user:
             raise HTTPException(

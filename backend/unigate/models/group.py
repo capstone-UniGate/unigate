@@ -8,6 +8,7 @@ from unigate.models.join import Join
 
 if TYPE_CHECKING:
     from unigate.models.student import Student
+    from unigate.models.join import Join
 
 
 class Group(DBUnigateBase, UUIDBase, GroupBase, table=True):
@@ -16,6 +17,6 @@ class Group(DBUnigateBase, UUIDBase, GroupBase, table=True):
     creator_id: uuid.UUID = Field(
         foreign_key="students.id", nullable=False, ondelete="CASCADE"
     )
-    creator: "Student" = Relationship(back_populates="groups")
+    creator: "Student" = Relationship(back_populates="created_groups")
 
     students: list["Student"] = Relationship(back_populates="groups", link_model=Join)

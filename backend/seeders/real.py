@@ -1,7 +1,7 @@
 from unigate import crud
 from unigate.core.database import get_auth_session, get_session
 from unigate.core.security import get_password_hash
-from unigate.models.group import GroupType
+from unigate.enums import GroupType
 from unigate.schemas.auth import AuthUserCreate
 from unigate.schemas.group import GroupCreate
 from unigate.schemas.student import StudentCreate
@@ -12,6 +12,18 @@ students = [
         email="s4891185@studenti.unige.it",
         name="Fabio",
         surname="Fontana",
+    ),
+    StudentCreate(
+        number=4989646,
+        email="s4989686@studenti.unige.it",
+        name="Lorenzo",
+        surname="Foschi",
+    ),
+    StudentCreate(
+        number=1234567,
+        email="s1234567@studenti.unige.it",
+        name="Test Name",
+        surname="Test Surname",
     )
 ]
 
@@ -41,18 +53,18 @@ for user in students:
 def seed_auth() -> None:
     session = next(get_auth_session())
     for user in users:
-        crud.auth_user.create(obj_in=user, db_session=session)
+        crud.auth_user.create(obj_in=user, session=session)
 
 
 def seed_unigate() -> None:
     session = next(get_session())
     for student in students:
-        current_student = crud.student.create(obj_in=student, db_session=session)
+        current_student = crud.student.create(obj_in=student, session=session)
         for group in groups:
             crud.group.create(
                 obj_in=group,
-                update={"creator_id": current_student.id},
-                db_session=session,
+                update={"creator_id": current_student.id, "name": f"{group.name} {current_student.number}"},
+                session=session,
             )
 
 
