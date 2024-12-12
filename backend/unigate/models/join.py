@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from sqlmodel import Field, Relationship, SQLModel  # type: ignore
+from sqlmodel import Field, SQLModel  # type: ignore
 
 from unigate.models.base import DBUnigateBase
 

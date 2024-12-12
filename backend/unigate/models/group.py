@@ -7,8 +7,8 @@ from unigate.models.base import DBUnigateBase, GroupBase, UUIDBase
 from unigate.models.join import Join
 
 if TYPE_CHECKING:
-    from unigate.models.student import Student
     from unigate.models.join import Join
+    from unigate.models.student import Student
 
 
 class Group(DBUnigateBase, UUIDBase, GroupBase, table=True):

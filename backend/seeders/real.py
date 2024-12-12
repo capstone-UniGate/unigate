@@ -24,7 +24,7 @@ students = [
         email="s1234567@studenti.unige.it",
         name="Test Name",
         surname="Test Surname",
-    )
+    ),
 ]
 
 groups = [
@@ -63,7 +63,10 @@ def seed_unigate() -> None:
         for group in groups:
             crud.group.create(
                 obj_in=group,
-                update={"creator_id": current_student.id, "name": f"{group.name} {current_student.number}"},
+                update={
+                    "creator_id": current_student.id,
+                    "name": f"{group.name} {current_student.number}",
+                },
                 session=session,
             )
 

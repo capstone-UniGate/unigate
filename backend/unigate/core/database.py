@@ -2,6 +2,7 @@ from collections.abc import Generator
 from typing import Annotated
 
 from fastapi import Depends
+from fastapi_async_sqlalchemy.middleware import create_middleware_and_session_proxy
 from sqlmodel import (
     Session,  # type: ignore
     SQLModel,  # type: ignore  # noqa: F401
@@ -11,7 +12,6 @@ from sqlmodel import (
 
 import unigate.models  # type: ignore  # noqa: F401
 from unigate.core.config import settings
-from fastapi_async_sqlalchemy.middleware import create_middleware_and_session_proxy
 
 # make sure all SQLModel models are imported (unigate.models) before initializing DB
 # otherwise, SQLModel might fail to initialize relationships properly
@@ -31,9 +31,11 @@ def init_db() -> None:
     # SQLModel.metadata.create_all(engine)
     pass
 
+
 def get_session() -> Generator[Session, None, None]:
     with Session(engine) as session:
         yield session
+
 
 def get_auth_session() -> Generator[Session, None, None]:
     with Session(auth_engine) as session:

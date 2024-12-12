@@ -6,8 +6,6 @@ from pydantic import BaseModel
 from sqlalchemy import exc
 from sqlmodel import Session, SQLModel, func, select
 from sqlmodel.sql.expression import SelectOfScalar
-from fastapi import Depends
-from unigate.core.database import get_session
 
 ModelType = TypeVar("ModelType", bound=SQLModel)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -23,9 +21,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
-    def get(
-        self, *, id: UUID | str, session: Session
-    ) -> ModelType | None:
+    def get(self, *, id: UUID | str, session: Session) -> ModelType | None:
         query = select(self.model).where(self.model.id == id)  # type: ignore
         response = session.exec(query)
         return response.one_or_none()
