@@ -4,7 +4,7 @@ from unigate import crud
 from unigate.core.database import SessionDep
 from unigate.enums import GroupType
 from unigate.models import Group, Request
-from unigate.routes.deps import GroupDep, RequestDep, StudentDep
+from unigate.routes.deps import GroupDep, RequestDep, CurrStudentDep, StudentDep
 from unigate.schemas.group import (
     GroupCreate,
     GroupReadOnlyStudents,
@@ -38,7 +38,7 @@ def get_group(group: GroupDep) -> Group:
 def create_group(
     session: SessionDep,
     group: GroupCreate,
-    current_user: StudentDep,
+    current_user: CurrStudentDep,
 ) -> Group:
     return crud.group.create(
         session=session,
@@ -58,7 +58,7 @@ def create_group(
 def join_group(
     session: SessionDep,
     group: GroupDep,
-    current_user: StudentDep,
+    current_user: CurrStudentDep,
 ) -> Group:
     if group.type == GroupType.PRIVATE:
         return crud.group.create_request(
@@ -74,7 +74,7 @@ def join_group(
 def leave_group(
     session: SessionDep,
     group: GroupDep,
-    current_user: StudentDep,
+    current_user: CurrStudentDep,
 ) -> Group:
     return crud.group.leave(session=session, group=group, student=current_user)
 
@@ -95,7 +95,7 @@ def get_group_students(
 )
 def get_group_requests(
     group: GroupDep,
-    current_user: StudentDep,
+    current_user: CurrStudentDep,
 ) -> list[Request]:
     if current_user not in group.super_students:
         raise HTTPException(
@@ -113,7 +113,7 @@ def accept_group_request(
     session: SessionDep,
     group: GroupDep,
     request: RequestDep,
-    current_user: StudentDep,
+    current_user: CurrStudentDep,
 ) -> Request:
     if current_user not in group.super_students:
         raise HTTPException(
@@ -131,7 +131,7 @@ def reject_group_requesr(
     session: SessionDep,
     group: GroupDep,
     request: RequestDep,
-    current_user: StudentDep,
+    current_user: CurrStudentDep,
 ) -> Request:
     if current_user not in group.super_students:
         raise HTTPException(
@@ -149,7 +149,7 @@ def block_group_request(
     session: SessionDep,
     group: GroupDep,
     request: RequestDep,
-    current_user: StudentDep,
+    current_user: CurrStudentDep,
 ) -> Request:
     if current_user not in group.super_students:
         raise HTTPException(
@@ -167,7 +167,7 @@ def block_user(
     session: SessionDep,
     group: GroupDep,
     student: StudentDep,
-    current_user: StudentDep,
+    current_user: CurrStudentDep,
 ) -> Group:
     if current_user not in group.super_students:
         raise HTTPException(
@@ -185,7 +185,7 @@ def unblock_user(
     session: SessionDep,
     group: GroupDep,
     student: StudentDep,
-    current_user: StudentDep,
+    current_user: CurrStudentDep,
 ) -> Group:
     if current_user not in group.super_students:
         raise HTTPException(

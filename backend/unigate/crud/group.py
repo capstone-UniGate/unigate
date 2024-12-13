@@ -73,6 +73,8 @@ class CRUDGroup(CRUDBase[Group, GroupCreate, Group]):
         return request
 
     def block_user(self, *, group: Group, student: Student, session: Session) -> Group:
+        if student in group.students:
+            group.students.remove(student)
         group.blocked_students.append(student)
         session.add(group)
         session.commit()

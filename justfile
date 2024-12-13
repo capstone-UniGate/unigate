@@ -24,7 +24,7 @@ init-database: reset-database
     cd backend/alembic_unigate && ../../{{ backend_venv }}/alembic upgrade head
     cd backend/alembic_auth && ../../{{ backend_venv }}/alembic upgrade head
 
-seed-real: init-database
+seed-real:
     {{ backend_python }} backend/seeders/real.py
 
 seed-fake:

@@ -61,7 +61,7 @@ def seed_unigate() -> None:
     for student in students:
         current_student = crud.student.create(obj_in=student, session=session)
         for group in groups:
-            crud.group.create(
+            group = crud.group.create(
                 obj_in=group,
                 update={
                     "creator_id": current_student.id,
@@ -69,6 +69,10 @@ def seed_unigate() -> None:
                 },
                 session=session,
             )
+            group.students.append(current_student)
+            group.super_students.append(current_student)
+            session.add(group)
+            session.commit()
 
 
 if __name__ == "__main__":

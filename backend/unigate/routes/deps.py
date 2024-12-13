@@ -62,7 +62,7 @@ def get_current_user(
     return get_current_user_aux
 
 
-StudentDep = Annotated[Student, Depends(get_current_user(wanted_model=Student))]
+CurrStudentDep = Annotated[Student, Depends(get_current_user(wanted_model=Student))]
 
 
 def get_group(
@@ -93,3 +93,16 @@ def get_request(
 
 
 RequestDep = Annotated[Request, Depends(get_request)]
+
+def get_student(
+    session: SessionDep,
+    student_id: uuid.UUID,
+) -> Student:
+    student = crud.student.get(id=student_id, session=session)
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Student not found."
+        )
+    return student
+
+StudentDep = Annotated[Student, Depends(get_student)]

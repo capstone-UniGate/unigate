@@ -32,6 +32,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["student_id"], ["students.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("student_id", "group_id"),
     )
+    op.execute("ALTER TYPE request_status ADD VALUE 'BLOCKED'")
     # ### end Alembic commands ###
 
 
