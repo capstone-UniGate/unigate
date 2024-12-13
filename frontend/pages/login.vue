@@ -11,7 +11,7 @@
   <div class="flex min-h-screen items-center justify-center bg-gray-100">
     <div class="w-full max-w-sm p-4 bg-white rounded-lg shadow-md">
       <h2 class="text-xl font-bold text-center text-gray-700 mb-4">Login</h2>
-      <Form>
+      <Form id="login-form">
         <!-- Username Field -->
         <FormField name="username">
           <FormLabel for="username">Username</FormLabel>
