@@ -5,19 +5,16 @@ Revises: 2f15884ef8c1
 Create Date: 2024-12-13 18:11:46.994847
 
 """
-from collections.abc import Sequence
 
-import sqlalchemy as sa
+from collections.abc import Sequence
 
 # see https://stackoverflow.com/a/69063829 for sqlmodel
 import sqlmodel
 import sqlmodel.sql.sqltypes  # noqa: F401
-from alembic import op
-
 
 # revision identifiers, used by Alembic.
-revision: str = 'd259f06a2b22'
-down_revision: str | None = '2f15884ef8c1'
+revision: str = "d259f06a2b22"
+down_revision: str | None = "2f15884ef8c1"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
