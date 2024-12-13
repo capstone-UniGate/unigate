@@ -75,3 +75,6 @@ frontend-fix:
 
 frontend-test: #init-database seed-database
     cd frontend && ../{{ frontend_venv }}/pytest tests/
+
+frontend-testlogout: #init-database seed-database
+    cd frontend && ../{{ frontend_venv }}/pytest tests/test_cases/test_logout.py

@@ -38,6 +38,7 @@
         <!-- Logout Button (Desktop) -->
         <button
           @click="logout"
+          id="logout-button"
           class="hidden md:block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
         >
           Logout
