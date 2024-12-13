@@ -134,11 +134,32 @@
             </p>
           </div>
 
+          <div>
+            <div v-if="isLoadingStatus">
+              <LoadingIndicator />
+            </div>
+            <div v-else-if="isErrorStatus">
+              <p class="text-red-500">
+                Failed to load request status. Please try again.
+              </p>
+            </div>
+            <div v-else>
+              <p
+                v-if="
+                  userRequestStatus && userRequestStatus.includes('PENDING')
+                "
+              >
+                Your request status: <strong>{{ userRequestStatus }}</strong>
+              </p>
+            </div>
+          </div>
+
           <div class="text-center mt-6">
             <Button
-              v-if="group.is_member_of || group.is_super_student"
+              v-if="is_member_of || is_super_student"
               @click="leaveGroup"
               class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-red-600 hover:shadow-xl active:scale-95 transition-all"
+              id="leave-group-button"
             >
               Leave Group
             </Button>
@@ -146,13 +167,19 @@
               v-else-if="group.type != 'Private'"
               @click="joinGroup"
               class="bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-indigo-600 hover:shadow-xl active:scale-95 transition-all"
+              id="join-group-button"
             >
               Join Group
             </Button>
+
             <Button
-              v-else
+              v-else-if="
+                userRequestStatus == null ||
+                userRequestStatus.includes('REJECTED')
+              "
               @click="askToJoinGroup"
               class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-yellow-600 hover:shadow-xl active:scale-95 transition-all"
+              id="ask-to-join-button"
             >
               Ask to Join
             </Button>
@@ -174,21 +201,31 @@ import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
-const toast = useToast();
+const { toast } = useToast();
 
 const groupId = route.params.id;
 const isLoading = ref(false);
 const isError = ref(false);
 const group = ref();
+const member_list = ref();
+const is_member_of = ref();
+const is_super_student = ref();
 
 const isViewingMembers = ref(false);
 const isAvatarModalOpen = ref(false);
+const studentId = "021b7a8a-0ffb-43d4-92ec-ee892739ab1f";
+const userRequestStatus = ref(null);
+const isLoadingStatus = ref(true);
+const isErrorStatus = ref(false);
 
 async function loadGroup() {
   try {
     isError.value = false;
     isLoading.value = true;
     group.value = await useApiFetch(`/groups/${groupId}`);
+    member_list.value = await useApiFetch(`/groups/${groupId}/get_members`);
+    is_member_of.value = checkList();
+    is_super_student.value = studentId == group.value.creator_id;
   } catch (error) {
     isError.value = true;
   } finally {
@@ -198,6 +235,7 @@ async function loadGroup() {
 
 onMounted(() => {
   loadGroup();
+  fetchUserRequestStatus();
 });
 
 const openAvatarModal = () => {
@@ -208,17 +246,153 @@ const closeAvatarModal = () => {
   isAvatarModalOpen.value = false;
 };
 
+const checkList = () => {
+  for (var i = 0; i < member_list.value.length; i++) {
+    if (member_list.value[i].id == studentId) {
+      console.log(studentId);
+      console.log(member_list.value[i].id);
+      return true;
+    }
+  }
+  return false;
+};
+
 const navigateToRequests = () => router.push(`/groups/${groupId}/requests`);
 
-const askToJoinGroup = () => {
-  // TODO: To be done done
+const askToJoinGroup = async () => {
+  try {
+    const response = await useApiFetch(`/groups/join_private_group`, {
+      method: "POST",
+      query: {
+        student_id: studentId,
+        group_id: groupId,
+      },
+    });
+
+    // Check response string and display the appropriate toast
+    if (response === "Join request submitted successfully") {
+      toast({
+        title: "Joined Group",
+        description: response,
+      });
+    } else {
+      toast({
+        title: "Join Failed",
+        description: response,
+        variant: "destructive",
+      });
+    }
+  } catch (error) {
+    toast({
+      title: "Join Failed",
+      description: error,
+      variant: "destructive",
+    });
+  }
 };
 
-const joinGroup = () => {
-  // TODO: To be done done
+const joinGroup = async () => {
+  try {
+    const response = await useApiFetch(`/groups/join_public_group`, {
+      method: "POST",
+      query: {
+        student_id: studentId,
+        group_id: groupId,
+      },
+    });
+
+    // Check response string and display the appropriate toast
+    if (response === "Insert successful") {
+      toast({
+        variant: "success",
+        title: "Joined Group",
+        description: response,
+        duration: 1000,
+      });
+      is_member_of.value = true;
+    } else {
+      toast({
+        title: "Join Failed",
+        description: response,
+        variant: "destructive",
+        duration: 1000,
+      });
+    }
+  } catch (error) {
+    toast({
+      title: "Join Failed",
+      description: error,
+      variant: "destructive",
+      duration: 1000,
+    });
+  }
 };
 
-const leaveGroup = () => {
-  // TODO: To be done done
-};
+async function fetchUserRequestStatus() {
+  try {
+    isLoadingStatus.value = true;
+    isErrorStatus.value = false;
+
+    // Fetch the requests
+    const requests = await useApiFetch(`/groups/${groupId}/requests`);
+
+    // Find the logged-in user's request
+    const userRequest = requests.find(
+      (request) => request.student_id === studentId,
+    );
+    // Update the status if found
+    userRequestStatus.value = userRequest ? userRequest.status : null;
+    //
+  } catch (error) {
+    isErrorStatus.value = true;
+    toast({
+      title: "Error",
+      description: "Failed to fetch request status. Please try again.",
+      duration: 1000,
+    });
+  } finally {
+    isLoadingStatus.value = false;
+  }
+}
+
+async function leaveGroup() {
+  try {
+    isError.value = false;
+    isLoading.value = true;
+    let string_message = await useApiFetch(`/groups/${groupId}/leave`, {
+      method: "POST",
+      params: {
+        student_id: studentId,
+        group_id: groupId,
+      },
+    });
+    if (string_message === "The student has been removed successfully") {
+      toast({
+        variant: "success",
+        description: "You have left the group",
+        duration: 1000,
+      });
+      is_member_of.value = false;
+      is_super_student.value = false;
+      setTimeout(() => {
+        router.push("/groups");
+      }, 1500);
+    } else {
+      toast({
+        variant: "destructive",
+        description: string_message,
+        duration: 1000,
+      });
+    }
+  } catch (error) {
+    toast({
+      variant: "destructive",
+      description: "You have NOT left the group",
+      duration: 1000,
+    });
+    isError.value = true;
+  } finally {
+    isLoading.value = false;
+  }
+}
 </script>

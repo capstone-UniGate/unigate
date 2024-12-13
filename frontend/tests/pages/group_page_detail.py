@@ -1,16 +1,17 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
-from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
 
 
 class GroupPageDetail:
     URL = "http://localhost:3000/groups/{group_id}"
-    JOIN_GROUP_BUTTON = (By.XPATH, "//button[contains(text(), 'Join Group')]")
 
     def __init__(self, driver: WebDriver, group_id: str) -> None:
         self.driver = driver
         self.group_id = group_id
+        self.wait = WebDriverWait(driver, 1000)
 
     def navigate(self) -> None:
         self.driver.get(self.URL)
@@ -63,12 +64,25 @@ class GroupPageDetail:
 
     def get_toast_message(self) -> str:
         """Retrieve the text from the success toast message."""
-        WebDriverWait(self.driver, 10).until(
-            ec.visibility_of_element_located((By.CLASS_NAME, "toast-success"))
+        # WebDriverWait(self.driver, 10).until(
+        #    ec.visibility_of_element_located((By.CLASS_NAME, "toast-success"))
+        # )
+        return (self.get_toast()).text
+
+    def get_toast(self) -> WebElement:
+        return self.driver.find_element(
+            By.CSS_SELECTOR, '[data-state="open"][data-swipe-direction="right"]'
         )
-        toast_message = self.driver.find_element(By.CLASS_NAME, "toast-success")
-        return toast_message.text
+
+    def toast_disappearence(self) -> None:
+        self.wait.until(EC.none_of(EC.visibility_of(self.get_toast())))
 
     def click_join(self) -> None:
-        create_button = self.driver.find_element(*self.JOIN_GROUP_BUTTON)
+        create_button = self.driver.find_element(By.ID, "join-group-button")
+        # create_button.send_keys(Keys.ENTER)
         create_button.click()
+
+    def click_leave(self) -> None:
+        leave_button = self.driver.find_element(By.ID, "leave-group-button")
+        # leave_button.send_keys(Keys.ENTER)
+        leave_button.click()

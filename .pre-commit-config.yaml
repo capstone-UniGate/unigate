@@ -18,7 +18,7 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.8.0"
+    rev: "v0.8.3"
     hooks:
       - id: ruff
         name: ruff-backend
@@ -46,7 +46,7 @@ repos:
         exclude: ^(frontend/|backend/)
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: "v9.15.0"
+    rev: "v9.16.0"
     hooks:
       - id: eslint
         args: [--fix, --config=frontend/eslint.config.js]
@@ -61,7 +61,7 @@ repos:
           - eslint-plugin-prettier@5.2.1
 
   - repo: https://github.com/ComPWA/prettier-pre-commit
-    rev: "v3.3.3"
+    rev: "v3.4.2"
     hooks:
       - id: prettier
         args: [--write]

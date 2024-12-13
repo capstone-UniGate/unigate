@@ -20,7 +20,7 @@ reset-database:
     docker compose exec postgres-unigate psql -U $POSTGRES_USER -d $UNIGATE_DB -c "DO \$\$ BEGIN EXECUTE 'DROP SCHEMA public CASCADE'; EXECUTE 'CREATE SCHEMA public'; END \$\$;"
     docker compose exec postgres-unigate psql -U $POSTGRES_USER -d $AUTH_DB -c "DO \$\$ BEGIN EXECUTE 'DROP SCHEMA public CASCADE'; EXECUTE 'CREATE SCHEMA public'; END \$\$;"
 
-init-database: reset-database
+init-database: reset-database seed-real
     cd backend/alembic_unigate && ../../{{ backend_venv }}/alembic upgrade head
     cd backend/alembic_auth && ../../{{ backend_venv }}/alembic upgrade head
 
@@ -76,5 +76,5 @@ frontend-fix:
     cd frontend && npx prettier . --write
     cd frontend && npx eslint --fix
 
-frontend-test: init-database
+frontend-test: init-database seed-real
     cd frontend && ../{{ frontend_venv }}/pytest tests/

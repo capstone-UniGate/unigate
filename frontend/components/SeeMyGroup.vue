@@ -1,16 +1,20 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { userGroupData } from "@/composables/userGroupData";
-
-const groups = ref([]);
-const isLoading = ref(true);
+const groups = ref();
+const isLoading = ref(false);
 const isError = ref(false);
 
-async function loadGroups() {
+const student_id = "5fa683ba-afab-408f-b8b2-8d326e21ed1f";
+
+async function loadMyGroups() {
   try {
     isError.value = false;
     isLoading.value = true;
-    groups.value = userGroupData();
+    groups.value = await useApiFetch(
+      `/groups/get_student_groups?student_id=${student_id}`,
+      {
+        method: "POST",
+      },
+    );
   } catch (error) {
     isError.value = true;
   } finally {
@@ -19,7 +23,7 @@ async function loadGroups() {
 }
 
 onMounted(() => {
-  loadGroups();
+  loadMyGroups();
 });
 </script>
 
@@ -28,7 +32,7 @@ onMounted(() => {
     <!-- Error Message Component -->
     <ErrorMessage
       v-if="isError"
-      @retry="loadGroups"
+      @retry="loadMyGroups"
       data-testid="error-message"
     />
 

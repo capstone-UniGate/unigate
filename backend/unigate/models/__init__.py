@@ -9,6 +9,7 @@ from unigate.models.base import (
     UserBase,
     UUIDBase,
 )
+from unigate.models.block import Block
 from unigate.models.group import Group
 from unigate.models.join import Join
 from unigate.models.request import Request, RequestStatus
@@ -18,6 +19,7 @@ from unigate.models.super_student import SuperStudent
 __all__ = [
     "AuthUser",
     "AuthUserBase",
+    "Block",
     "DBAuthBase",
     "DBUnigateBase",
     "Group",

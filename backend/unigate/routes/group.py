@@ -5,7 +5,11 @@ from unigate.core.database import SessionDep
 from unigate.enums import GroupType
 from unigate.models import Group, Request
 from unigate.routes.deps import GroupDep, RequestDep, StudentDep
-from unigate.schemas.group import GroupCreate, GroupReadWithStudents
+from unigate.schemas.group import (
+    GroupCreate,
+    GroupReadOnlyStudents,
+    GroupReadWithStudents,
+)
 from unigate.schemas.request import RequestRead
 
 router = APIRouter()
@@ -76,6 +80,16 @@ def leave_group(
 
 
 @router.get(
+    "/{group_id}/students",
+    response_model=GroupReadOnlyStudents,
+)
+def get_group_students(
+    group: GroupDep,
+) -> Group:
+    return group
+
+
+@router.get(
     "/{group_id}/requests",
     response_model=list[RequestRead],
 )
@@ -143,3 +157,39 @@ def block_group_request(
             detail="You are not a super student of this group",
         )
     return crud.group.block_request(session=session, request=request)
+
+
+@router.post(
+    "/{group_id}/students/{student_id}/block",
+    response_model=GroupReadWithStudents,
+)
+def block_user(
+    session: SessionDep,
+    group: GroupDep,
+    student: StudentDep,
+    current_user: StudentDep,
+) -> Group:
+    if current_user not in group.super_students:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not a super student of this group",
+        )
+    return crud.group.block_user(session=session, group=group, student=student)
+
+
+@router.post(
+    "/{group_id}/students/{student_id}/unblock",
+    response_model=GroupReadWithStudents,
+)
+def unblock_user(
+    session: SessionDep,
+    group: GroupDep,
+    student: StudentDep,
+    current_user: StudentDep,
+) -> Group:
+    if current_user not in group.super_students:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not a super student of this group",
+        )
+    return crud.group.unblock_user(session=session, group=group, student=student)

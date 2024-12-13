@@ -66,10 +66,27 @@ class CRUDGroup(CRUDBase[Group, GroupCreate, Group]):
 
     def block_request(self, *, request: Request, session: Session) -> Request:
         request.status = RequestStatus.BLOCKED
+        request.group.blocked_students.append(request.student)
         session.add(request)
         session.commit()
         session.refresh(request)
         return request
+
+    def block_user(self, *, group: Group, student: Student, session: Session) -> Group:
+        group.blocked_students.append(student)
+        session.add(group)
+        session.commit()
+        session.refresh(group)
+        return group
+
+    def unblock_user(
+        self, *, group: Group, student: Student, session: Session
+    ) -> Group:
+        group.blocked_students.remove(student)
+        session.add(group)
+        session.commit()
+        session.refresh(group)
+        return group
 
 
 group = CRUDGroup(Group)
