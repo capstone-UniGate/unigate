@@ -7,7 +7,7 @@ async function loadGroups() {
   try {
     isError.value = false;
     isLoading.value = true;
-    groups.value = await useApiFetch("groups/get");
+    groups.value = await useApiFetch("groups");
   } catch (error) {
     isError.value = true;
   } finally {

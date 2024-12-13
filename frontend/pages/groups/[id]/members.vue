@@ -6,7 +6,7 @@ import { useRoute, useRouter } from "vue-router";
 const route = useRoute();
 const router = useRouter();
 const groupId = route.params.id;
-const members = await useApiFetch(`groups/${groupId}/get_members`);
+const members = await useApiFetch(`groups/${groupId}/students`);
 </script>
 
 <template>
