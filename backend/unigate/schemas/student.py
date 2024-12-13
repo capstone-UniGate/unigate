@@ -17,6 +17,7 @@ class StudentRead(UserBase):
 class StudentReadWithoutGroups(UserBase):
     id: uuid.UUID
 
+
 class StudentReadOnlyGroups(UserBase):
     groups: list[GroupReadBasic]
     created_groups: list[GroupReadBasic]
