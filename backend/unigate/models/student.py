@@ -1,28 +1,34 @@
-import uuid
-from enum import Enum
 from typing import TYPE_CHECKING
 
-from pydantic import EmailStr
-from sqlmodel import Field, Relationship, SQLModel  # type: ignore
+from sqlmodel import Relationship  # type: ignore
+
+from unigate.models.base import DBUnigateBase, UserBase, UUIDBase
+from unigate.models.block import Block
+from unigate.models.join import Join
+from unigate.models.super_student import SuperStudent
 
 if TYPE_CHECKING:
-    from .request import Request
+    from unigate.models.group import Group
+    from unigate.models.request import Request
 
 
-class GroupType(str, Enum):
-    PUBLIC = "PUBLIC"
-    PRIVATE = "PRIVATE"
-
-
-class Student(SQLModel, table=True):
+class Student(DBUnigateBase, UUIDBase, UserBase, table=True):
     __tablename__ = "students"  # type: ignore
 
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    hashed_password: str
-    number: int = Field(unique=True, index=True)
-    email: EmailStr = Field(unique=True, index=True, max_length=255)
-    name: str = Field(max_length=255)
-    surname: str = Field(default=None, max_length=255)
+    created_groups: list["Group"] = Relationship(
+        back_populates="creator",  # type: ignore
+    )
 
-    # Reverse relationship to Request
-    requests: list["Request"] = Relationship(back_populates="student")
+    groups: list["Group"] = Relationship(
+        back_populates="students",  # type: ignore
+        link_model=Join,
+    )
+    super_groups: list["Group"] = Relationship(
+        back_populates="super_students", link_model=SuperStudent
+    )
+    requests: list["Request"] = Relationship(
+        back_populates="student",  # type: ignore
+    )
+    blocked_groups: list["Group"] = Relationship(
+        back_populates="blocked_students", link_model=Block
+    )

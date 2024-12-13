@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.pool import AsyncAdaptedQueuePool
 
-from unigate.routes import (
-    groups,
-    requests,
-)
+from unigate.core.config import settings
+from unigate.core.database import AuthMiddleware, UnigateMiddleware
+from unigate.routes import auth, group, student
 
 app = FastAPI()
 
@@ -12,22 +12,38 @@ origins = ["http://localhost", "http://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.all_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+app.add_middleware(
+    UnigateMiddleware,
+    db_url=str(settings.UNIGATE_DB_URI),
+    engine_args={"echo": False, "poolclass": AsyncAdaptedQueuePool},
+)
+app.add_middleware(
+    AuthMiddleware,
+    db_url=str(settings.AUTH_DB_URI),
+    engine_args={"echo": False, "poolclass": AsyncAdaptedQueuePool},
+)
+
 
 @app.get("/")
-def main() -> dict[str, str]:
-    """Root endpoint to confirm the API is working."""
+async def hello() -> dict[str, str]:
     return {"message": "Hello, World!"}
 
 
-# Include the groups router under /groups
-app.include_router(groups.router, prefix="/groups")
-app.include_router(requests.router, prefix="/requests")
+@app.get("/ping")
+async def ping() -> dict[str, str]:
+    return {"message": "pong"}
+
+
+app.include_router(auth.router, prefix="/auth")
+app.include_router(student.router, prefix="/students")
+app.include_router(group.router, prefix="/groups")
+
 
 if __name__ == "__main__":
     import uvicorn

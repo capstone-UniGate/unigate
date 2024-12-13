@@ -1,34 +1,32 @@
-import enum
 import uuid
+from typing import TYPE_CHECKING
 
-from sqlmodel import Column, Enum, Field, SQLModel  # type: ignore
+from sqlmodel import Field, Relationship  # type: ignore
+
+from unigate.models.base import DBUnigateBase, GroupBase, UUIDBase
+from unigate.models.block import Block
+from unigate.models.join import Join
+from unigate.models.super_student import SuperStudent
+
+if TYPE_CHECKING:
+    from unigate.models.request import Request
+    from unigate.models.student import Student
 
 
-class GroupType(str, enum.Enum):
-    PUBLIC = "Public"
-    PRIVATE = "Private"
-
-
-class Group(SQLModel, table=True):
+class Group(DBUnigateBase, UUIDBase, GroupBase, table=True):
     __tablename__ = "groups"  # type: ignore
-
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    name: str = Field(max_length=255)
-    description: str | None = Field(default=None)
-    category: str | None = Field(default=None, max_length=255)
-    type: GroupType = Field(sa_column=Column(Enum(GroupType, name="group_type")))
-    members_count: int = Field(default=0)
 
     creator_id: uuid.UUID = Field(
         foreign_key="students.id", nullable=False, ondelete="CASCADE"
     )
 
-    @property
-    def is_super_student(self) -> bool:
-        # TODO: It should be dynamic after login implementation
-        return False
+    creator: "Student" = Relationship(back_populates="created_groups")
 
-    @property
-    def is_member_of(self) -> bool:
-        # TODO: It should be dynamic after login implementation
-        return False
+    students: list["Student"] = Relationship(back_populates="groups", link_model=Join)
+    super_students: list["Student"] = Relationship(
+        back_populates="super_groups", link_model=SuperStudent
+    )
+    requests: list["Request"] = Relationship(back_populates="group")
+    blocked_students: list["Student"] = Relationship(
+        back_populates="blocked_groups", link_model=Block
+    )

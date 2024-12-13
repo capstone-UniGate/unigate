@@ -2,8 +2,10 @@ import uuid
 
 from sqlmodel import Field, SQLModel  # type: ignore
 
+from unigate.models.base import DBUnigateBase
 
-class SuperStudent(SQLModel, table=True):
+
+class SuperStudent(DBUnigateBase, SQLModel, table=True):
     __tablename__ = "super_students"  # type: ignore
 
     student_id: uuid.UUID = Field(

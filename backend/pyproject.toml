@@ -4,11 +4,14 @@ version = "0.1.0"
 description = ""
 requires-python = ">=3.12"
 dependencies = [
+    "bcrypt>=4.2.1",
     "faker>=33.1.0",
-    "fastapi-pagination>=0.12.31",
+    "fastapi-async-sqlalchemy>=0.6.1",
     "fastapi[all,standard]>=0.115.4",
     "loguru>=0.7.2",
     "psycopg[binary]>=3.2.3",
+    "pyjwt>=2.10.1",
+    "python-dotenv>=1.0.1",
     "pytz>=2024.2",
     "sendgrid>=6.11.0",
     "sqlmodel>=0.0.22",
