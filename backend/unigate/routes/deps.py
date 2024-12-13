@@ -15,7 +15,7 @@ from unigate.core.database import (
     SessionDep,
 )
 from unigate.enums import Role
-from unigate.models import Student
+from unigate.models import Request, Student
 from unigate.models.group import Group
 from unigate.schemas.token import TokenPayload
 from unigate.utils.auth import get_user
@@ -78,3 +78,18 @@ def get_group(
 
 
 GroupDep = Annotated[Group, Depends(get_group)]
+
+
+def get_request(
+    session: SessionDep,
+    request_id: uuid.UUID,
+) -> Request:
+    request = crud.request.get(id=request_id, session=session)
+    if not request:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Request not found."
+        )
+    return request
+
+
+RequestDep = Annotated[Request, Depends(get_request)]

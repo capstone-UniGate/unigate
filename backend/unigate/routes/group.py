@@ -1,10 +1,12 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 
 from unigate import crud
 from unigate.core.database import SessionDep
-from unigate.models import Group
-from unigate.routes.deps import GroupDep, StudentDep
+from unigate.enums import GroupType
+from unigate.models import Group, Request
+from unigate.routes.deps import GroupDep, RequestDep, StudentDep
 from unigate.schemas.group import GroupCreate, GroupReadWithStudents
+from unigate.schemas.request import RequestRead
 
 router = APIRouter()
 
@@ -14,7 +16,7 @@ router = APIRouter()
     response_model=list[GroupReadWithStudents],
 )
 def get_groups(session: SessionDep) -> list[Group]:
-    return crud.group.get_multi(session=session)
+    return crud.group.get_all(session=session)
 
 
 @router.get(
@@ -37,7 +39,11 @@ def create_group(
     return crud.group.create(
         session=session,
         obj_in=group,
-        update={"creator_id": current_user.id, "students": [current_user]},
+        update={
+            "creator_id": current_user.id,
+            "students": [current_user],
+            "super_students": [current_user],
+        },
     )
 
 
@@ -50,16 +56,90 @@ def join_group(
     group: GroupDep,
     current_user: StudentDep,
 ) -> Group:
-    # TODO: define the function to join a group
-    # if the group is private, create a join request
-    # if the group is public, add the student to the group
+    if group.type == GroupType.PRIVATE:
+        return crud.group.create_request(
+            session=session, group=group, student=current_user
+        )
     return crud.group.join(session=session, group=group, student=current_user)
 
 
-# @router.get(
-#     "/{group_id}/requests",
-#     response_model=list[StudentRead],
-# )
-# def get_group_requests(group_id: uuid.UUID) -> list[StudentRead]:
-#     # define the function to get the join requests for a group if the group is private
-#     return crud.group.get_requests(id=group_id)
+@router.post(
+    "/{group_id}/leave",
+    response_model=GroupReadWithStudents,
+)
+def leave_group(
+    session: SessionDep,
+    group: GroupDep,
+    current_user: StudentDep,
+) -> Group:
+    return crud.group.leave(session=session, group=group, student=current_user)
+
+
+@router.get(
+    "/{group_id}/requests",
+    response_model=list[RequestRead],
+)
+def get_group_requests(
+    group: GroupDep,
+    current_user: StudentDep,
+) -> list[Request]:
+    if current_user not in group.super_students:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not a super student of this group",
+        )
+    return group.requests
+
+
+@router.post(
+    "/{group_id}/requests/{request_id}/approve",
+    response_model=RequestRead,
+)
+def accept_group_request(
+    session: SessionDep,
+    group: GroupDep,
+    request: RequestDep,
+    current_user: StudentDep,
+) -> Request:
+    if current_user not in group.super_students:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not a super student of this group",
+        )
+    return crud.group.approve_request(session=session, request=request)
+
+
+@router.post(
+    "/{group_id}/requests/{request_id}/reject",
+    response_model=RequestRead,
+)
+def reject_group_requesr(
+    session: SessionDep,
+    group: GroupDep,
+    request: RequestDep,
+    current_user: StudentDep,
+) -> Request:
+    if current_user not in group.super_students:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not a super student of this group",
+        )
+    return crud.group.reject_request(session=session, request=request)
+
+
+@router.post(
+    "/{group_id}/requests/{request_id}/block",
+    response_model=RequestRead,
+)
+def block_group_request(
+    session: SessionDep,
+    group: GroupDep,
+    request: RequestDep,
+    current_user: StudentDep,
+) -> Request:
+    if current_user not in group.super_students:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not a super student of this group",
+        )
+    return crud.group.block_request(session=session, request=request)

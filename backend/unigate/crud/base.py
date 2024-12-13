@@ -78,6 +78,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         response = session.exec(query)
         return response.all()  # type: ignore
 
+    def get_all(self, *, session: Session) -> list[ModelType]:
+        response = session.exec(select(self.model))
+        return response.all()  # type: ignore
+
     def create(
         self,
         *,

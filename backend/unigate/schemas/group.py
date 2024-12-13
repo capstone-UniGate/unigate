@@ -1,6 +1,6 @@
 import uuid
 
-from unigate.models.group import GroupBase
+from unigate.models.base import GroupBase
 from unigate.schemas.student import StudentReadWithoutGroups
 
 
@@ -9,9 +9,9 @@ class GroupRead(GroupBase):
 
 
 class GroupReadWithStudents(GroupRead):
-    id: uuid.UUID
     students: list[StudentReadWithoutGroups]
     creator: StudentReadWithoutGroups
+    super_students: list[StudentReadWithoutGroups]
 
 
 class GroupCreate(GroupBase):

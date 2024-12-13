@@ -11,6 +11,7 @@ class StudentRead(UserBase):
     id: uuid.UUID
     groups: list[GroupReadBasic]
     created_groups: list[GroupReadBasic]
+    super_groups: list[GroupReadBasic]
 
 
 class StudentReadWithoutGroups(UserBase):

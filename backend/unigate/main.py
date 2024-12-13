@@ -4,7 +4,7 @@ from sqlalchemy.pool import AsyncAdaptedQueuePool
 
 from unigate.core.config import settings
 from unigate.core.database import AuthMiddleware, UnigateMiddleware
-from unigate.routes import auth, group, requests, student
+from unigate.routes import auth, group, student
 
 app = FastAPI()
 
@@ -43,7 +43,6 @@ async def ping() -> dict[str, str]:
 app.include_router(auth.router, prefix="/auth")
 app.include_router(student.router, prefix="/students")
 app.include_router(group.router, prefix="/groups")
-app.include_router(requests.router, prefix="/requests")
 
 
 if __name__ == "__main__":

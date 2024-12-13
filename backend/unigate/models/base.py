@@ -35,3 +35,8 @@ class GroupBase(SQLModel):
     description: str | None = None
     category: str | None = None
     type: GroupType = Field(sa_column=Column(Enum(GroupType, name="group_type")))
+
+
+class RequestBase(SQLModel):
+    student_id: uuid.UUID = Field(foreign_key="students.id", ondelete="CASCADE")
+    group_id: uuid.UUID = Field(foreign_key="groups.id", ondelete="CASCADE")
