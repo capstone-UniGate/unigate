@@ -2,8 +2,7 @@ from fastapi import APIRouter, Depends
 
 from unigate.models import Group, Student
 from unigate.routes.deps import get_current_user
-from unigate.schemas.group import GroupReadWithStudents
-from unigate.schemas.student import StudentRead
+from unigate.schemas.student import StudentRead, StudentReadOnlyGroups
 
 router = APIRouter()
 
@@ -17,9 +16,9 @@ def get_me(
 
 @router.get(
     "/groups",
-    response_model=list[GroupReadWithStudents],
+    response_model=list[StudentReadOnlyGroups],
 )
 def get_groups(
     current_user: Student = Depends(get_current_user(wanted_model=Student)),
 ) -> list[Group]:
-    return current_user.groups + current_user.created_groups
+    return current_user
