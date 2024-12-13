@@ -1,8 +1,10 @@
 import uuid
 
+from pydantic import BaseModel
+
 from unigate.models.base import GroupBase
 from unigate.schemas.student import StudentReadWithoutGroups
-from pydantic import BaseModel
+
 
 class GroupRead(GroupBase):
     id: uuid.UUID

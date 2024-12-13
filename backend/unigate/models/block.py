@@ -1,7 +1,9 @@
 import uuid
 
 from sqlmodel import Field, SQLModel  # type: ignore
+
 from unigate.models.base import DBUnigateBase
+
 
 class Block(DBUnigateBase, SQLModel, table=True):
     __tablename__ = "blocks"  # type: ignore
