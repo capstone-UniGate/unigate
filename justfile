@@ -20,11 +20,11 @@ reset-database:
     docker compose exec postgres-unigate psql -U $POSTGRES_USER -d $UNIGATE_DB -c "DO \$\$ BEGIN EXECUTE 'DROP SCHEMA public CASCADE'; EXECUTE 'CREATE SCHEMA public'; END \$\$;"
     docker compose exec postgres-unigate psql -U $POSTGRES_USER -d $AUTH_DB -c "DO \$\$ BEGIN EXECUTE 'DROP SCHEMA public CASCADE'; EXECUTE 'CREATE SCHEMA public'; END \$\$;"
 
-init-database: reset-database seed-real
+init-database: reset-database
     cd backend/alembic_unigate && ../../{{ backend_venv }}/alembic upgrade head
     cd backend/alembic_auth && ../../{{ backend_venv }}/alembic upgrade head
 
-seed-real:
+seed-real: init-database
     {{ backend_python }} backend/seeders/real.py
 
 seed-fake:
