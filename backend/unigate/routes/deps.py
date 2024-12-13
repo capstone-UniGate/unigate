@@ -94,6 +94,7 @@ def get_request(
 
 RequestDep = Annotated[Request, Depends(get_request)]
 
+
 def get_student(
     session: SessionDep,
     student_id: uuid.UUID,
@@ -104,5 +105,6 @@ def get_student(
             status_code=status.HTTP_404_NOT_FOUND, detail="Student not found."
         )
     return student
+
 
 StudentDep = Annotated[Student, Depends(get_student)]

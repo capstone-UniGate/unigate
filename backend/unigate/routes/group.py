@@ -4,7 +4,7 @@ from unigate import crud
 from unigate.core.database import SessionDep
 from unigate.enums import GroupType
 from unigate.models import Group, Request
-from unigate.routes.deps import GroupDep, RequestDep, CurrStudentDep, StudentDep
+from unigate.routes.deps import CurrStudentDep, GroupDep, RequestDep, StudentDep
 from unigate.schemas.group import (
     GroupCreate,
     GroupReadOnlyStudents,
