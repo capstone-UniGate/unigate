@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from sqlmodel import Field, Relationship  # type: ignore
 
 from unigate.models.base import DBUnigateBase, GroupBase, UUIDBase
-from unigate.models.block import Blocked
+from unigate.models.block import Block
 from unigate.models.join import Join
 from unigate.models.super_student import SuperStudent
 
@@ -28,5 +28,5 @@ class Group(DBUnigateBase, UUIDBase, GroupBase, table=True):
     )
     requests: list["Request"] = Relationship(back_populates="group")
     blocked_students: list["Student"] = Relationship(
-        back_populates="blocked_groups", link_model=Blocked
+        back_populates="blocked_groups", link_model=Block
     )

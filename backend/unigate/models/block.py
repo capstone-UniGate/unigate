@@ -3,7 +3,7 @@ import uuid
 from sqlmodel import Field, SQLModel  # type: ignore
 
 
-class Blocked(SQLModel, table=True):
+class Block(SQLModel, table=True):
     __tablename__ = "blocks"  # type: ignore
 
     student_id: uuid.UUID = Field(
