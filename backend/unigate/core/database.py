@@ -2,7 +2,6 @@ from collections.abc import Generator
 from typing import Annotated
 
 from fastapi import Depends
-from fastapi_async_sqlalchemy.middleware import create_middleware_and_session_proxy
 from sqlmodel import (
     Session,  # type: ignore
     SQLModel,  # type: ignore  # noqa: F401
@@ -18,9 +17,6 @@ from unigate.core.config import settings
 
 engine = create_engine(str(settings.UNIGATE_DB_URI), echo=True)
 auth_engine = create_engine(str(settings.AUTH_DB_URI))
-
-UnigateMiddleware, unigate_db = create_middleware_and_session_proxy()
-AuthMiddleware, auth_db = create_middleware_and_session_proxy()
 
 
 def init_db() -> None:
