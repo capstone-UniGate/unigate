@@ -3,6 +3,8 @@ from typing import Annotated
 from pydantic import AnyUrl, BeforeValidator, PostgresDsn, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from unigate.enums import Mode
+
 
 def parse_cors(v: str | list[str]) -> list[str] | str:
     if isinstance(v, str) and not v.startswith("["):
@@ -17,6 +19,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    MODE: Mode = Mode.DEV
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: int = 5432
     POSTGRES_USER: str
