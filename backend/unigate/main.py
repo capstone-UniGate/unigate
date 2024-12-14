@@ -1,9 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.pool import AsyncAdaptedQueuePool
 
 from unigate.core.config import settings
-from unigate.core.database import AuthMiddleware, UnigateMiddleware
 from unigate.routes import auth, group, student
 
 app = FastAPI()
@@ -17,18 +15,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-app.add_middleware(
-    UnigateMiddleware,
-    db_url=str(settings.UNIGATE_DB_URI),
-    engine_args={"echo": False, "poolclass": AsyncAdaptedQueuePool},
-)
-app.add_middleware(
-    AuthMiddleware,
-    db_url=str(settings.AUTH_DB_URI),
-    engine_args={"echo": False, "poolclass": AsyncAdaptedQueuePool},
-)
-
 
 @app.get("/")
 async def hello() -> dict[str, str]:
