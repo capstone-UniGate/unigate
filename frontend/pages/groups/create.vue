@@ -258,15 +258,13 @@ const formHasErrors = computed(() => Object.keys(errors.value).length > 0);
 // Handle form submission
 const onSubmit = handleSubmit(async (values) => {
   try {
-    const groupData = {
+    await createGroup({
       name: values.name,
       description: values.description,
       category: values.course,
       type: values.isPublic,
       tags: tags.value,
-    };
-
-    await createGroup(groupData);
+    });
 
     toast({
       variant: "success",
@@ -275,10 +273,9 @@ const onSubmit = handleSubmit(async (values) => {
     });
 
     setTimeout(() => {
-      router.push("/groups");
+      router.push({ name: "my-groups" });
     }, 1500);
   } catch (error) {
-    console.error("Error creating group:", error);
     toast({
       variant: "destructive",
       description: "Failed to create group. Please try again.",
@@ -288,7 +285,7 @@ const onSubmit = handleSubmit(async (values) => {
 });
 
 const onCancel = () => {
-  router.push("/groups");
+  router.push({ name: "groups" });
 };
 </script>
 
