@@ -1,22 +1,8 @@
 <script setup lang="ts">
-const groups = ref();
-const isLoading = ref(false);
-const isError = ref(false);
-
-async function loadGroups() {
-  try {
-    isError.value = false;
-    isLoading.value = true;
-    groups.value = await useApiFetch("groups");
-  } catch (error) {
-    isError.value = true;
-  } finally {
-    isLoading.value = false;
-  }
-}
+const { groups, isLoading, isError, getAllGroups } = useGroups();
 
 onMounted(() => {
-  loadGroups();
+  getAllGroups();
 });
 </script>
 
@@ -25,7 +11,7 @@ onMounted(() => {
     <h1 class="text-2xl font-bold mb-4">Explore Groups</h1>
 
     <!-- Error Message Component -->
-    <ErrorMessage v-if="isError" @retry="loadGroups" />
+    <ErrorMessage v-if="isError" @retry="getAllGroups" />
 
     <!-- Loading Indicator Component -->
     <LoadingIndicator v-if="isLoading" />

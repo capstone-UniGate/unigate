@@ -135,16 +135,17 @@
       <div class="flex justify-start space-x-4 margin-bottom-custom">
         <Button
           type="submit"
-          :disabled="formHasErrors"
+          :disabled="formHasErrors || isLoading"
           id="create-group-button"
         >
-          Create
+          {{ isLoading ? "Creating..." : "Create" }}
         </Button>
         <Button
           type="button"
           @click="onCancel"
           variant="destructive"
           id="cancel-button"
+          :disabled="isLoading"
         >
           Cancel
         </Button>
@@ -172,6 +173,9 @@ import { useForm } from "vee-validate";
 import * as z from "zod";
 
 const { toast } = useToast();
+const router = useRouter();
+const { createGroup, isLoading, isError } = useGroups();
+const { currentStudent } = useCurrentStudent();
 
 const formSchema = toTypedSchema(
   z.object({
@@ -188,9 +192,6 @@ const { handleSubmit, errors, setFieldValue } = useForm({
 });
 
 const errorMessage = ref("");
-
-const router = useRouter();
-
 const tags = ref<string[]>([]);
 const tagInput = ref("");
 const filteredSuggestions = ref<string[]>([]);
@@ -257,17 +258,15 @@ const formHasErrors = computed(() => Object.keys(errors.value).length > 0);
 // Handle form submission
 const onSubmit = handleSubmit(async (values) => {
   try {
-    const response = await useApiFetch("/groups", {
-      method: "POST",
-      body: {
-        name: values.name,
-        description: values.description,
-        category: values.course,
-        type: values.isPublic,
-        creator_id: 1,
-        tags: tags.value,
-      },
-    });
+    const groupData = {
+      name: values.name,
+      description: values.description,
+      category: values.course,
+      type: values.isPublic,
+      tags: tags.value,
+    };
+
+    await createGroup(groupData);
 
     toast({
       variant: "success",

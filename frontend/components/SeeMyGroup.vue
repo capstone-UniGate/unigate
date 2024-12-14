@@ -1,29 +1,8 @@
 <script setup lang="ts">
-const groups = ref();
-const isLoading = ref(false);
-const isError = ref(false);
-
-const student_id = "5fa683ba-afab-408f-b8b2-8d326e21ed1f";
-
-async function loadMyGroups() {
-  try {
-    isError.value = false;
-    isLoading.value = true;
-    groups.value = await useApiFetch(
-      `/groups/get_student_groups?student_id=${student_id}`,
-      {
-        method: "POST",
-      },
-    );
-  } catch (error) {
-    isError.value = true;
-  } finally {
-    isLoading.value = false;
-  }
-}
+const { groups, isLoading, isError, getMyGroups } = useStudentGroups();
 
 onMounted(() => {
-  loadMyGroups();
+  getMyGroups();
 });
 </script>
 
@@ -32,7 +11,7 @@ onMounted(() => {
     <!-- Error Message Component -->
     <ErrorMessage
       v-if="isError"
-      @retry="loadMyGroups"
+      @retry="getMyGroups"
       data-testid="error-message"
     />
 
