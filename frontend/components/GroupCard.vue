@@ -12,9 +12,13 @@ interface Group {
   members_count: number;
 }
 
+// router.push(`/groups/${props.group.id}`);
+
 // Define props with TypeScript, ensuring `group` matches the Group interface
 const props = defineProps<{ group: Group }>();
 const router = useRouter();
+const { getGroupById } = useGroups();
+
 const goToGroupPage = () => {
   router.push(`/groups/${props.group.id}`);
 };

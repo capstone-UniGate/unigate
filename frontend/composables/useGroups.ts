@@ -4,6 +4,7 @@ export function useGroups() {
   const groups = ref();
   const isLoading = ref(false);
   const isError = ref(false);
+  const { currentStudent, getCurrentStudent } = useCurrentStudent();
 
   async function getAllGroups() {
     try {
@@ -53,14 +54,24 @@ export function useGroups() {
 
   async function joinGroup(groupId: string) {
     try {
+      await getCurrentStudent();
+
+      if (!currentStudent.value) {
+        throw new Error("No student found");
+      }
+
       isError.value = false;
       isLoading.value = true;
       const response = await useApiFetch(`/groups/${groupId}/join`, {
         method: "POST",
+        body: {
+          student_id: currentStudent.value.id,
+        },
       });
       return response;
     } catch (error) {
       isError.value = true;
+      throw error;
     } finally {
       isLoading.value = false;
     }

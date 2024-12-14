@@ -213,7 +213,10 @@ const is_super_student = ref();
 
 const isViewingMembers = ref(false);
 const isAvatarModalOpen = ref(false);
-const studentId = "021b7a8a-0ffb-43d4-92ec-ee892739ab1f";
+
+const { currentStudent, getCurrentStudent } = useCurrentStudent();
+const studentId = computed(() => currentStudent.value?.id);
+
 const userRequestStatus = ref(null);
 const isLoadingStatus = ref(true);
 const isErrorStatus = ref(false);
@@ -235,6 +238,7 @@ async function loadGroup() {
 
 onMounted(() => {
   loadGroup();
+  getCurrentStudent();
   fetchUserRequestStatus();
 });
 

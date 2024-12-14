@@ -12,7 +12,7 @@ onMounted(() => {
     <ErrorMessage
       v-if="isError"
       @retry="getMyGroups"
-      data-testid="error-message"
+      data-testid="error-mesMsage"
     />
 
     <!-- Loading Indicator Component -->

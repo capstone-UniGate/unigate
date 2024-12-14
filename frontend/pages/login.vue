@@ -102,12 +102,14 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
 import { Form, FormField, FormLabel } from "@/components/ui/form";
 import Button from "@/components/ui/button/Button.vue";
 import Input from "@/components/ui/input/Input.vue";
 import Progress from "@/components/ui/progress/Progress.vue";
+import { useAuth } from "@/composables/useAuth";
 
 export default {
   components: {
@@ -119,6 +121,9 @@ export default {
     Progress,
   },
   setup() {
+    const router = useRouter();
+    const { login } = useAuth();
+
     const form = ref({
       username: "",
       password: "",
@@ -173,23 +178,33 @@ export default {
       return "bg-green-700";
     });
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
       const password = form.value.password;
-      if (
-        passwordStrength.value < 100 ||
-        !/[A-Z]/.test(password) ||
-        !/[a-z]/.test(password) ||
-        !/\d/.test(password) ||
-        !/[^a-zA-Z0-9]/.test(password)
-      ) {
-        passwordError.value =
-          "Password must contain at least 8 characters, including uppercase, lowercase, a number, and a special character.";
-        return;
-      }
+      // if (
+      //   passwordStrength.value < 100 ||
+      //   !/[A-Z]/.test(password) ||
+      //   !/[a-z]/.test(password) ||
+      //   !/\d/.test(password) ||
+      //   !/[^a-zA-Z0-9]/.test(password)
+      // ) {
+      //   passwordError.value =
+      //     'Password must contain at least 8 characters, including uppercase, lowercase, a number, and a special character.'
+      //   return
+      // }
       passwordError.value = "";
+
+      try {
+        await login({
+          username: form.value.username,
+          password: form.value.password,
+        });
+        router.push("/");
+      } catch (error: any) {
+        passwordError.value = error?.data?.message || "Login failed.";
+      }
     };
 
-    const clearInput = (field) => {
+    const clearInput = (field: "username" | "password") => {
       form.value[field] = "";
     };
 
