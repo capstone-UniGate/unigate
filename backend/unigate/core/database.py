@@ -18,6 +18,7 @@ from unigate.core.config import settings
 engine = create_engine(str(settings.UNIGATE_DB_URI), echo=True)
 auth_engine = create_engine(str(settings.AUTH_DB_URI))
 
+
 def init_db() -> None:
     # tables should be created with Alembic migrations
     # if you don't use migrations, you can create them here
