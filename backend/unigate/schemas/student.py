@@ -1,5 +1,7 @@
 import uuid
 
+from pydantic import BaseModel
+
 from unigate.models.base import GroupBase, UserBase
 
 
@@ -18,7 +20,7 @@ class StudentReadWithoutGroups(UserBase):
     id: uuid.UUID
 
 
-class StudentReadOnlyGroups(UserBase):
+class StudentReadOnlyGroups(BaseModel):
     groups: list[GroupReadBasic]
     created_groups: list[GroupReadBasic]
     super_groups: list[GroupReadBasic]
