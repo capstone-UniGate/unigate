@@ -257,7 +257,7 @@ const formHasErrors = computed(() => Object.keys(errors.value).length > 0);
 // Handle form submission
 const onSubmit = handleSubmit(async (values) => {
   try {
-    const response = await useApiFetch("/groups/create", {
+    const response = await useApiFetch("/groups", {
       method: "POST",
       body: {
         name: values.name,

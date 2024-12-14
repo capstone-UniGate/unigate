@@ -223,7 +223,7 @@ async function loadGroup() {
     isError.value = false;
     isLoading.value = true;
     group.value = await useApiFetch(`/groups/${groupId}`);
-    member_list.value = await useApiFetch(`/groups/${groupId}/get_members`);
+    member_list.value = await useApiFetch(`/groups/${groupId}/students`);
     is_member_of.value = checkList();
     is_super_student.value = studentId == group.value.creator_id;
   } catch (error) {
