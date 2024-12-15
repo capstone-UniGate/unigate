@@ -47,7 +47,7 @@
         <!-- Logout Button (Desktop) -->
         <button
           v-if="isLoggedIn"
-          @click="logout"
+          @click="handleLogout"
           id="logout-button"
           class="hidden md:block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
         >
@@ -90,7 +90,7 @@
         <!-- Logout Button (Mobile) -->
         <button
           v-if="isLoggedIn"
-          @click="logout"
+          @click="handleLogout"
           class="block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-center"
         >
           Logout
@@ -104,45 +104,39 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { useAuth } from "@/composables/useAuth";
 import { useCurrentStudent } from "@/composables/useCurrentStudent";
-import { onMounted } from "vue";
+import { onMounted, watch } from "vue";
+import { useRouter } from "vue-router";
 
-export default {
-  data() {
-    return {
-      isMenuOpen: false,
-    };
-  },
-  setup() {
-    const { logout, isLoggedIn } = useAuth();
-    const { currentStudent, getCurrentStudent } = useCurrentStudent();
+const { logout, isLoggedIn } = useAuth();
+const { currentStudent, getCurrentStudent } = useCurrentStudent();
+const router = useRouter();
 
-    onMounted(() => {
-      if (isLoggedIn) {
-        getCurrentStudent();
-      }
-    });
+// Watch for login state changes
+watch(isLoggedIn, async (newValue) => {
+  if (newValue) {
+    await getCurrentStudent();
+  } else {
+    currentStudent.value = null;
+  }
+});
 
-    return {
-      logout,
-      isLoggedIn,
-      currentStudent,
-    };
-  },
-  methods: {
-    toggleMenu() {
-      this.isMenuOpen = !this.isMenuOpen;
-    },
-    async logout() {
-      await this.logout();
-      this.$router.push({
-        name: "login",
-        query: { message: "You have successfully logged out." },
-      });
-    },
-  },
+onMounted(async () => {
+  if (isLoggedIn.value) {
+    await getCurrentStudent();
+  }
+});
+
+const handleLogout = async () => {
+  try {
+    await logout();
+    currentStudent.value = null;
+    await router.push("/login?message=You have successfully logged out.");
+  } catch (error) {
+    console.error("Logout error:", error);
+  }
 };
 </script>
 
