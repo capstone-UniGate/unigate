@@ -25,6 +25,12 @@ students = [
         name="Test Name",
         surname="Test Surname",
     ),
+    StudentCreate(
+        number=6015033,
+        email="s6015033@studenti.unige.it",
+        name="Musse",
+        surname="Gher",
+    ),
 ]
 
 groups = [
