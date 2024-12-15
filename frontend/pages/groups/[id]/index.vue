@@ -105,7 +105,7 @@
           </div>
 
           <div
-            v-if="is_super_student && type == 'PRIVATE'"
+            v-if="is_super_student && group.type == 'Private'"
             class="text-left mb-6"
           >
             <Button
@@ -159,7 +159,7 @@
               Leave Group
             </Button>
             <Button
-              v-else-if="!is_member_of && group.type === 'PUBLIC'"
+              v-else-if="!is_member_of && group.type === 'Public'"
               @click="joinGroups"
               class="bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-indigo-600 hover:shadow-xl active:scale-95 transition-all"
               id="join-group-button"
@@ -172,7 +172,7 @@
                 userRequestStatus == null ||
                 (userRequestStatus.includes('REJECTED') &&
                   !is_member_of &&
-                  group.type === 'PRIVATE')
+                  group.type === 'Private')
               "
               @click="askToJoinGroup"
               class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-yellow-600 hover:shadow-xl active:scale-95 transition-all"
@@ -208,13 +208,19 @@ const groupId = route.params.id;
 const isLoading = ref(false);
 const isError = ref(false);
 const group = ref<any>(null);
-const is_member_of = ref(false);
+const is_member_of = computed(() => {
+  return group.value?.students?.some(
+    (student) => student.number === currentStudent.value?.number,
+  );
+});
 
 const isViewingMembers = ref(false);
 const isAvatarModalOpen = ref(false);
-const is_super_student = computed(
-  () => currentStudent.value?.id == group.value?.creator_id,
-);
+const is_super_student = computed(() => {
+  return group.value?.super_students?.some(
+    (superStudent) => superStudent.number === currentStudent.value?.number,
+  );
+});
 
 const userRequestStatus = ref(null);
 const isLoadingStatus = ref(true);
