@@ -273,7 +273,7 @@ const onSubmit = handleSubmit(async (values) => {
     });
 
     setTimeout(() => {
-      router.push({ name: "my-groups" });
+      router.push({ name: "groups" });
     }, 1500);
   } catch (error) {
     toast({

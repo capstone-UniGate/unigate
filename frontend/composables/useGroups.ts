@@ -6,8 +6,32 @@ export function useGroups() {
   const isError = ref(false);
   const { currentStudent, getCurrentStudent } = useCurrentStudent();
 
+  // Ensure user is authenticated before making requests
+  const ensureAuthenticated = async () => {
+    if (!currentStudent.value) {
+      await getCurrentStudent();
+    }
+    if (!currentStudent.value) {
+      throw new Error("User not authenticated");
+    }
+    return currentStudent.value;
+  };
+
+  // Add this function to check authentication status
+  const checkAuthStatus = async () => {
+    try {
+      if (!currentStudent.value) {
+        await getCurrentStudent();
+      }
+      return !!currentStudent.value;
+    } catch (error) {
+      return false;
+    }
+  };
+
   async function getAllGroups() {
     try {
+      await ensureAuthenticated();
       isError.value = false;
       isLoading.value = true;
       const response = await useApiFetch("/groups", {
@@ -16,6 +40,7 @@ export function useGroups() {
       groups.value = response;
     } catch (error) {
       isError.value = true;
+      throw error;
     } finally {
       isLoading.value = false;
     }
@@ -23,6 +48,7 @@ export function useGroups() {
 
   async function getGroupById(groupId: string) {
     try {
+      await ensureAuthenticated();
       isError.value = false;
       isLoading.value = true;
       const response = await useApiFetch(`/groups/${groupId}`, {
@@ -31,6 +57,7 @@ export function useGroups() {
       return response;
     } catch (error) {
       isError.value = true;
+      throw error;
     } finally {
       isLoading.value = false;
     }
@@ -109,6 +136,7 @@ export function useGroups() {
 
   async function getGroupRequests(groupId: string) {
     try {
+      await ensureAuthenticated();
       isError.value = false;
       isLoading.value = true;
       const response = await useApiFetch(`/groups/${groupId}/requests`, {
@@ -117,6 +145,7 @@ export function useGroups() {
       return response;
     } catch (error) {
       isError.value = true;
+      throw error;
     } finally {
       isLoading.value = false;
     }
@@ -128,6 +157,7 @@ export function useGroups() {
     action: "approve" | "reject" | "block",
   ) {
     try {
+      await ensureAuthenticated();
       isError.value = false;
       isLoading.value = true;
       const response = await useApiFetch(
@@ -139,6 +169,7 @@ export function useGroups() {
       return response;
     } catch (error) {
       isError.value = true;
+      throw error;
     } finally {
       isLoading.value = false;
     }
@@ -170,6 +201,7 @@ export function useGroups() {
     groups,
     isLoading,
     isError,
+    currentStudent,
     getAllGroups,
     getGroupById,
     createGroup,
@@ -179,5 +211,6 @@ export function useGroups() {
     getGroupRequests,
     handleGroupRequest,
     handleUserBlock,
+    checkAuthStatus,
   };
 }

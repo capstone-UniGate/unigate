@@ -7,15 +7,19 @@ export const useApiFetch = (
   const config = useRuntimeConfig();
   const tokenCookie = useCookie("access_token");
 
-  // Merge headers with Authorization token
-  const headers = {
-    ...options.headers,
-    Authorization: `Bearer ${tokenCookie.value}`,
-  };
+  // Ensure headers object exists
+  if (!options.headers) {
+    options.headers = {};
+  }
+
+  // Only add Authorization header if token exists
+  if (tokenCookie.value) {
+    options.headers.Authorization = `Bearer ${tokenCookie.value}`;
+  }
 
   return $fetch(url, {
     baseURL: config.public.baseURL,
     ...options,
-    headers,
+    headers: options.headers,
   });
 };

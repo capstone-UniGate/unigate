@@ -12,15 +12,31 @@ interface Group {
   members_count: number;
 }
 
-// router.push(`/groups/${props.group.id}`);
-
-// Define props with TypeScript, ensuring `group` matches the Group interface
 const props = defineProps<{ group: Group }>();
 const router = useRouter();
-const { getGroupById } = useGroups();
+const { getGroupById, checkAuthStatus } = useGroups();
 
-const goToGroupPage = () => {
-  router.push(`/groups/${props.group.id}`);
+const goToGroupPage = async () => {
+  try {
+    // First verify authentication status
+    const isAuthenticated = await checkAuthStatus();
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+
+    // Try to get group details
+    const groupDetails = await getGroupById(props.group.id);
+    if (groupDetails) {
+      router.push(`/groups/${props.group.id}`);
+    }
+  } catch (error) {
+    console.error("Error navigating to group:", error);
+    // Only redirect to login for actual auth errors
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      router.push("/login");
+    }
+  }
 };
 </script>
 

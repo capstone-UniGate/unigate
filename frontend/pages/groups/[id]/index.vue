@@ -95,7 +95,7 @@
             <p class="text-gray-600">
               Number of
               <NuxtLink
-                :to="`/groups/${groupId}/members`"
+                :to="`/groups/${groupId}/students`"
                 class="text-blue-500 hover:underline"
               >
                 members
@@ -157,15 +157,15 @@
           <div class="text-center mt-6">
             <Button
               v-if="is_member_of || is_super_student"
-              @click="leaveGroup"
+              @click="leaveGroups"
               class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-red-600 hover:shadow-xl active:scale-95 transition-all"
               id="leave-group-button"
             >
               Leave Group
             </Button>
             <Button
-              v-else-if="group.type != 'Private'"
-              @click="joinGroup"
+              v-else-if="!is_member_of && group.type !== 'PUBLIC'"
+              @click="joinGroups"
               class="bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-indigo-600 hover:shadow-xl active:scale-95 transition-all"
               id="join-group-button"
             >
@@ -175,7 +175,9 @@
             <Button
               v-else-if="
                 userRequestStatus == null ||
-                userRequestStatus.includes('REJECTED')
+                (userRequestStatus.includes('REJECTED') &&
+                  is_member_of &&
+                  group.type == 'PRIVATE')
               "
               @click="askToJoinGroup"
               class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-yellow-600 hover:shadow-xl active:scale-95 transition-all"
@@ -198,10 +200,12 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRoute, useRouter } from "vue-router";
+import { useGroups } from "@/composables/useGroups";
 
 const route = useRoute();
 const router = useRouter();
 const { toast } = useToast();
+const { getGroupById, getGroupStudents, leaveGroup, joinGroup } = useGroups();
 
 const groupId = route.params.id;
 const isLoading = ref(false);
@@ -225,10 +229,11 @@ async function loadGroup() {
   try {
     isError.value = false;
     isLoading.value = true;
-    group.value = await useApiFetch(`/groups/${groupId}`);
-    member_list.value = await useApiFetch(`/groups/${groupId}/students`);
+    group.value = await getGroupById(groupId.toString());
+    member_list.value = await getGroupStudents(groupId.toString());
+
     is_member_of.value = checkList();
-    is_super_student.value = studentId == group.value.creator_id;
+    is_super_student.value = studentId.value === group.value.creator_id;
   } catch (error) {
     isError.value = true;
   } finally {
@@ -253,25 +258,18 @@ const closeAvatarModal = () => {
 const checkList = () => {
   for (var i = 0; i < member_list.value.length; i++) {
     if (member_list.value[i].id == studentId) {
-      console.log(studentId);
-      console.log(member_list.value[i].id);
       return true;
     }
   }
   return false;
 };
 
-const navigateToRequests = () => router.push(`/groups/${groupId}/requests`);
-
+const navigateToRequests = () => {
+  router.push({ name: "request", params: { id: groupId } });
+};
 const askToJoinGroup = async () => {
   try {
-    const response = await useApiFetch(`/groups/join_private_group`, {
-      method: "POST",
-      query: {
-        student_id: studentId,
-        group_id: groupId,
-      },
-    });
+    const response = await joinGroup(groupId.toString());
 
     // Check response string and display the appropriate toast
     if (response === "Join request submitted successfully") {
@@ -295,15 +293,9 @@ const askToJoinGroup = async () => {
   }
 };
 
-const joinGroup = async () => {
+const joinGroups = async () => {
   try {
-    const response = await useApiFetch(`/groups/join_public_group`, {
-      method: "POST",
-      query: {
-        student_id: studentId,
-        group_id: groupId,
-      },
-    });
+    const response = await joinGroup(groupId.toString());
 
     // Check response string and display the appropriate toast
     if (response === "Insert successful") {
@@ -359,17 +351,11 @@ async function fetchUserRequestStatus() {
   }
 }
 
-async function leaveGroup() {
+async function leaveGroups() {
   try {
     isError.value = false;
     isLoading.value = true;
-    let string_message = await useApiFetch(`/groups/${groupId}/leave`, {
-      method: "POST",
-      params: {
-        student_id: studentId,
-        group_id: groupId,
-      },
-    });
+    let string_message = await leaveGroup(groupId.toString());
     if (string_message === "The student has been removed successfully") {
       toast({
         variant: "success",

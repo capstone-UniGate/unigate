@@ -3,10 +3,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Import Avatar components
 import { useRoute, useRouter } from "vue-router";
 
+import { useGroups } from "@/composables/useGroups";
+
+const { getGroupStudents } = useGroups();
+
 const route = useRoute();
 const router = useRouter();
 const groupId = route.params.id;
-const members = await useApiFetch(`groups/${groupId}/students`);
+const members = await getGroupStudents(groupId.toString());
 </script>
 
 <template>
