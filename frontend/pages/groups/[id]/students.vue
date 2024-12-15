@@ -1,18 +1,3 @@
-<script setup lang="ts">
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Import Avatar components
-import { useRoute, useRouter } from "vue-router";
-
-import { useGroups } from "@/composables/useGroups";
-
-const { getGroupStudents } = useGroups();
-
-const route = useRoute();
-const router = useRouter();
-const groupId = route.params.id;
-const members = await getGroupStudents(groupId.toString());
-</script>
-
 <template>
   <div class="p-6 bg-gray-50 min-h-screen">
     <!-- Header -->
@@ -49,6 +34,7 @@ const members = await getGroupStudents(groupId.toString());
 
         <!-- Block Button -->
         <button
+          @click="handleBlock(member.id, 'block')"
           class="px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded-lg hover:bg-gray-600 transition"
         >
           Block
@@ -64,5 +50,50 @@ const members = await getGroupStudents(groupId.toString());
     </NuxtLink>
   </div>
 </template>
+
+<script setup lang="ts">
+import { ref, onMounted } from "vue";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Import Avatar components
+import { useRoute, useRouter } from "vue-router";
+
+import { useGroups } from "@/composables/useGroups";
+
+const { getGroupStudents, handleUserBlock } = useGroups();
+
+const route = useRoute();
+const router = useRouter();
+const groupId = route.params.id;
+const members = ref<any[]>([]);
+
+onMounted(async () => {
+  try {
+    // Fetch group members
+    const response = await getGroupStudents(groupId);
+    members.value = response.students;
+  } catch (error) {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      router.push("/login");
+    }
+  }
+});
+
+// Handle request actions (approve/reject/block)
+async function handleBlock(
+  requestId: string,
+  action: "approve" | "reject" | "block",
+) {
+  try {
+    await handleUserBlock(groupId, requestId, action);
+    // Remove the request from the list after successful action
+    members.value = members.value.filter((member) => member.id !== requestId);
+  } catch (error) {
+    console.error(`Error ${action}ing request:`, error);
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      router.push("/login");
+    }
+  }
+}
+</script>
 
 <style scoped></style>
