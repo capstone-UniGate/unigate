@@ -1,7 +1,8 @@
 import { ref } from "vue";
+import { fetchCurrentStudent } from "@/services/studentService";
 
 export function useCurrentStudent() {
-  const currentStudent = ref();
+  const currentStudent = ref(null);
   const isLoading = ref(false);
   const isError = ref(false);
 
@@ -9,9 +10,7 @@ export function useCurrentStudent() {
     try {
       isError.value = false;
       isLoading.value = true;
-      const response = await useApiFetch("/students/me", {
-        method: "GET",
-      });
+      const response = await fetchCurrentStudent();
       currentStudent.value = response;
     } catch (error) {
       isError.value = true;

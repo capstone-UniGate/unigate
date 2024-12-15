@@ -105,7 +105,7 @@
           </div>
 
           <div
-            v-if="group.is_super_student && group.type == 'Private'"
+            v-if="is_super_student && type == 'PRIVATE'"
             class="text-left mb-6"
           >
             <Button
@@ -138,11 +138,6 @@
             <div v-if="isLoadingStatus">
               <LoadingIndicator />
             </div>
-            <div v-else-if="isErrorStatus">
-              <p class="text-red-500">
-                Failed to load request status. Please try again.
-              </p>
-            </div>
             <div v-else>
               <p
                 v-if="
@@ -156,7 +151,7 @@
 
           <div class="text-center mt-6">
             <Button
-              v-if="is_member_of || is_super_student"
+              v-if="is_member_of"
               @click="leaveGroups"
               class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-red-600 hover:shadow-xl active:scale-95 transition-all"
               id="leave-group-button"
@@ -164,7 +159,7 @@
               Leave Group
             </Button>
             <Button
-              v-else-if="!is_member_of && group.type !== 'PUBLIC'"
+              v-else-if="!is_member_of && group.type === 'PUBLIC'"
               @click="joinGroups"
               class="bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-indigo-600 hover:shadow-xl active:scale-95 transition-all"
               id="join-group-button"
@@ -176,8 +171,8 @@
               v-else-if="
                 userRequestStatus == null ||
                 (userRequestStatus.includes('REJECTED') &&
-                  is_member_of &&
-                  group.type == 'PRIVATE')
+                  !is_member_of &&
+                  group.type === 'PRIVATE')
               "
               @click="askToJoinGroup"
               class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-yellow-600 hover:shadow-xl active:scale-95 transition-all"
@@ -195,31 +190,31 @@
 <script setup lang="ts">
 import { Toaster } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/toast/use-toast";
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRoute, useRouter } from "vue-router";
 import { useGroups } from "@/composables/useGroups";
+import { useCurrentStudent } from "@/composables/useCurrentStudent";
 
 const route = useRoute();
 const router = useRouter();
 const { toast } = useToast();
-const { getGroupById, getGroupStudents, leaveGroup, joinGroup } = useGroups();
+const { getGroupById, leaveGroup, joinGroup, getGroupRequests } = useGroups();
+const { currentStudent, getCurrentStudent } = useCurrentStudent();
 
 const groupId = route.params.id;
 const isLoading = ref(false);
 const isError = ref(false);
-const group = ref();
-const member_list = ref();
-const is_member_of = ref();
-const is_super_student = ref();
+const group = ref<any>(null);
+const is_member_of = ref(false);
 
 const isViewingMembers = ref(false);
 const isAvatarModalOpen = ref(false);
-
-const { currentStudent, getCurrentStudent } = useCurrentStudent();
-const studentId = computed(() => currentStudent.value?.id);
+const is_super_student = computed(
+  () => currentStudent.value?.id == group.value?.creator_id,
+);
 
 const userRequestStatus = ref(null);
 const isLoadingStatus = ref(true);
@@ -229,13 +224,21 @@ async function loadGroup() {
   try {
     isError.value = false;
     isLoading.value = true;
-    group.value = await getGroupById(groupId.toString());
-    member_list.value = await getGroupStudents(groupId.toString());
 
-    is_member_of.value = checkList();
-    is_super_student.value = studentId.value === group.value.creator_id;
+    // First get current student
+    await getCurrentStudent();
+
+    // Then load group data and check membership in parallel
+    const [groupData] = await Promise.all([getGroupById(groupId.toString())]);
+
+    group.value = groupData;
   } catch (error) {
     isError.value = true;
+    toast({
+      title: "Error",
+      description: "Failed to load group information",
+      variant: "destructive",
+    });
   } finally {
     isLoading.value = false;
   }
@@ -253,15 +256,6 @@ const openAvatarModal = () => {
 
 const closeAvatarModal = () => {
   isAvatarModalOpen.value = false;
-};
-
-const checkList = () => {
-  for (var i = 0; i < member_list.value.length; i++) {
-    if (member_list.value[i].id == studentId) {
-      return true;
-    }
-  }
-  return false;
 };
 
 const navigateToRequests = () => {
@@ -305,7 +299,8 @@ const joinGroups = async () => {
         description: response,
         duration: 1000,
       });
-      is_member_of.value = true;
+      is_member_of.value = true; // Update membership status
+      await loadGroup(); // Reload group data to get fresh information
     } else {
       toast({
         title: "Join Failed",
@@ -329,41 +324,40 @@ async function fetchUserRequestStatus() {
     isLoadingStatus.value = true;
     isErrorStatus.value = false;
 
+    // Ensure current student is loaded
+    if (!currentStudent.value) {
+      await getCurrentStudent();
+    }
+
     // Fetch the requests
-    const requests = await useApiFetch(`/groups/${groupId}/requests`);
+    const requests = await getGroupRequests(groupId.toString());
 
     // Find the logged-in user's request
     const userRequest = requests.find(
-      (request) => request.student_id === studentId,
+      (request) => request.student_id === currentStudent.value?.id,
     );
     // Update the status if found
     userRequestStatus.value = userRequest ? userRequest.status : null;
-    //
   } catch (error) {
     isErrorStatus.value = true;
-    toast({
-      title: "Error",
-      description: "Failed to fetch request status. Please try again.",
-      duration: 1000,
-    });
   } finally {
     isLoadingStatus.value = false;
   }
 }
 
-async function leaveGroups() {
+const leaveGroups = async () => {
   try {
     isError.value = false;
     isLoading.value = true;
-    let string_message = await leaveGroup(groupId.toString());
+    const string_message = await leaveGroup(groupId.toString());
+
     if (string_message === "The student has been removed successfully") {
       toast({
         variant: "success",
         description: "You have left the group",
         duration: 1000,
       });
-      is_member_of.value = false;
-      is_super_student.value = false;
+      is_member_of.value = false; // Update membership status
       setTimeout(() => {
         router.push("/groups");
       }, 1500);
@@ -384,5 +378,5 @@ async function leaveGroups() {
   } finally {
     isLoading.value = false;
   }
-}
+};
 </script>

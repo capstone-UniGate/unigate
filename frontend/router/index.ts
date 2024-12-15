@@ -31,7 +31,7 @@ const router = createRouter({
     {
       path: "/groups/:id",
       name: "group-details",
-      component: () => import("@/pages/groups/[id].vue"),
+      component: () => import("@/pages/groups/[id]/index.vue"),
     },
     {
       path: "/my-groups",

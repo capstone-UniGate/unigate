@@ -4,14 +4,23 @@
       class="bg-light-blue-100/70 backdrop-blur-md border-b border-blue-300 fixed top-0 w-full z-50"
     >
       <div class="container mx-auto flex items-center justify-between p-4">
-        <!-- Logo -->
-        <div class="text-2xl font-bold flex items-center">
-          <img
-            src="../static/images/logo.png"
-            alt="Logo"
-            class="h-8 w-8 mr-2"
-          />
-          <router-link to="/" class="text-blue-800">UniGate</router-link>
+        <!-- Logo and Welcome Message -->
+        <div class="flex items-center space-x-4">
+          <div class="text-2xl font-bold flex items-center">
+            <img
+              src="../static/images/logo.png"
+              alt="Logo"
+              class="h-8 w-8 mr-2"
+            />
+            <router-link to="/" class="text-blue-800">UniGate</router-link>
+          </div>
+          <!-- Student Name -->
+          <div
+            v-if="isLoggedIn && currentStudent"
+            class="text-blue-800 h-4 z-60"
+          >
+            Welcome, {{ currentStudent.name }}
+          </div>
         </div>
 
         <!-- Desktop Navigation -->
@@ -19,7 +28,7 @@
           class="hidden md:flex space-x-6 absolute left-1/2 transform -translate-x-1/2"
         >
           <router-link
-            to="/"
+            to="/homepage"
             class="text-blue-800 hover:text-blue-500 transition"
             >Home</router-link
           >
@@ -37,6 +46,7 @@
 
         <!-- Logout Button (Desktop) -->
         <button
+          v-if="isLoggedIn"
           @click="logout"
           id="logout-button"
           class="hidden md:block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
@@ -79,6 +89,7 @@
         >
         <!-- Logout Button (Mobile) -->
         <button
+          v-if="isLoggedIn"
           @click="logout"
           class="block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-center"
         >
@@ -95,6 +106,8 @@
 
 <script>
 import { useAuth } from "@/composables/useAuth";
+import { useCurrentStudent } from "@/composables/useCurrentStudent";
+import { onMounted } from "vue";
 
 export default {
   data() {
@@ -103,10 +116,19 @@ export default {
     };
   },
   setup() {
-    const { logout } = useAuth();
+    const { logout, isLoggedIn } = useAuth();
+    const { currentStudent, getCurrentStudent } = useCurrentStudent();
+
+    onMounted(() => {
+      if (isLoggedIn) {
+        getCurrentStudent();
+      }
+    });
 
     return {
       logout,
+      isLoggedIn,
+      currentStudent,
     };
   },
   methods: {
