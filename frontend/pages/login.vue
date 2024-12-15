@@ -198,7 +198,7 @@ export default {
           username: form.value.username,
           password: form.value.password,
         });
-        router.push("/");
+        router.push("/groups");
       } catch (error: any) {
         passwordError.value = error?.data?.message || "Login failed.";
       }
