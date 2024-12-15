@@ -20,7 +20,7 @@ const router = createRouter({
     },
     {
       path: "/groups/create",
-      name: "create-group",
+      name: "create",
       component: () => import("@/pages/groups/create.vue"),
     },
     {
