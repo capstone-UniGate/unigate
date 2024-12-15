@@ -94,22 +94,29 @@
 </template>
 
 <script>
+import { useAuth } from "@/composables/useAuth";
+
 export default {
   data() {
     return {
       isMenuOpen: false,
     };
   },
+  setup() {
+    const { logout } = useAuth();
+
+    return {
+      logout,
+    };
+  },
   methods: {
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen;
     },
-    logout() {
-      console.log("Logging out...");
-      localStorage.removeItem("authToken");
-      // Redirect to login page with a success message
+    async logout() {
+      await this.logout();
       this.$router.push({
-        path: "/login",
+        name: "login",
         query: { message: "You have successfully logged out." },
       });
     },

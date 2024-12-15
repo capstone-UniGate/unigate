@@ -1,29 +1,8 @@
 <script setup lang="ts">
-const groups = ref();
-const isLoading = ref(false);
-const isError = ref(false);
-
-const student_id = "5fa683ba-afab-408f-b8b2-8d326e21ed1f";
-
-async function loadMyGroups() {
-  try {
-    isError.value = false;
-    isLoading.value = true;
-    groups.value = await useApiFetch(
-      `/groups/get_student_groups?student_id=${student_id}`,
-      {
-        method: "POST",
-      },
-    );
-  } catch (error) {
-    isError.value = true;
-  } finally {
-    isLoading.value = false;
-  }
-}
+const { groups, isLoading, isError, getMyGroups } = useStudentGroups();
 
 onMounted(() => {
-  loadMyGroups();
+  getMyGroups();
 });
 </script>
 
@@ -32,8 +11,8 @@ onMounted(() => {
     <!-- Error Message Component -->
     <ErrorMessage
       v-if="isError"
-      @retry="loadMyGroups"
-      data-testid="error-message"
+      @retry="getMyGroups"
+      data-testid="error-mesMsage"
     />
 
     <!-- Loading Indicator Component -->
@@ -47,7 +26,7 @@ onMounted(() => {
         Your Enrolled Groups
       </h1>
       <Button
-        @click="() => $router.push('/groups/create')"
+        @click="() => $router.push({ name: 'create-group' })"
         class="ml-auto bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-semibold py-1 px-2 rounded-lg shadow-lg hover:from-blue-500 hover:to-blue-600 hover:shadow-xl active:scale-95 transition-all"
         data-testid="create-group-button"
       >
