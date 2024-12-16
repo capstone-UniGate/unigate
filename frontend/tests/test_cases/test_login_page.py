@@ -1,18 +1,8 @@
-import pytest
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
+
 from tests.pages.login_page import LoginPage
 from tests.constants import Urls
-
-@pytest.fixture(scope="module")
-def driver():
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service)
-    yield driver
-    driver.quit()
 
 def test_login_page(driver: WebDriver):
     login_page = LoginPage(driver)
@@ -44,9 +34,9 @@ def test_successful_login(driver: WebDriver):
     
     # Wait until the user is redirected to the groups page
     WebDriverWait(driver, 10).until(
-        lambda d: d.current_url == Urls.GROUP_PAGE  # Use Urls.GROUP_PAGE
+        lambda d: d.current_url == Urls.GROUP_PAGE
     )
-    assert driver.current_url == Urls.GROUP_PAGE  # Use Urls.GROUP_PAGE
+    assert driver.current_url == Urls.GROUP_PAGE
 
 def test_invalid_login(driver: WebDriver):
     login_page = LoginPage(driver)
