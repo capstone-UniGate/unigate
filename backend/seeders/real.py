@@ -20,6 +20,12 @@ students = [
         surname="Foschi",
     ),
     StudentCreate(
+        number=5806782,
+        email="s5806782@studenti.unige.it",
+        name="Mimmo",
+        surname="Torabi",
+    ),
+    StudentCreate(
         number=1234567,
         email="s1234567@studenti.unige.it",
         name="Test Name",

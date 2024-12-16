@@ -20,7 +20,7 @@ const router = createRouter({
     },
     {
       path: "/groups/create",
-      name: "create-group",
+      name: "create",
       component: () => import("@/pages/groups/create.vue"),
     },
     {
@@ -31,7 +31,7 @@ const router = createRouter({
     {
       path: "/groups/:id",
       name: "group-details",
-      component: () => import("@/pages/groups/[id].vue"),
+      component: () => import("@/pages/groups/[id]/index.vue"),
     },
     {
       path: "/my-groups",

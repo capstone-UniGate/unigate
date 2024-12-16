@@ -4,14 +4,23 @@
       class="bg-light-blue-100/70 backdrop-blur-md border-b border-blue-300 fixed top-0 w-full z-50"
     >
       <div class="container mx-auto flex items-center justify-between p-4">
-        <!-- Logo -->
-        <div class="text-2xl font-bold flex items-center">
-          <img
-            src="../static/images/logo.png"
-            alt="Logo"
-            class="h-8 w-8 mr-2"
-          />
-          <router-link to="/" class="text-blue-800">UniGate</router-link>
+        <!-- Logo and Welcome Message -->
+        <div class="flex items-center space-x-4">
+          <div class="text-2xl font-bold flex items-center">
+            <img
+              src="../static/images/logo.png"
+              alt="Logo"
+              class="h-8 w-8 mr-2"
+            />
+            <router-link to="/" class="text-blue-800">UniGate</router-link>
+          </div>
+          <!-- Student Name -->
+          <div
+            v-if="isLoggedIn && currentStudent"
+            class="text-blue-800 h-4 z-60"
+          >
+            Welcome, {{ currentStudent.name }}
+          </div>
         </div>
 
         <!-- Desktop Navigation -->
@@ -19,7 +28,7 @@
           class="hidden md:flex space-x-6 absolute left-1/2 transform -translate-x-1/2"
         >
           <router-link
-            to="/"
+            to="/homepage"
             class="text-blue-800 hover:text-blue-500 transition"
             >Home</router-link
           >
@@ -37,7 +46,8 @@
 
         <!-- Logout Button (Desktop) -->
         <button
-          @click="logout"
+          v-if="isLoggedIn"
+          @click="handleLogout"
           id="logout-button"
           class="hidden md:block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
         >
@@ -79,7 +89,8 @@
         >
         <!-- Logout Button (Mobile) -->
         <button
-          @click="logout"
+          v-if="isLoggedIn"
+          @click="handleLogout"
           class="block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-center"
         >
           Logout
@@ -93,34 +104,39 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { useAuth } from "@/composables/useAuth";
+import { useCurrentStudent } from "@/composables/useCurrentStudent";
+import { onMounted, watch } from "vue";
+import { useRouter } from "vue-router";
 
-export default {
-  data() {
-    return {
-      isMenuOpen: false,
-    };
-  },
-  setup() {
-    const { logout } = useAuth();
+const { logout, isLoggedIn } = useAuth();
+const { currentStudent, getCurrentStudent } = useCurrentStudent();
+const router = useRouter();
 
-    return {
-      logout,
-    };
-  },
-  methods: {
-    toggleMenu() {
-      this.isMenuOpen = !this.isMenuOpen;
-    },
-    async logout() {
-      await this.logout();
-      this.$router.push({
-        name: "login",
-        query: { message: "You have successfully logged out." },
-      });
-    },
-  },
+// Watch for login state changes
+watch(isLoggedIn, async (newValue) => {
+  if (newValue) {
+    await getCurrentStudent();
+  } else {
+    currentStudent.value = null;
+  }
+});
+
+onMounted(async () => {
+  if (isLoggedIn.value) {
+    await getCurrentStudent();
+  }
+});
+
+const handleLogout = async () => {
+  try {
+    await logout();
+    currentStudent.value = null;
+    await router.push("/login?message=You have successfully logged out.");
+  } catch (error) {
+    console.error("Logout error:", error);
+  }
 };
 </script>
 

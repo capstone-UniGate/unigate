@@ -10,7 +10,7 @@ from unigate.schemas.group import (
     GroupReadOnlyStudents,
     GroupReadWithStudents,
 )
-from unigate.schemas.request import RequestRead
+from unigate.schemas.request import RequestRead, RequestReadWithStudent
 
 router = APIRouter()
 
@@ -91,7 +91,7 @@ def get_group_students(
 
 @router.get(
     "/{group_id}/requests",
-    response_model=list[RequestRead],
+    response_model=list[RequestReadWithStudent],
 )
 def get_group_requests(
     group: GroupDep,
