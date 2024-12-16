@@ -136,10 +136,10 @@
                         Status: {{ request.status }}
                       </p>
                     </div>
-                    <div class="space-x-2" v-if="request.status === 'PENDING'">
+                    <div class="space-x-2">
                       <Button
                         @click="handleRequest(request.id, 'approve')"
-                        class="bg-green-500 hover:bg-green-600"
+                        class="bg-green-500 hover:bg-green-600 col-span-2"
                       >
                         Approve
                       </Button>
@@ -148,6 +148,12 @@
                         class="bg-red-500 hover:bg-red-600"
                       >
                         Reject
+                      </Button>
+                      <Button
+                        @click="handleRequest(request.id, 'block')"
+                        class="bg-red-500 hover:bg-red-600"
+                      >
+                        Block
                       </Button>
                     </div>
                   </div>
@@ -300,10 +306,13 @@ async function loadGroup() {
   }
 }
 
-onMounted(() => {
-  loadGroup();
-  getCurrentStudent();
-  fetchUserRequestStatus();
+onMounted(async () => {
+  await loadGroup();
+  await getCurrentStudent();
+  await fetchUserRequestStatus();
+  if (is_super_student.value) {
+    await loadRequests();
+  }
 });
 
 const openAvatarModal = () => {
@@ -324,7 +333,8 @@ const toggleRequests = async () => {
 const loadRequests = async () => {
   try {
     isLoadingRequests.value = true;
-    requests.value = await getGroupRequests(groupId.toString());
+    const response = await getGroupRequests(groupId.toString());
+    requests.value = response;
   } catch (error) {
     toast({
       title: "Error",
@@ -338,15 +348,25 @@ const loadRequests = async () => {
 
 const handleRequest = async (
   requestId: string,
-  action: "approve" | "reject",
+  action: "approve" | "reject" | "block",
 ) => {
   try {
-    await handleGroupRequest(groupId.toString(), requestId, action);
-    toast({
-      title: "Success",
-      description: `Request ${action}ed successfully`,
-    });
-    await loadRequests(); // Reload requests after handling
+    // Wait for the backend request to complete
+    const response = (await handleGroupRequest(
+      groupId.toString(),
+      requestId,
+      action,
+    )) as boolean;
+
+    // Only update the frontend if the backend request was successful
+    if (response) {
+      requests.value = requests.value.filter(
+        (request) => request.id !== requestId,
+      );
+
+      // Reload group data to get fresh information
+      await loadGroup();
+    }
   } catch (error) {
     toast({
       title: "Error",
