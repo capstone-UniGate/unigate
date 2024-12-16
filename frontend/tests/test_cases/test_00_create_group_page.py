@@ -1,5 +1,3 @@
-import time
-
 import pytest
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
@@ -12,8 +10,10 @@ from tests.test_cases.base_test import BaseTest
 class TestGroupCreate(BaseTest):
     @pytest.fixture
     def page(self, base_page: webdriver.Chrome) -> CreateGroupPage:
+        self.login(base_page)
         page = CreateGroupPage(base_page)
         page.navigate()
+        # self.wait.until(EC.url_to_be(url=Urls.CREATE_GROUP_PAGE))
         return page
 
     def test_create_group_form(self, page: CreateGroupPage) -> None:
@@ -23,9 +23,7 @@ class TestGroupCreate(BaseTest):
 
     def test_form_validation(self, page: CreateGroupPage) -> None:
         # Define expected validation messages
-        time.sleep(1)
         expected_messages: dict[str, str | int] = {"required": "Required", "count": 5}
-
         page.click_create()
         error_messages = page.get_error_messages()
 
@@ -38,6 +36,5 @@ class TestGroupCreate(BaseTest):
         ), f"Expected {expected_messages['count']} 'Required' messages, but got {actual_required_count}. Messages: {error_messages}"
 
     def test_cancel_button(self, page: CreateGroupPage) -> None:
-        time.sleep(1)
         page.click_cancel()
         self.wait.until(EC.url_to_be(url=Urls.GROUP_PAGE))

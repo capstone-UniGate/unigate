@@ -16,6 +16,8 @@ class LoginPage(BasePage):
 
     # Locators
     LOGIN_FORM = (By.ID, "login-form")
+    USERNAME = (By.ID, "username")
+    PASSWORD = (By.ID, "password")
 
     def is_login_form_visible(self) -> bool:
         """Check if login form is visible on the page"""
@@ -24,3 +26,11 @@ class LoginPage(BasePage):
         except TimeoutException:
             return False
         return True
+
+    def login(self, username: str, password: str) -> None:
+        self.is_login_form_visible()
+        username_field = self.driver.find_element(By.ID, "username")
+        username_field.send_keys(str(username))
+        password_field = self.driver.find_element(By.ID, "password")
+        password_field.send_keys(password)
+        (self.driver.find_element(By.ID, "login_button")).click()

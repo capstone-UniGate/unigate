@@ -6,19 +6,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 
 class GroupPageDetail:
-    URL = "http://localhost:3000/groups/{group_id}"
-
-    def __init__(self, driver: WebDriver, group_id: str) -> None:
+    def __init__(self, driver: WebDriver) -> None:
         self.driver = driver
-        self.group_id = group_id
         self.wait = WebDriverWait(driver, 1000)
-
-    def navigate(self) -> None:
-        self.driver.get(self.URL)
-
-    def load(self) -> None:
-        """Load the group page."""
-        self.driver.get(self.URL.format(group_id=self.group_id))
 
     def is_manage_requests_section_visible(self) -> bool:
         """Check if the Manage Join Requests section is visible."""
