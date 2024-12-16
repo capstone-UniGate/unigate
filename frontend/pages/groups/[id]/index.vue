@@ -367,49 +367,19 @@ const askToJoinGroup = async () => {
         description: response,
       });
     } else {
-      toast({
-        title: "Join Failed",
-        description: response,
-        variant: "destructive",
-      });
     }
-  } catch (error) {
-    toast({
-      title: "Join Failed",
-      description: error,
-      variant: "destructive",
-    });
-  }
+  } catch (error) {}
 };
 
 const joinGroups = async () => {
   try {
     const response = await joinGroup(groupId.toString());
-
-    // Check response string and display the appropriate toast
-    if (response === "Insert successful") {
-      toast({
-        variant: "success",
-        title: "Joined Group",
-        description: response,
-        duration: 1000,
-      });
-      is_member_of.value = true; // Update membership status
-      await loadGroup(); // Reload group data to get fresh information
-    } else {
-      toast({
-        title: "Join Failed",
-        description: response,
-        variant: "destructive",
-        duration: 1000,
-      });
-    }
+    is_member_of.value = true; // Update membership status
+    await loadGroup(); // Reload group data to get fresh information
   } catch (error) {
     toast({
-      title: "Join Failed",
-      description: error,
       variant: "destructive",
-      duration: 1000,
+      description: "Failed to join group",
     });
   }
 };
@@ -447,27 +417,16 @@ const leaveGroups = async () => {
     const string_message = await leaveGroup(groupId.toString());
 
     if (string_message === "The student has been removed successfully") {
-      toast({
-        variant: "success",
-        description: "You have left the group",
-        duration: 1000,
-      });
       is_member_of.value = false; // Update membership status
       setTimeout(() => {
         router.push("/groups");
       }, 1500);
-    } else {
-      toast({
-        variant: "destructive",
-        description: string_message,
-        duration: 1000,
-      });
     }
+    await loadGroup(); // Reload group data to get fresh information
   } catch (error) {
     toast({
       variant: "destructive",
-      description: "You have NOT left the group",
-      duration: 1000,
+      description: "Failed to join group",
     });
     isError.value = true;
   } finally {
