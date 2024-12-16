@@ -109,11 +109,51 @@
             class="text-left mb-6"
           >
             <Button
-              @click="navigateToRequests"
+              @click="toggleRequests"
               class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-blue-600 hover:shadow-xl active:scale-95 transition-all"
             >
-              Manage Requests
+              {{ showRequests ? "Hide Requests" : "Manage Requests" }}
             </Button>
+
+            <div v-if="showRequests" class="mt-4">
+              <h3 class="text-xl font-semibold mb-4">Join Requests</h3>
+              <div v-if="isLoadingRequests">
+                <LoadingIndicator />
+              </div>
+              <div v-else-if="requests.length === 0" class="text-gray-500">
+                No pending requests
+              </div>
+              <div v-else class="space-y-4">
+                <div
+                  v-for="request in requests"
+                  :key="request.id"
+                  class="bg-white p-4 rounded-lg shadow border"
+                >
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="font-medium">{{ request.student?.name }}</p>
+                      <p class="text-sm text-gray-500">
+                        Status: {{ request.status }}
+                      </p>
+                    </div>
+                    <div class="space-x-2" v-if="request.status === 'PENDING'">
+                      <Button
+                        @click="handleRequest(request.id, 'approve')"
+                        class="bg-green-500 hover:bg-green-600"
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        @click="handleRequest(request.id, 'reject')"
+                        class="bg-red-500 hover:bg-red-600"
+                      >
+                        Reject
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="text-left mb-6">
@@ -201,7 +241,13 @@ import { useCurrentStudent } from "@/composables/useCurrentStudent";
 const route = useRoute();
 const router = useRouter();
 const { toast } = useToast();
-const { getGroupById, leaveGroup, joinGroup, getGroupRequests } = useGroups();
+const {
+  getGroupById,
+  leaveGroup,
+  joinGroup,
+  getGroupRequests,
+  handleGroupRequest,
+} = useGroups();
 const { currentStudent, getCurrentStudent } = useCurrentStudent();
 
 const groupId = route.params.id;
@@ -225,6 +271,10 @@ const is_super_student = computed(() => {
 const userRequestStatus = ref(null);
 const isLoadingStatus = ref(true);
 const isErrorStatus = ref(false);
+
+const showRequests = ref(false);
+const requests = ref([]);
+const isLoadingRequests = ref(false);
 
 async function loadGroup() {
   try {
@@ -264,9 +314,48 @@ const closeAvatarModal = () => {
   isAvatarModalOpen.value = false;
 };
 
-const navigateToRequests = () => {
-  router.push({ name: "request", params: { id: groupId } });
+const toggleRequests = async () => {
+  showRequests.value = !showRequests.value;
+  if (showRequests.value) {
+    await loadRequests();
+  }
 };
+
+const loadRequests = async () => {
+  try {
+    isLoadingRequests.value = true;
+    requests.value = await getGroupRequests(groupId.toString());
+  } catch (error) {
+    toast({
+      title: "Error",
+      description: "Failed to load requests",
+      variant: "destructive",
+    });
+  } finally {
+    isLoadingRequests.value = false;
+  }
+};
+
+const handleRequest = async (
+  requestId: string,
+  action: "approve" | "reject",
+) => {
+  try {
+    await handleGroupRequest(groupId.toString(), requestId, action);
+    toast({
+      title: "Success",
+      description: `Request ${action}ed successfully`,
+    });
+    await loadRequests(); // Reload requests after handling
+  } catch (error) {
+    toast({
+      title: "Error",
+      description: `Failed to ${action} request`,
+      variant: "destructive",
+    });
+  }
+};
+
 const askToJoinGroup = async () => {
   try {
     const response = await joinGroup(groupId.toString());
