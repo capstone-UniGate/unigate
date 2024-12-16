@@ -25,14 +25,15 @@
               />
               <div>
                 <p class="text-lg font-semibold text-gray-900">
-                  {{ request.student.name }} {{ request.student.surname }}
+                  {{ request.student.name }}
+                  {{ request.student.surname }}
                 </p>
               </div>
             </div>
 
             <!-- Buttons Section -->
             <div class="flex gap-x-4">
-              <div v-if="request.status === 'PENDING'">
+              <div>
                 <button
                   @click="handleRequest(request.id, 'reject')"
                   class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition mr-5"
@@ -65,13 +66,19 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
+interface Student {
+  id: string;
+  number: number;
+  email: string;
+  name: string;
+  surname: string;
+}
+
 interface Request {
   id: string;
-  status: string;
-  student: {
-    name: string;
-    surname: string;
-  };
+  student_id: string; // Student ID
+  group_id: string; // Group ID
+  student: Student; // Include the nested student object
 }
 
 const route = useRoute();
@@ -82,7 +89,11 @@ const requests = ref<Request[]>([]);
 const isLoading = ref(true);
 const isError = ref(false);
 
-const { getGroupRequests, handleGroupRequest, currentStudent } = useGroups();
+const { getGroupRequests, handleGroupRequest } = useGroups();
+
+const { currentStudent, getCurrentStudent } = useCurrentStudent();
+
+const students = ref<{ [key: string]: { name: string; surname: string } }>({}); // Store student details by student_id
 
 // Fetch requests
 async function fetchRequests() {
@@ -124,6 +135,8 @@ async function handleRequest(
 
 // Initial fetch with authentication check
 onMounted(async () => {
+  await getCurrentStudent();
+
   if (!currentStudent.value) {
     router.push("/login");
     return;

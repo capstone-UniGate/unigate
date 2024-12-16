@@ -250,9 +250,9 @@ async function loadGroup() {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   loadGroup();
-  getCurrentStudent();
+  await getCurrentStudent();
   fetchUserRequestStatus();
 });
 
@@ -265,7 +265,7 @@ const closeAvatarModal = () => {
 };
 
 const navigateToRequests = () => {
-  router.push({ name: "request", params: { id: groupId } });
+  router.push(`/groups/${groupId}/requests`);
 };
 const askToJoinGroup = async () => {
   try {
@@ -340,7 +340,7 @@ async function fetchUserRequestStatus() {
 
     // Find the logged-in user's request
     const userRequest = requests.find(
-      (request) => request.student_id === currentStudent.value?.id,
+      (request) => request.student_id === studentId,
     );
     // Update the status if found
     userRequestStatus.value = userRequest ? userRequest.status : null;
