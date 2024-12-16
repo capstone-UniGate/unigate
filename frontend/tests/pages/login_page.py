@@ -27,6 +27,8 @@ class LoginPage:
             '//button[@type="button" and @class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"]',
         )
 
+        self.logout_button = (By.ID, "logout-button")  # Add logout button locator
+
     def navigate(self) -> None:
         self.driver.get(self.URL)
 
@@ -105,3 +107,16 @@ class LoginPage:
                 "uploadThroughput": -1,
             },
         )
+
+    def click_logout(self) -> None:
+        """Click the logout button."""
+        WebDriverWait(self.driver, 10).until(
+            ec.element_to_be_clickable(self.logout_button)
+        ).click()
+
+    def is_logout_successful(self) -> bool:
+        """Check if the user is successfully logged out by checking the URL or a specific element."""
+        WebDriverWait(self.driver, 3).until(
+            ec.url_changes(self.driver.current_url)  # Wait for the URL to change
+        )
+        return self.driver.current_url == Urls.LOGOUT_PAGE

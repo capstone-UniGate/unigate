@@ -29,6 +29,9 @@ class TestLogin(BaseTest):
         # Assert that the user is successfully logged in
         assert "Welcome" in page.get_success_message()
 
+        # Logout after successful login
+        page.click_logout()
+
     def test_failed_login_invalid_credentials(self, page: LoginPage) -> None:
         # Define expected error message for invalid login
         time.sleep(1)
