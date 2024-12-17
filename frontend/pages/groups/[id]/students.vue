@@ -146,6 +146,7 @@ onMounted(async () => {
     <ScrollArea
       v-else
       class="h-96 w-full rounded-lg border border-gray-300 bg-white shadow-sm p-4 m-4"
+      id="members_area"
     >
       <!-- Active Members List -->
       <div v-if="activeTab === 'members'">
@@ -157,6 +158,7 @@ onMounted(async () => {
           v-else
           v-for="member in members"
           :key="member.id"
+          id="member"
           class="py-3 px-4 bg-gray-100 rounded-md mb-2 flex items-center justify-between hover:bg-gray-200 transition duration-200"
         >
           <!-- Avatar with Default Image -->
@@ -164,6 +166,7 @@ onMounted(async () => {
             <AvatarImage
               src="https://via.placeholder.com/50"
               alt="Default Avatar"
+              id="avatar"
             />
             <AvatarFallback
               >{{ member.name?.[0] }}{{ member.surname?.[0] }}</AvatarFallback
@@ -174,15 +177,15 @@ onMounted(async () => {
           <div class="flex-grow">
             <div class="flex flex-col">
               <!-- Member Name -->
-              <span class="text-gray-800 font-bold">
+              <span id="member_name" class="text-gray-800 font-bold">
                 {{ member.name }} {{ member.surname }}
               </span>
               <!-- Member Email -->
-              <span class="text-gray-600 text-sm">
+              <span id="member_email" class="text-gray-600 text-sm">
                 {{ member.email }}
               </span>
               <!-- Student Number -->
-              <span class="text-gray-500 text-xs">
+              <span id="member_number" class="text-gray-500 text-xs">
                 Student #{{ member.number }}
               </span>
             </div>
@@ -193,6 +196,7 @@ onMounted(async () => {
             v-if="isSuperStudent()"
             @click="handleBlock(member.id)"
             class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition"
+            id="block_member"
           >
             Block
           </button>

@@ -76,3 +76,30 @@ class GroupPageDetail:
         leave_button = self.driver.find_element(By.ID, "leave-group-button")
         # leave_button.send_keys(Keys.ENTER)
         leave_button.click()
+
+    def click_members(self) -> None:
+        members_button = self.driver.find_element(By.ID, "members_list")
+        # members_button.send_keys(Keys.ENTER)
+        members_button.click()
+
+    def check_description(self) -> bool:
+        description_element = self.driver.find_element(
+            By.CSS_SELECTOR, ".text-gray-600"
+        )
+        return description_element.is_displayed() and description_element.text != ""
+
+    def check_members_link(self) -> bool:
+        members_link = self.driver.find_element(By.CSS_SELECTOR, "a.text-blue-500")
+        return members_link.is_displayed()
+
+    def check_ask_join(self) -> bool:
+        join_button = self.driver.find_element(By.ID, "ask-to-join-button")
+        return join_button.is_displayed()
+
+    def check_leave(self) -> bool:
+        leave_button = self.driver.find_element(By.ID, "leave-group-button")
+        return leave_button.is_displayed()
+
+    def check_manage(self) -> bool:
+        manage_button = self.driver.find_element(By.ID, "Manage_requests")
+        return manage_button.is_displayed()

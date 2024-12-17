@@ -5,6 +5,7 @@ from selenium import webdriver
 
 from tests.pages.group_page import GroupPage
 from tests.pages.group_page_detail import GroupPageDetail
+from tests.pages.group_page_members import GroupPageMembers
 from tests.test_cases.base_test import BaseTest
 
 
@@ -14,6 +15,7 @@ class TestGroupCreate(BaseTest):
         self.login(base_page)
         self.page = GroupPage(base_page)
         self.group_page_detail = GroupPageDetail(base_page)
+        self.group_page_members = GroupPageMembers(base_page)
         self.page.load()
 
     def test_join_group_toast(self) -> None:
@@ -26,4 +28,8 @@ class TestGroupCreate(BaseTest):
         # Click the button
         self.group_page_detail.click_join()
         # Small wait to allow alert to appear
-        # group_page_members = Gr
+        self.group_page_detail.click_members()
+        members_emails = self.group_page_members.get_members_email()
+        assert (
+            any(x.text == "s1234567@studenti.unige.it" for x in members_emails) == 1
+        ), "Student has not been inserted"

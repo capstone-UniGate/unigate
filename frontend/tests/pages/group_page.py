@@ -42,7 +42,14 @@ class GroupPage(BasePage):
             return []
 
     def click_button(self, group_card: WebElement) -> None:
-        (group_card.find_element(By.ID, "details")).click()
+        group_button = group_card.find_element(By.ID, "details")
+        coordinates = (
+            group_button.location_once_scrolled_into_view
+        )  # returns dict of X, Y coordinates
+        self.driver.execute_script(
+            "window.scrollTo({}, {});".format(coordinates["x"], coordinates["y"])
+        )
+        group_button.click()
 
     def is_page_loaded(self) -> bool:
         try:
