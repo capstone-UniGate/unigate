@@ -8,24 +8,22 @@ from tests.test_cases.base_test import BaseTest
 
 
 class TestGroupCreate(BaseTest):
-    @pytest.fixture
-    def page(self, base_page: webdriver.Chrome) -> CreateGroupPage:
+    @pytest.fixture(autouse=True)
+    def setup(self, base_page: webdriver.Chrome) -> None:
         self.login(base_page)
-        page = CreateGroupPage(base_page)
-        page.navigate()
-        # self.wait.until(EC.url_to_be(url=Urls.CREATE_GROUP_PAGE))
-        return page
+        self.page = CreateGroupPage(base_page)
+        self.page.navigate()
 
-    def test_create_group_form(self, page: CreateGroupPage) -> None:
-        page.fill_form(TestData.VALID_GROUP)
-        page.click_create()
+    def test_create_group_form(self) -> None:
+        self.page.fill_form(TestData.VALID_GROUP)
+        self.page.click_create()
         self.wait.until(EC.url_to_be(url=Urls.GROUP_PAGE))
 
-    def test_form_validation(self, page: CreateGroupPage) -> None:
+    def test_form_validation(self) -> None:
         # Define expected validation messages
         expected_messages: dict[str, str | int] = {"required": "Required", "count": 5}
-        page.click_create()
-        error_messages = page.get_error_messages()
+        self.page.click_create()
+        error_messages = self.page.get_error_messages()
 
         # Type assertion to tell mypy that we know "required" key contains a string
         required_msg = expected_messages["required"]
@@ -35,6 +33,6 @@ class TestGroupCreate(BaseTest):
             actual_required_count == expected_messages["count"]
         ), f"Expected {expected_messages['count']} 'Required' messages, but got {actual_required_count}. Messages: {error_messages}"
 
-    def test_cancel_button(self, page: CreateGroupPage) -> None:
-        page.click_cancel()
+    def test_cancel_button(self) -> None:
+        self.page.click_cancel()
         self.wait.until(EC.url_to_be(url=Urls.GROUP_PAGE))

@@ -46,7 +46,7 @@ repos:
         exclude: ^(frontend/|backend/)
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: "v9.16.0"
+    rev: "v9.17.0"
     hooks:
       - id: eslint
         args: [--fix, --config=frontend/eslint.config.js]

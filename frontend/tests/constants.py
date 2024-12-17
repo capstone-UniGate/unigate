@@ -16,6 +16,11 @@ class TestData:
         "tags_required": "Please add at least one tag",
     }
 
+    VALID_USERNAME: ClassVar[str] = "S1234567"
+    VALID_PASSWORD: ClassVar[str] = "testpassword"
+    INVALID_USERNAME: ClassVar[str] = "S7654321"
+    INVALID_PASSWORD: ClassVar[str] = "wrongpassword"
+
 
 class Urls:
     BASE_URL = "http://localhost:3000"
@@ -23,3 +28,5 @@ class Urls:
     SEE_MY_GROUP = f"{GROUP_PAGE}/see-my-group"
     CREATE_GROUP_PAGE = f"{GROUP_PAGE}/create"
     JOIN_REQUESTS_PAGE = f"{GROUP_PAGE}/1/requests"
+    LOGIN_PAGE = f"{BASE_URL}/login"
+    LOGOUT_PAGE = f"{BASE_URL}/login?message=You have successfully logged out."

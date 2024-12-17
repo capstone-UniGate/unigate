@@ -109,11 +109,57 @@
             class="text-left mb-6"
           >
             <Button
-              @click="navigateToRequests"
+              @click="toggleRequests"
               class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-blue-600 hover:shadow-xl active:scale-95 transition-all"
             >
-              Manage Requests
+              {{ showRequests ? "Hide Requests" : "Manage Requests" }}
             </Button>
+
+            <div v-if="showRequests" class="mt-4">
+              <h3 class="text-xl font-semibold mb-4">Join Requests</h3>
+              <div v-if="isLoadingRequests">
+                <LoadingIndicator />
+              </div>
+              <div v-else-if="requests.length === 0" class="text-gray-500">
+                No pending requests
+              </div>
+              <div v-else class="space-y-4">
+                <div
+                  v-for="request in requests"
+                  :key="request.id"
+                  class="bg-white p-4 rounded-lg shadow border"
+                >
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="font-medium">{{ request.student?.name }}</p>
+                      <p class="text-sm text-gray-500">
+                        Status: {{ request.status }}
+                      </p>
+                    </div>
+                    <div class="space-x-2">
+                      <Button
+                        @click="handleRequest(request.id, 'approve')"
+                        class="bg-green-500 hover:bg-green-600 col-span-2"
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        @click="handleRequest(request.id, 'reject')"
+                        class="bg-red-500 hover:bg-red-600"
+                      >
+                        Reject
+                      </Button>
+                      <Button
+                        @click="handleRequest(request.id, 'block')"
+                        class="bg-red-500 hover:bg-red-600"
+                      >
+                        Block
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="text-left mb-6">
@@ -201,7 +247,13 @@ import { useCurrentStudent } from "@/composables/useCurrentStudent";
 const route = useRoute();
 const router = useRouter();
 const { toast } = useToast();
-const { getGroupById, leaveGroup, joinGroup, getGroupRequests } = useGroups();
+const {
+  getGroupById,
+  leaveGroup,
+  joinGroup,
+  getGroupRequests,
+  handleGroupRequest,
+} = useGroups();
 const { currentStudent, getCurrentStudent } = useCurrentStudent();
 
 const groupId = route.params.id;
@@ -225,6 +277,10 @@ const is_super_student = computed(() => {
 const userRequestStatus = ref(null);
 const isLoadingStatus = ref(true);
 const isErrorStatus = ref(false);
+
+const showRequests = ref(false);
+const requests = ref([]);
+const isLoadingRequests = ref(false);
 
 async function loadGroup() {
   try {
@@ -250,10 +306,13 @@ async function loadGroup() {
   }
 }
 
-onMounted(() => {
-  loadGroup();
-  getCurrentStudent();
-  fetchUserRequestStatus();
+onMounted(async () => {
+  await loadGroup();
+  await getCurrentStudent();
+  await fetchUserRequestStatus();
+  if (is_super_student.value) {
+    await loadRequests();
+  }
 });
 
 const openAvatarModal = () => {
@@ -264,9 +323,59 @@ const closeAvatarModal = () => {
   isAvatarModalOpen.value = false;
 };
 
-const navigateToRequests = () => {
-  router.push({ name: "request", params: { id: groupId } });
+const toggleRequests = async () => {
+  showRequests.value = !showRequests.value;
+  if (showRequests.value) {
+    await loadRequests();
+  }
 };
+
+const loadRequests = async () => {
+  try {
+    isLoadingRequests.value = true;
+    const response = await getGroupRequests(groupId.toString());
+    requests.value = response;
+  } catch (error) {
+    toast({
+      title: "Error",
+      description: "Failed to load requests",
+      variant: "destructive",
+    });
+  } finally {
+    isLoadingRequests.value = false;
+  }
+};
+
+const handleRequest = async (
+  requestId: string,
+  action: "approve" | "reject" | "block",
+) => {
+  try {
+    // Wait for the backend request to complete
+    const response = (await handleGroupRequest(
+      groupId.toString(),
+      requestId,
+      action,
+    )) as boolean;
+
+    // Only update the frontend if the backend request was successful
+    if (response) {
+      requests.value = requests.value.filter(
+        (request) => request.id !== requestId,
+      );
+
+      // Reload group data to get fresh information
+      await loadGroup();
+    }
+  } catch (error) {
+    toast({
+      title: "Error",
+      description: `Failed to ${action} request`,
+      variant: "destructive",
+    });
+  }
+};
+
 const askToJoinGroup = async () => {
   try {
     const response = await joinGroup(groupId.toString());
@@ -278,49 +387,19 @@ const askToJoinGroup = async () => {
         description: response,
       });
     } else {
-      toast({
-        title: "Join Failed",
-        description: response,
-        variant: "destructive",
-      });
     }
-  } catch (error) {
-    toast({
-      title: "Join Failed",
-      description: error,
-      variant: "destructive",
-    });
-  }
+  } catch (error) {}
 };
 
 const joinGroups = async () => {
   try {
     const response = await joinGroup(groupId.toString());
-
-    // Check response string and display the appropriate toast
-    if (response === "Insert successful") {
-      toast({
-        variant: "success",
-        title: "Joined Group",
-        description: response,
-        duration: 1000,
-      });
-      is_member_of.value = true; // Update membership status
-      await loadGroup(); // Reload group data to get fresh information
-    } else {
-      toast({
-        title: "Join Failed",
-        description: response,
-        variant: "destructive",
-        duration: 1000,
-      });
-    }
+    is_member_of.value = true; // Update membership status
+    await loadGroup(); // Reload group data to get fresh information
   } catch (error) {
     toast({
-      title: "Join Failed",
-      description: error,
       variant: "destructive",
-      duration: 1000,
+      description: "Failed to join group",
     });
   }
 };
@@ -358,27 +437,16 @@ const leaveGroups = async () => {
     const string_message = await leaveGroup(groupId.toString());
 
     if (string_message === "The student has been removed successfully") {
-      toast({
-        variant: "success",
-        description: "You have left the group",
-        duration: 1000,
-      });
       is_member_of.value = false; // Update membership status
       setTimeout(() => {
         router.push("/groups");
       }, 1500);
-    } else {
-      toast({
-        variant: "destructive",
-        description: string_message,
-        duration: 1000,
-      });
     }
+    await loadGroup(); // Reload group data to get fresh information
   } catch (error) {
     toast({
       variant: "destructive",
-      description: "You have NOT left the group",
-      duration: 1000,
+      description: "Failed to join group",
     });
     isError.value = true;
   } finally {

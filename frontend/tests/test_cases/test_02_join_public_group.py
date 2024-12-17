@@ -13,6 +13,7 @@ class TestGroupCreate(BaseTest):
     def setup(self, base_page: webdriver.Chrome) -> None:
         self.login(base_page)
         self.page = GroupPage(base_page)
+        self.group_page_detail = GroupPageDetail(base_page)
         self.page.load()
 
     def test_join_group_toast(self) -> None:
@@ -20,9 +21,9 @@ class TestGroupCreate(BaseTest):
         # Load the group details page
         group_card = (self.page.get_group_cards())[0]
         self.page.click_button(group_card)
-        group_page_detail = GroupPageDetail(self.page.driver)
 
         time.sleep(1)
         # Click the button
-        group_page_detail.click_join()
+        self.group_page_detail.click_join()
         # Small wait to allow alert to appear
+        # group_page_members = Gr

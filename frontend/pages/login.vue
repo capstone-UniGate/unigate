@@ -202,6 +202,8 @@ export default {
         router.push("/groups");
       } catch (error: any) {
         passwordError.value = error?.data?.message || "Login failed.";
+        clearInput("username");
+        clearInput("password");
       }
     };
 
