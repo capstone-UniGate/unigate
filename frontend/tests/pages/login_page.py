@@ -1,11 +1,12 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
-from tests.pages.base_page import BasePage
 from tests.constants import Urls
+from tests.pages.base_page import BasePage
+
 
 class LoginPage(BasePage):
     # Define XPath constants
@@ -51,7 +52,7 @@ class LoginPage(BasePage):
     def get_error_message(self) -> WebElement:
         """Get the error message displayed after failed login."""
         return self._get_element(self.ERROR_MESSAGE_XPATH)
-    
+
     def get_login_button(self) -> WebElement:
         """Returns the login button element."""
         return self._get_element(self.LOGIN_BUTTON_XPATH)
