@@ -1,4 +1,5 @@
 import uuid
+
 from fastapi.testclient import TestClient
 from unigate.main import app
 
@@ -17,12 +18,13 @@ def authenticate_user() -> dict:
 
     response = client.post("/auth/login", data=login_payload)
 
-    assert response.status_code == 200, f"Failed to authenticate user: {response.json()}"
+    assert (
+        response.status_code == 200
+    ), f"Failed to authenticate user: {response.json()}"
     return response.json()
 
 
 def create_group() -> dict:
-
     token_data = authenticate_user()
     token = token_data["access_token"]
 
@@ -42,7 +44,6 @@ def create_group() -> dict:
 
 
 def test_block_user_success():
-
     group_response = create_group()
     created_group_id = group_response["id"]
 
@@ -57,9 +58,12 @@ def test_block_user_success():
     assert response.status_code == 200, f"Block failed: {response.json()}"
     assert response.json()["id"] == created_group_id
 
-
-    blocked_student_ids = [student["id"] for student in response.json().get("blocked_students", [])]
-    assert test_student_id in blocked_student_ids, f"Student {test_student_id} was not blocked."
+    blocked_student_ids = [
+        student["id"] for student in response.json().get("blocked_students", [])
+    ]
+    assert (
+        test_student_id in blocked_student_ids
+    ), f"Student {test_student_id} was not blocked."
 
 
 def test_block_user_group_not_found():
@@ -76,7 +80,6 @@ def test_block_user_group_not_found():
 
 
 def test_block_user_student_not_found():
-
     group_response = create_group()
     created_group_id = group_response["id"]
 
@@ -90,9 +93,3 @@ def test_block_user_student_not_found():
 
     assert response.status_code == 404, f"Expected 404, got: {response.status_code}"
     assert response.json() == {"detail": "Student not found."}
-
-
-
-
-
-
