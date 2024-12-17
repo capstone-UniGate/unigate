@@ -259,7 +259,6 @@ const formHasErrors = computed(() => Object.keys(errors.value).length > 0);
 // Handle form submission
 const onSubmit = handleSubmit(async (values) => {
   try {
-    await ensureAuthenticated();
     let result = await createGroup({
       name: values.name,
       description: values.description,
@@ -267,7 +266,6 @@ const onSubmit = handleSubmit(async (values) => {
       type: values.isPublic,
       tags: tags.value,
     });
-    console.log(result);
     toast({
       variant: "success",
       description: "Group created successfully!",
