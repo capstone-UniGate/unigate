@@ -54,7 +54,7 @@ services:
       dockerfile: Dockerfile
     develop:
       watch:
-        - path: ./backend
+        - path: ./backend/unigate
           action: sync
           target: /app
           ignore:
@@ -73,8 +73,13 @@ services:
       - POSTGRES_DB=${POSTGRES_DB?Variable not set}
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-      - POSTGRES_HOST=${POSTGRES_HOST?Variable not set}
-      - POSTGRES_PORT=${POSTGRES_PORT?Variable not set}
+      - POSTGRES_HOST=postgres-unigate
+      - POSTGRES_PORT=5432
+      - UNIGATE_DB=${UNIGATE_DB?Variable not set}
+      - AUTH_DB=${AUTH_DB?Variable not set}
+      - MODE=test
+      - JWT_SECRET=${JWT_SECRET?Variable not set}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY?Variable not set}
     depends_on:
       postgres-unigate:
         condition: service_healthy
