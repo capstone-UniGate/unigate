@@ -119,6 +119,7 @@ onMounted(async () => {
               ? 'bg-blue-500 text-white'
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
           ]"
+          id="members_tab"
           @click="activeTab = 'members'"
         >
           Active Members ({{ members.length }})
@@ -130,6 +131,7 @@ onMounted(async () => {
               ? 'bg-blue-500 text-white'
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
           ]"
+          id="blocked_tab"
           @click="activeTab = 'blocked'"
         >
           Blocked Users ({{ blockedStudents.length }})
@@ -150,7 +152,11 @@ onMounted(async () => {
     >
       <!-- Active Members List -->
       <div v-if="activeTab === 'members'">
-        <div v-if="members.length === 0" class="text-center text-gray-500 py-4">
+        <div
+          v-if="members.length === 0"
+          class="text-center text-gray-500 py-4"
+          id="no_members"
+        >
           No members found in this group.
         </div>
 
@@ -208,6 +214,7 @@ onMounted(async () => {
         <div
           v-if="blockedStudents.length === 0"
           class="text-center text-gray-500 py-4"
+          id="no_blocked_users"
         >
           No blocked users.
         </div>
@@ -216,6 +223,7 @@ onMounted(async () => {
           v-else
           v-for="user in blockedStudents"
           :key="user.id"
+          id="blocked_student"
           class="py-3 px-4 bg-gray-100 rounded-md mb-2 flex items-center justify-between hover:bg-gray-200 transition duration-200"
         >
           <Avatar class="mr-4">
@@ -246,6 +254,7 @@ onMounted(async () => {
           <button
             @click="handleUnblock(user.id)"
             class="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-lg hover:bg-green-600 transition"
+            id="unblock_student"
           >
             Unblock
           </button>
