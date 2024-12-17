@@ -86,6 +86,26 @@ services:
         restart: true
     restart: always
 
+  frontend-unigate:
+    container_name: frontend-unigate
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    develop:
+      watch:
+        - path: ./frontend
+          action: sync
+          target: /app
+        - path: ./frontend/package.json
+          action: rebuild
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    env_file:
+      - .env
+    environment:
+      - FRONTEND_PORT=${FRONTEND_PORT?Variable not set}
+    restart: always
+
 volumes:
   pgdata:
   pgadmin_data:
