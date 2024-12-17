@@ -46,6 +46,41 @@ services:
       - postgres-unigate
     restart: always
 
+  backend-unigate:
+    container_name: backend-unigate
+    command: fastapi run --reload unigate/main.py
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    develop:
+      watch:
+        - path: ./backend
+          action: sync
+          target: /app
+          ignore:
+            - ./backend/.venv
+            - .venv
+            - ./backend/alembic_auth
+            - ./backend/alembic_unigate
+        - path: ./backend/pyproject.toml
+          action: rebuild
+    ports:
+      - "${BACKEND_PORT}:8000"
+    env_file:
+      - .env
+    environment:
+      - BACKEND_PORT=${BACKEND_PORT?Variable not set}
+      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
+      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+      - POSTGRES_HOST=${POSTGRES_HOST?Variable not set}
+      - POSTGRES_PORT=${POSTGRES_PORT?Variable not set}
+    depends_on:
+      postgres-unigate:
+        condition: service_healthy
+        restart: true
+    restart: always
+
 volumes:
   pgdata:
   pgadmin_data:

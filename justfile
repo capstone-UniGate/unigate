@@ -15,6 +15,15 @@ frontend_python := frontend_venv + python
 @_default:
     just --list
 
+docker-up:
+    docker compose up --watch
+
+docker-stop:
+    docker compose stop
+
+docker-down:
+    docker compose down -v
+
 reset-database:
     docker compose exec postgres-unigate psql -U $POSTGRES_USER -d $POSTGRES_DB -c "DO \$\$ BEGIN EXECUTE 'DROP SCHEMA public CASCADE'; EXECUTE 'CREATE SCHEMA public'; END \$\$;"
     docker compose exec postgres-unigate psql -U $POSTGRES_USER -d $UNIGATE_DB -c "DO \$\$ BEGIN EXECUTE 'DROP SCHEMA public CASCADE'; EXECUTE 'CREATE SCHEMA public'; END \$\$;"
