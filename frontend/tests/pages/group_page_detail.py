@@ -18,13 +18,15 @@ class GroupPageDetail:
         except Exception:  # noqa: BLE001
             return False
 
-    def get_join_requests(self) -> list | None:
+    def get_join_requests(self) -> list[WebElement] | None:
         """Return all join requests as elements."""
         return self.driver.find_elements(By.CSS_SELECTOR, ".scroll-area ul li")
 
     def approve_request(self, request_index: int) -> None:
         """Approve a join request by its index."""
         requests = self.get_join_requests()
+        if requests is None:
+            raise TypeError
         if request_index >= len(requests):
             raise IndexError("Request index out of range.")
         approve_button = requests[request_index].find_element(
@@ -35,6 +37,8 @@ class GroupPageDetail:
     def reject_request(self, request_index: int) -> None:
         """Reject a join request by its index."""
         requests = self.get_join_requests()
+        if requests is None:
+            raise TypeError
         if request_index >= len(requests):
             raise IndexError("Request index out of range.")
         reject_button = requests[request_index].find_element(
@@ -45,6 +49,8 @@ class GroupPageDetail:
     def block_request(self, request_index: int) -> None:
         """Block a join request by its index."""
         requests = self.get_join_requests()
+        if requests is None:
+            raise TypeError
         if request_index >= len(requests):
             raise IndexError("Request index out of range.")
         block_button = requests[request_index].find_element(

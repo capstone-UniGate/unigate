@@ -43,9 +43,7 @@ class GroupPage(BasePage):
 
     def click_button(self, group_card: WebElement) -> None:
         group_button = group_card.find_element(By.ID, "details")
-        coordinates = (
-            group_button.location_once_scrolled_into_view
-        )  # returns dict of X, Y coordinates
+        coordinates = group_button.location_once_scrolled_into_view
         self.driver.execute_script(
             "window.scrollTo({}, {});".format(coordinates["x"], coordinates["y"])
         )
