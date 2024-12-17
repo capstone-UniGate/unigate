@@ -21,7 +21,7 @@ class GroupPage(BasePage):
 
     def load(self) -> bool:
         try:
-            self.driver.get(self.URL)
+            self.driver.get(Urls.GROUP_PAGE)
         except Exception:  # noqa: BLE001
             return False
         return True
@@ -40,6 +40,14 @@ class GroupPage(BasePage):
             return self.driver.find_elements(*self.GROUP_CARDS)
         except (TimeoutException, NoSuchElementException):
             return []
+
+    def click_button(self, group_card: WebElement) -> None:
+        group_button = group_card.find_element(By.ID, "details")
+        coordinates = group_button.location_once_scrolled_into_view
+        self.driver.execute_script(
+            "window.scrollTo({}, {});".format(coordinates["x"], coordinates["y"])
+        )
+        group_button.click()
 
     def is_page_loaded(self) -> bool:
         try:

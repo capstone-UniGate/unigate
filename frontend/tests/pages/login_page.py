@@ -1,8 +1,9 @@
 import time
 
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
 
 from tests.constants import Urls
@@ -26,8 +27,31 @@ class LoginPage:
             By.XPATH,
             '//button[@type="button" and @class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"]',
         )
+        self.wait = WebDriverWait(driver=driver, timeout=10)
 
         self.logout_button = (By.ID, "logout-button")  # Add logout button locator
+
+        # Locators
+
+    LOGIN_FORM = (By.ID, "login-form")
+    USERNAME = (By.ID, "username")
+    PASSWORD = (By.ID, "password")
+
+    def is_login_form_visible(self) -> bool:
+        """Check if login form is visible on the page"""
+        try:
+            self.wait.until(EC.visibility_of_element_located(self.LOGIN_FORM))
+        except TimeoutException:
+            return False
+        return True
+
+    def login(self, username: str, password: str) -> None:
+        self.is_login_form_visible()
+        username_field = self.driver.find_element(By.ID, "username")
+        username_field.send_keys(str(username))
+        password_field = self.driver.find_element(By.ID, "password")
+        password_field.send_keys(password)
+        (self.driver.find_element(By.ID, "login_button")).click()
 
     def navigate(self) -> None:
         self.driver.get(self.URL)
@@ -42,7 +66,7 @@ class LoginPage:
 
     def click_login(self) -> None:
         login_button = WebDriverWait(self.driver, 10).until(
-            ec.element_to_be_clickable((By.CSS_SELECTOR, "button.bg-blue-600"))
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.bg-blue-600"))
         )
         login_button.click()
 
@@ -60,7 +84,7 @@ class LoginPage:
 
     def get_success_message(self) -> str:
         welcome_message = WebDriverWait(self.driver, 10).until(
-            ec.visibility_of_element_located(
+            EC.visibility_of_element_located(
                 (By.XPATH, "//div[contains(text(), 'Welcome')]")
             )
         )
@@ -111,12 +135,12 @@ class LoginPage:
     def click_logout(self) -> None:
         """Click the logout button."""
         WebDriverWait(self.driver, 10).until(
-            ec.element_to_be_clickable(self.logout_button)
+            EC.element_to_be_clickable(self.logout_button)
         ).click()
 
     def is_logout_successful(self) -> bool:
         """Check if the user is successfully logged out by checking the URL or a specific element."""
         WebDriverWait(self.driver, 3).until(
-            ec.url_changes(self.driver.current_url)  # Wait for the URL to change
+            EC.url_changes(self.driver.current_url)  # Wait for the URL to change
         )
         return self.driver.current_url == Urls.LOGOUT_PAGE

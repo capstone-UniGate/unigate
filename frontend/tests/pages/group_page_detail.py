@@ -6,19 +6,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 
 class GroupPageDetail:
-    URL = "http://localhost:3000/groups/{group_id}"
-
-    def __init__(self, driver: WebDriver, group_id: str) -> None:
+    def __init__(self, driver: WebDriver) -> None:
         self.driver = driver
-        self.group_id = group_id
         self.wait = WebDriverWait(driver, 1000)
-
-    def navigate(self) -> None:
-        self.driver.get(self.URL)
-
-    def load(self) -> None:
-        """Load the group page."""
-        self.driver.get(self.URL.format(group_id=self.group_id))
 
     def is_manage_requests_section_visible(self) -> bool:
         """Check if the Manage Join Requests section is visible."""
@@ -28,13 +18,15 @@ class GroupPageDetail:
         except Exception:  # noqa: BLE001
             return False
 
-    def get_join_requests(self) -> list | None:
+    def get_join_requests(self) -> list[WebElement] | None:
         """Return all join requests as elements."""
         return self.driver.find_elements(By.CSS_SELECTOR, ".scroll-area ul li")
 
     def approve_request(self, request_index: int) -> None:
         """Approve a join request by its index."""
         requests = self.get_join_requests()
+        if requests is None:
+            raise TypeError
         if request_index >= len(requests):
             raise IndexError("Request index out of range.")
         approve_button = requests[request_index].find_element(
@@ -45,6 +37,8 @@ class GroupPageDetail:
     def reject_request(self, request_index: int) -> None:
         """Reject a join request by its index."""
         requests = self.get_join_requests()
+        if requests is None:
+            raise TypeError
         if request_index >= len(requests):
             raise IndexError("Request index out of range.")
         reject_button = requests[request_index].find_element(
@@ -55,6 +49,8 @@ class GroupPageDetail:
     def block_request(self, request_index: int) -> None:
         """Block a join request by its index."""
         requests = self.get_join_requests()
+        if requests is None:
+            raise TypeError
         if request_index >= len(requests):
             raise IndexError("Request index out of range.")
         block_button = requests[request_index].find_element(
@@ -86,3 +82,30 @@ class GroupPageDetail:
         leave_button = self.driver.find_element(By.ID, "leave-group-button")
         # leave_button.send_keys(Keys.ENTER)
         leave_button.click()
+
+    def click_members(self) -> None:
+        members_button = self.driver.find_element(By.ID, "members_list")
+        # members_button.send_keys(Keys.ENTER)
+        members_button.click()
+
+    def check_description(self) -> bool:
+        description_element = self.driver.find_element(
+            By.CSS_SELECTOR, ".text-gray-600"
+        )
+        return description_element.is_displayed() and description_element.text != ""
+
+    def check_members_link(self) -> bool:
+        members_link = self.driver.find_element(By.CSS_SELECTOR, "a.text-blue-500")
+        return members_link.is_displayed()
+
+    def check_ask_join(self) -> bool:
+        join_button = self.driver.find_element(By.ID, "ask-to-join-button")
+        return join_button.is_displayed()
+
+    def check_leave(self) -> bool:
+        leave_button = self.driver.find_element(By.ID, "leave-group-button")
+        return leave_button.is_displayed()
+
+    def check_manage(self) -> bool:
+        manage_button = self.driver.find_element(By.ID, "Manage_requests")
+        return manage_button.is_displayed()

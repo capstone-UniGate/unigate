@@ -170,6 +170,7 @@ import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
+import {} from "@/composables/useGroups";
 import * as z from "zod";
 
 const { toast } = useToast();
@@ -258,14 +259,13 @@ const formHasErrors = computed(() => Object.keys(errors.value).length > 0);
 // Handle form submission
 const onSubmit = handleSubmit(async (values) => {
   try {
-    await createGroup({
+    let result = await createGroup({
       name: values.name,
       description: values.description,
       category: values.course,
       type: values.isPublic,
       tags: tags.value,
     });
-
     toast({
       variant: "success",
       description: "Group created successfully!",

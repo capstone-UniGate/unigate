@@ -97,6 +97,7 @@
               <NuxtLink
                 :to="`/groups/${groupId}/students`"
                 class="text-blue-500 hover:underline"
+                id="members_list"
               >
                 members
               </NuxtLink>
@@ -110,6 +111,7 @@
           >
             <Button
               @click="toggleRequests"
+              id="Manage_requests"
               class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-blue-600 hover:shadow-xl active:scale-95 transition-all"
             >
               {{ showRequests ? "Hide Requests" : "Manage Requests" }}
