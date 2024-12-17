@@ -6,6 +6,27 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 
 class GroupPageDetail:
+    # Element Locators
+    # BLOCK_BUTTON = (By.CSS_SELECTOR, '[data-test="block-user-button"]')
+
+    REQUESTS_SECTION = (By.XPATH, "//div[@v-if='showRequests']")
+    BLOCK_BUTTON_XPATH = (
+        By.XPATH,
+        "//button[normalize-space(text())='Block']",
+    )  # Using text-based XPath
+
+    REQUEST_ITEM = (By.CSS_SELECTOR, ".request-item")
+    SUCCESS_TOAST = (By.CSS_SELECTOR, ".toast-success")
+    ERROR_TOAST = (By.CSS_SELECTOR, ".toast-error")
+    LOADING_INDICATOR = (By.CSS_SELECTOR, ".loading-indicator")
+    REQUEST_LIST = (By.CSS_SELECTOR, ".requests-list")
+    MANAGE_REQUESTS_BUTTON = (By.ID, "Manage_requests")
+
+    BLOCK_BUTTONS = (
+        By.XPATH,
+        "//button[contains(@class, 'bg-red-500') and text()='Block']",
+    )
+
     def __init__(self, driver: WebDriver) -> None:
         self.driver = driver
         self.wait = WebDriverWait(driver, 1000)
@@ -109,3 +130,43 @@ class GroupPageDetail:
     def check_manage(self) -> bool:
         manage_button = self.driver.find_element(By.ID, "Manage_requests")
         return manage_button.is_displayed()
+
+    def click_block_user_button(self):
+        block_button = self.wait.until(EC.element_to_be_clickable(self.BLOCK_BUTTON))
+        block_button.click()
+
+    def confirm_block_action(self):
+        block_button = self.wait.until(EC.element_to_be_clickable(self.BLOCK_BUTTON))
+        block_button.click()
+
+    def verify_user_blocked(self):
+        toast = self.wait.until(EC.visibility_of_element_located(self.SUCCESS_TOAST))
+        assert "User has been successfully blocked from the group." in toast.text
+
+    def verify_request_removed(self, request_id):
+        requests = self.driver.find_elements(*self.REQUEST_LIST)
+        for request in requests:
+            assert request_id not in request.text
+
+    def verify_loading_indicator_visible(self):
+        self.wait.until(EC.visibility_of_element_located(self.LOADING_INDICATOR))
+
+    def verify_error_message(self, message):
+        toast = self.wait.until(EC.visibility_of_element_located(self.ERROR_TOAST))
+        assert message in toast.text
+
+    def click_request_item(self, request_id):
+        request_item = self.wait.until(
+            EC.element_to_be_clickable(self.MANAGE_REQUESTS_BUTTON)
+        )
+        request_item.click()
+
+    def click_block_button(self, request_index: int = 0) -> None:
+        self.wait.until(EC.presence_of_element_located(self.REQUESTS_SECTION))
+        # Wait for the Block button to be clickable based on text (assumes first button found is correct)
+        block_button = self.wait.until(
+            EC.element_to_be_clickable(self.BLOCK_BUTTON_XPATH)
+        )
+
+        # Click the Block button
+        block_button.click()
