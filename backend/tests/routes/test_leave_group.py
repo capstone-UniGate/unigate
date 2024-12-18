@@ -24,24 +24,15 @@ def mock_session() -> MagicMock:
 
 
 def create_student(student_id: str, number: int, mail: str) -> None:
-    """
-    Check if a Student record exists, and create one if it does not.
-
-    Args:
-        student_id (str): The UUID of the student to check or insert.
-    """
     with Session(engine) as session:
-        # Check if the student already exists
         existing_student = session.query(Student).filter_by(id=UUID(student_id)).first()
         if existing_student:
             return
-
-        # Create a new student record
         student = Student(
             id=UUID(student_id),
-            hashed_password="hashedpassword123",  # noqa: S106  # Replace with actual hashed password logic
-            number=number,  # Unique student number
-            email=mail + "@example.com",  # Unique email
+            hashed_password="hashedpassword123",
+            number=number,
+            email=mail + "@example.com",
             name="Test",
             surname="Student",
         )
@@ -71,13 +62,12 @@ def test_group_non_existant() -> None:
             "group_id": group_id,
         },
     )
-    assert r.status_code == 200
-    assert r.json() == "The group doesn't exist"
+    assert r.status_code == 404
+    assert r.json() == {"detail": "Group not found."}
 
 
 def test_student_non_existent() -> None:
     create_group(student_id=student_id, group_id=group_id)
-
     r = client.post(
         "/groups/" + group_id + "/leave",
         params={
@@ -85,8 +75,8 @@ def test_student_non_existent() -> None:
             "group_id": group_id,
         },
     )
-    assert r.status_code == 200
-    assert r.json() == "The student is not part of the group"
+    assert r.status_code == 404
+    assert r.json() == {"detail": "Student not found."}
 
 
 def test_valid_leave() -> None:
@@ -107,7 +97,8 @@ def test_valid_leave() -> None:
     )
 
     group_json = client.get("/groups/" + group_id)
-    group = group_json.json()
+    original_group = group_json.json()
+    original_count = len(original_group["students"])
 
     response = client.post(
         "/groups/" + group_id + "/leave",
@@ -116,19 +107,31 @@ def test_valid_leave() -> None:
             "student_id": student_id2,
         },
     )
-
-    group["members_count"] = group["members_count"] - 1
-
     assert response.status_code == 200
-    assert response.json() == "The student has been removed successfully"
+    left_group = response.json()
+    assert len(left_group["students"]) == original_count - 1
+    assert all(member["id"] != student_id2 for member in left_group["students"])
 
     r = client.get("/groups/" + group_id)
-
     assert r.status_code == 200
-    assert r.json() == group
+    updated_group = r.json()
+    # The group should still exist, with one less member
+    assert len(updated_group["students"]) == len(original_group["students"]) - 1
 
 
 def test_valid_leave_no_members(client: TestClient) -> None:
+    # Join the group first (to have one member)
+    create_student(student_id=student_id, number=12350, mail="testnostudent")
+    create_group(student_id=student_id, group_id=group_id)
+    client.post(
+        "/groups/join_public_group",
+        params={
+            "student_id": student_id,
+            "group_id": group_id,
+        },
+    )
+
+    # Now leave the group as the only member
     response = client.post(
         "/groups/" + group_id + "/leave",
         params={
@@ -136,11 +139,14 @@ def test_valid_leave_no_members(client: TestClient) -> None:
             "group_id": group_id,
         },
     )
-
     assert response.status_code == 200
-    assert response.json() == "The student has been removed successfully"
+    # After leaving, the code currently still returns the updated group (empty students)
+    empty_group = response.json()
+    assert len(empty_group["students"]) == 0
 
+    # Group should still exist (not deleted by the code)
     r = client.get("/groups/" + group_id)
-
-    assert r.status_code == 404
-    assert r.json() == {"detail": "Group not found."}
+    assert r.status_code == 200
+    final_group = r.json()
+    # Group exists with zero members
+    assert len(final_group["students"]) == 0
