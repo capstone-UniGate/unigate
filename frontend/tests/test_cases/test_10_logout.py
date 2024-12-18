@@ -33,6 +33,7 @@ class TestLogout(BaseTest):
         4. Verify login form is visible
         """
         # Perform logout
+        time.sleep(0.5)
         self.main_page.click_logout()
 
         # Wait for login form to be visible

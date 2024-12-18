@@ -14,6 +14,7 @@
           <li
             v-for="request in requests"
             :key="request.id"
+            id="request"
             class="flex items-center justify-between gap-x-12 bg-white rounded-lg shadow-md p-6 hover:shadow-lg hover:scale-105 transition-transform duration-300"
           >
             <!-- Profile Section -->
@@ -36,18 +37,21 @@
                 <button
                   @click="handleRequest(request.id, 'reject')"
                   class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition mr-5"
+                  id="reject_btn"
                 >
                   Reject
                 </button>
                 <button
                   @click="handleRequest(request.id, 'approve')"
                   class="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-lg hover:bg-green-600 transition"
+                  id="approve_btn"
                 >
                   Approve
                 </button>
                 <button
                   @click="handleRequest(request.id, 'block')"
                   class="px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded-lg hover:bg-gray-600 transition ml-5"
+                  id="block_btn"
                 >
                   Block
                 </button>

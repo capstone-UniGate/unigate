@@ -47,6 +47,7 @@ class LoginPage:
 
     def login(self, username: str, password: str) -> None:
         self.is_login_form_visible()
+        time.sleep(0.5)
         username_field = self.driver.find_element(By.ID, "username")
         username_field.send_keys(str(username))
         password_field = self.driver.find_element(By.ID, "password")
