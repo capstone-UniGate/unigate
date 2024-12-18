@@ -238,13 +238,13 @@ onMounted(async () => {
 
           <div class="flex-grow">
             <div class="flex flex-col">
-              <span class="text-gray-800 font-bold">
+              <span class="text-gray-800 font-bold" id="blocked_student_name">
                 {{ user.name }} {{ user.surname }}
               </span>
-              <span class="text-gray-600 text-sm">
+              <span class="text-gray-600 text-sm" id="blocked_student_email">
                 {{ user.email }}
               </span>
-              <span class="text-gray-500 text-xs">
+              <span class="text-gray-500 text-xs" id="blocked_student_number">
                 Student #{{ user.number }}
               </span>
             </div>

@@ -122,19 +122,24 @@
               <div v-if="isLoadingRequests">
                 <LoadingIndicator />
               </div>
-              <div v-else-if="requests.length === 0" class="text-gray-500">
+              <div
+                v-else-if="requests.length === 0"
+                id="no_requests"
+                class="text-gray-500"
+              >
                 No pending requests
               </div>
               <div v-else class="space-y-4">
                 <div
                   v-for="request in requests"
                   :key="request.id"
+                  id="request"
                   class="bg-white p-4 rounded-lg shadow border"
                 >
                   <div class="flex items-center justify-between">
                     <div>
                       <p class="font-medium">{{ request.student?.name }}</p>
-                      <p class="text-sm text-gray-500">
+                      <p class="text-sm text-gray-500" id="request_status">
                         Status: {{ request.status }}
                       </p>
                     </div>
@@ -142,18 +147,21 @@
                       <Button
                         @click="handleRequest(request.id, 'approve')"
                         class="bg-green-500 hover:bg-green-600 col-span-2"
+                        id="approve_button"
                       >
                         Approve
                       </Button>
                       <Button
                         @click="handleRequest(request.id, 'reject')"
                         class="bg-red-500 hover:bg-red-600"
+                        id="reject_button"
                       >
                         Reject
                       </Button>
                       <Button
                         @click="handleRequest(request.id, 'block')"
                         class="bg-red-500 hover:bg-red-600"
+                        id="block_button"
                       >
                         Block
                       </Button>
@@ -186,7 +194,7 @@
             <div v-if="isLoadingStatus">
               <LoadingIndicator />
             </div>
-            <div v-else>
+            <div v-else id="request_status_student">
               <p
                 v-if="
                   userRequestStatus && userRequestStatus.includes('PENDING')
@@ -447,7 +455,7 @@ const joinGroups = async () => {
   } catch (error) {
     toast({
       variant: "destructive",
-      description: "Failed to join group",
+      description: error,
     });
   }
 };

@@ -34,7 +34,7 @@ class TestLogin(BaseTest):
 
     def test_failed_login_invalid_credentials(self, page: LoginPage) -> None:
         # Define expected error message for invalid login
-        time.sleep(1)
+        time.sleep(0.5)
         expected_error_msg = "Login failed."
 
         # Enter invalid credentials and attempt to log in
@@ -56,7 +56,7 @@ class TestLogin(BaseTest):
         assert page.is_password_empty()
 
     def test_login_network_error(self, page: LoginPage) -> None:
-        time.sleep(1)
+        time.sleep(0.5)
 
         page.enter_username(TestData.VALID_USERNAME)
         page.enter_password(TestData.VALID_PASSWORD)

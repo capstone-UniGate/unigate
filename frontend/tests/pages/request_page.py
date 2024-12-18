@@ -5,12 +5,11 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
 
-from tests.constants import Urls
 from tests.pages.base_page import BasePage
 
 
 class RequestPage(BasePage):
-    URL = Urls.JOIN_REQUESTS_PAGE
+    # URL = Urls.JOIN_REQUESTS_PAGE
     # Locators using standard CSS selectors
     PAGE_HEADING = (By.CSS_SELECTOR, "h1")
     LIST_REQUESTS = (By.CSS_SELECTOR, "<ul role='list'")
@@ -21,13 +20,6 @@ class RequestPage(BasePage):
     def __init__(self, driver: webdriver.Chrome) -> None:
         super().__init__(driver)
         self.wait = WebDriverWait(driver, 10)
-
-    def load(self) -> bool:
-        try:
-            self.driver.get(self.URL)
-        except Exception:  # noqa: BLE001
-            return False
-        return True
 
     def is_heading_visible(self) -> bool:
         try:

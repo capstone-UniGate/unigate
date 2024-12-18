@@ -21,10 +21,11 @@ class TestLeaveGroup:
         group_card = (self.page.get_group_cards())[0]
         self.page.click_button(group_card)
 
-        time.sleep(1)
+        time.sleep(0.5)
         # Click the button
         self.group_page_detail.click_leave()
         # Small wait to allow alert to appear
+        time.sleep(0.5)
         self.group_page_detail.click_members()
         members_emails = self.group_page_members.get_members_email()
         assert (

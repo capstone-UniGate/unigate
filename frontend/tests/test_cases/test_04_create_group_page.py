@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
@@ -15,6 +17,7 @@ class TestGroupCreate(BaseTest):
         self.page.navigate()
 
     def test_create_group_form(self) -> None:
+        time.sleep(0.5)
         self.page.fill_form(TestData.VALID_GROUP)
         self.page.click_create()
         self.wait.until(EC.url_to_be(url=Urls.GROUP_PAGE))
@@ -22,6 +25,7 @@ class TestGroupCreate(BaseTest):
     def test_form_validation(self) -> None:
         # Define expected validation messages
         expected_messages: dict[str, str | int] = {"required": "Required", "count": 5}
+        time.sleep(0.5)
         self.page.click_create()
         error_messages = self.page.get_error_messages()
 
@@ -34,5 +38,6 @@ class TestGroupCreate(BaseTest):
         ), f"Expected {expected_messages['count']} 'Required' messages, but got {actual_required_count}. Messages: {error_messages}"
 
     def test_cancel_button(self) -> None:
+        time.sleep(0.5)
         self.page.click_cancel()
         self.wait.until(EC.url_to_be(url=Urls.GROUP_PAGE))
