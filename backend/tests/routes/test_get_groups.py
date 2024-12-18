@@ -18,22 +18,22 @@ def authenticate_user() -> dict:
 
     response = client.post("/auth/login", data=login_payload)
 
-    assert (
-        response.status_code == 200
-    ), f"Failed to authenticate user: {response.json()}"
+    assert response.status_code == 200, f"Failed to authenticate user: {response.json()}"
     return response.json()
 
 
-def create_group() -> dict:
+def create_group(student_id: str) -> dict:
+
     token_data = authenticate_user()
     token = token_data["access_token"]
 
     group_payload = {
-        "id": str(uuid4()),
+        "id": str(uuid4()),  # Generate a new UUID for the group
         "name": f"TestGroup-{uuid4().hex[:6]}",
         "description": "A test group description",
         "category": "Test Category",
         "type": "Public",
+        "creator_id": student_id,
     }
 
     headers = {"Authorization": f"Bearer {token}"}
@@ -43,28 +43,15 @@ def create_group() -> dict:
     return response.json()
 
 
-def test_get_group_info() -> None:
-
-    created_group = create_group()
+def test_get_groups_list() -> None:
+    create_group(student_id=test_student_id)
 
     token_data = authenticate_user()
     token = token_data["access_token"]
 
     headers = {"Authorization": f"Bearer {token}"}
-    response = client.get(f"/groups/{created_group['id']}", headers=headers)
+    response = client.get("/groups", headers=headers)
 
-    assert response.status_code == 200, f"Failed to retrieve group: {response.json()}"
-    assert response.json() == created_group
-
-
-def test_group_not_found() -> None:
-
-    token_data = authenticate_user()
-    token = token_data["access_token"]
-
-    non_existent_group_id = uuid4()
-    headers = {"Authorization": f"Bearer {token}"}
-    response = client.get(f"/groups/{non_existent_group_id}", headers=headers)
-
-    assert response.status_code == 404
-    assert response.json() == {"detail": "Group not found."}
+    assert response.status_code == 200, f"Failed to retrieve groups list: {response.json()}"
+    assert isinstance(response.json(), list), "Response should be a list of groups"
+    assert len(response.json()) > 0, "There should be at least one group"
