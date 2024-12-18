@@ -23,7 +23,9 @@ def authenticate_user() -> dict:
         "password": test_student_password,
     }
     response = client.post("/auth/login", data=login_payload)
-    assert response.status_code == 200, f"Failed to authenticate user: {response.json()}"
+    assert (
+        response.status_code == 200
+    ), f"Failed to authenticate user: {response.json()}"
     return response.json()
 
 
@@ -115,7 +117,9 @@ def test_create_request_already_exists() -> None:
     client.post(f"/groups/{created_group_id}/join", headers=headers)
     response = client.post(f"/groups/{created_group_id}/join", headers=headers)
 
-    assert response.status_code == 200, f"Expected success (200), got {response.status_code}"
+    assert (
+        response.status_code == 200
+    ), f"Expected success (200), got {response.status_code}"
 
 
 def test_get_all_requests_for_group() -> None:
@@ -160,7 +164,9 @@ def test_reject_request_success() -> None:
         return
     request_id = requests_data[0]["id"]
 
-    reject_response = client.post(f"/groups/{created_group_id}/requests/{request_id}/reject", headers=headers)
+    reject_response = client.post(
+        f"/groups/{created_group_id}/requests/{request_id}/reject", headers=headers
+    )
     assert reject_response.status_code == 200
 
 
@@ -182,9 +188,13 @@ def test_reject_request_already_rejected() -> None:
     request_id = requests_data[0]["id"]
 
     # Reject it once
-    client.post(f"/groups/{created_group_id}/requests/{request_id}/reject", headers=headers)
+    client.post(
+        f"/groups/{created_group_id}/requests/{request_id}/reject", headers=headers
+    )
     # Reject again should fail with 400 and "Request is already rejected."
-    second_response = client.post(f"/groups/{created_group_id}/requests/{request_id}/reject", headers=headers)
+    second_response = client.post(
+        f"/groups/{created_group_id}/requests/{request_id}/reject", headers=headers
+    )
 
     assert second_response.status_code == 400
     assert second_response.json() == {"detail": "Request is already rejected."}
@@ -211,5 +221,7 @@ def test_approve_request_success() -> None:
         return
     request_id = requests_data[0]["id"]
 
-    approve_response = client.post(f"/groups/{created_group_id}/requests/{request_id}/approve", headers=headers)
+    approve_response = client.post(
+        f"/groups/{created_group_id}/requests/{request_id}/approve", headers=headers
+    )
     assert approve_response.status_code == 200

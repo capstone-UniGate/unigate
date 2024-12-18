@@ -25,7 +25,9 @@ def authenticate_user() -> dict:
     }
 
     response = client.post("/auth/login", data=login_payload)
-    assert response.status_code == 200, f"Failed to authenticate user: {response.json()}"
+    assert (
+        response.status_code == 200
+    ), f"Failed to authenticate user: {response.json()}"
     return response.json()
 
 
@@ -69,7 +71,9 @@ def test_create_group_success() -> None:
     }
 
     response = client.post("/groups", json=valid_group_payload, headers=headers)
-    assert response.status_code == 200, f"Expected status code 200, but got {response.status_code}"
+    assert (
+        response.status_code == 200
+    ), f"Expected status code 200, but got {response.status_code}"
 
     data = response.json()
     assert data["name"] == valid_group_payload["name"]
@@ -114,7 +118,9 @@ def test_get_group_info() -> None:
         "type": "Public",
         "creator_id": test_student_id,
     }
-    create_group_response = client.post("/groups", json=valid_group_payload, headers=headers)
+    create_group_response = client.post(
+        "/groups", json=valid_group_payload, headers=headers
+    )
     assert create_group_response.status_code == 200, "Group creation failed"
     created_group = create_group_response.json()
 
