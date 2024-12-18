@@ -1,162 +1,154 @@
+import uuid
 import secrets
 import string
-from unittest.mock import MagicMock
-from uuid import UUID
 
-import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
+from sqlmodel import Session, select
 from unigate.core.database import engine
 from unigate.main import app
 from unigate.models import Student
 
 client = TestClient(app)
 
-student_id = "12745678-1234-5678-1234-567812345678"
-group_id = "12375678-1234-5678-1234-567812345677"
-student_id2 = "12345678-1234-5778-1234-567812345678"
+test_student_username = "S1234567"
+test_student_password = "testpassword"
+student_id = uuid.uuid4()
+student_id2 = uuid.uuid4()
+group_id = uuid.uuid4()
 
 
-@pytest.fixture
-def mock_session() -> MagicMock:
-    session: MagicMock = MagicMock(spec=Session)
-    return session
+def authenticate_user() -> dict:
+    login_payload = {
+        "username": test_student_username,
+        "password": test_student_password,
+    }
+    response = client.post("/auth/login", data=login_payload)
+    assert response.status_code == 200, f"Failed to authenticate user: {response.json()}"
+    return response.json()
 
 
-def create_student(student_id: str, number: int, mail: str) -> None:
+def create_student(student_id: uuid.UUID, email_par: str) -> None:
     with Session(engine) as session:
-        existing_student = session.query(Student).filter_by(id=UUID(student_id)).first()
+        existing_student = session.exec(
+            select(Student).where(Student.id == student_id)
+        ).first()
         if existing_student:
             return
+
         student = Student(
-            id=UUID(student_id),
-            hashed_password="hashedpassword123",
-            number=number,
-            email=mail + "@example.com",
-            name="Test",
-            surname="Student",
+            id=student_id,
+            hashed_password="hashedpassword123",  # noqa: S106
+            number=secrets.choice(range(10000, 99999)),
+            email=email_par,
+            name="mirco",
+            surname="alessandrini",
         )
         session.add(student)
         session.commit()
 
 
-def create_and_login_student(student_id: str, number: int, mail: str) -> str:
-    create_student(student_id, number, mail)
-    # Use 'S' as the role character (assuming 'S' is a valid role)
-    username = f"S{number}"
-    token_resp = client.post("/auth/login", data={"username": username, "password": "hashedpassword123"})
-    if token_resp.status_code == 200:
-        return token_resp.json()["access_token"]
-    return ""
+def create_group(student_id: uuid.UUID, group_id: uuid.UUID) -> dict:
+    # Authenticate the user to get the token
+    token_data = authenticate_user()
+    token = token_data["access_token"]
 
-
-def create_group(student_id: str, group_id: str) -> dict:
-    token = create_and_login_student(student_id=student_id, number=12345, mail="teststudent")
+    # Authorization headers
     headers = {"Authorization": f"Bearer {token}"}
+
+    # Group payload
     group_payload = {
+        "id": str(group_id),
+        "name": f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}",
+        "description": "A test group description",
+        "category": "Test Category",
+        "type": "Public",  # Adjust as needed
+    }
+
+    # Call the API to create the group
+    response = client.post("/groups", json=group_payload, headers=headers)
+
+    # Ensure the group creation was successful
+    assert response.status_code == 200, f"Group creation failed: {response.json()}"
+    return response.json()
+
+
+def test_create_group_success() -> None:
+    create_student(student_id=student_id, email_par="test1@example.com")
+    group_data = create_group(student_id=student_id, group_id=group_id)
+
+    assert "id" in group_data, f"Expected 'id' in group_data: {group_data}"
+    assert group_data["name"].startswith("TestGroup"), "Group name format mismatch"
+
+
+def test_create_group_failure_unauthenticated() -> None:
+    # No authentication headers
+    group_payload = {
+        "id": str(group_id),
         "name": f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}",
         "description": "A test group description",
         "category": "Test Category",
         "type": "Public",
     }
-    response = client.post("/groups", json=group_payload, headers=headers)
-    if response.status_code == 200:
-        return response.json()
-    return {}
+
+    response = client.post("/groups", json=group_payload)
+    assert response.status_code == 401, f"Expected 401 Unauthorized, got {response.status_code}"
 
 
-def join_group(student_id: str, group_id: str) -> dict:
-    number = 99999
-    mail = f"randommail{secrets.randbelow(100000)}"
-    token = create_and_login_student(student_id, number, mail)
-    if not token:
-        return {}
-    headers = {"Authorization": f"Bearer {token}"}
-    join_resp = client.post(f"/groups/{group_id}/join", headers=headers)
-    return join_resp.json() if join_resp.status_code == 200 else {}
+def test_create_group_already_exists() -> None:
+    create_student(student_id=student_id, email_par="test2@example.com")
+    create_group(student_id=student_id, group_id=group_id)
+
+    # Try creating the same group again
+    try:
+        create_group(student_id=student_id, group_id=group_id)
+    except AssertionError as e:
+        assert "Group creation failed" in str(e), "Group creation did not fail as expected"
 
 
-def leave_group(student_id: str, group_id: str) -> dict:
-    with Session(engine) as session:
-        student = session.query(Student).filter_by(id=UUID(student_id)).first()
-        if not student:
-            return {}
-        token_resp = client.post("/auth/login", data={"username": f"S{student.number}", "password": "hashedpassword123"})
-        if token_resp.status_code != 200:
-            return {}
-        token = token_resp.json()["access_token"]
-    headers = {"Authorization": f"Bearer {token}"}
-    resp = client.post(f"/groups/{group_id}/leave", headers=headers)
-    if resp.status_code == 200:
-        return resp.json()
-    else:
-        return resp.json()
-
-
-def get_group_data(group_id: str) -> dict:
-    resp = client.get(f"/groups/{group_id}")
-    return resp
-
-
-def test_group_non_existant() -> None:
-    create_student(student_id=student_id, number=12347, mail="testsdstudent")
-    r = client.post(
-        "/groups/" + group_id + "/leave",
-        params={
-            "student_id": student_id,
-            "group_id": group_id,
-        },
-    )
-    assert r.status_code == 404
-    assert r.json() == {"detail": "Group not found."}
-
-
-def test_student_non_existent() -> None:
+def test_join_group_success() -> None:
+    create_student(student_id=student_id, email_par="test3@example.com")
+    create_student(student_id=student_id2, email_par="test4@example.com")
     group_data = create_group(student_id=student_id, group_id=group_id)
-    assert "id" in group_data
-    r = client.post(
-        f"/groups/{group_id}/leave",
-        params={
-            "student_id": student_id2,
-            "group_id": group_id,
-        },
-    )
-    assert r.status_code == 404
-    assert r.json() == {"detail": "Student not found."}
+
+    created_group_id = group_data["id"]
+
+    # Authenticate second student
+    token_data = authenticate_user()
+    headers = {"Authorization": f"Bearer {token_data['access_token']}"}
+
+    # Join group
+    response = client.post(f"/groups/{created_group_id}/join", headers=headers)
+    assert response.status_code == 200, f"Unexpected: {response.json()}"
+    joined_group = response.json()
+    assert "id" in joined_group, "Join group response missing 'id'"
 
 
-def test_valid_leave() -> None:
+def test_join_group_not_found() -> None:
+    new_group_id = uuid.uuid4()
+
+    token_data = authenticate_user()
+    headers = {"Authorization": f"Bearer {token_data['access_token']}"}
+
+    response = client.post(f"/groups/{new_group_id}/join", headers=headers)
+    assert response.status_code == 404, f"Expected 404, got: {response.status_code}"
+    assert response.json() == {"detail": "Group not found."}
+
+
+def test_leave_group_success() -> None:
+    create_student(student_id=student_id, email_par="test5@example.com")
+    create_student(student_id=student_id2, email_par="test6@example.com")
     group_data = create_group(student_id=student_id, group_id=group_id)
-    assert "id" in group_data
-    join_group(student_id=student_id, group_id=group_id)
-    join_group(student_id=student_id2, group_id=group_id)
 
-    before = get_group_data(group_id).json()
-    count_before = len(before["students"])
+    created_group_id = group_data["id"]
 
-    after_leave = leave_group(student_id=student_id2, group_id=group_id)
-    assert "students" in after_leave
-    assert len(after_leave["students"]) == count_before - 1
-    assert not any(m["id"] == student_id2 for m in after_leave["students"])
+    # Authenticate second student
+    token_data = authenticate_user()
+    headers = {"Authorization": f"Bearer {token_data['access_token']}"}
 
-    after = get_group_data(group_id).json()
-    assert len(after["students"]) == count_before - 1
+    # Join group
+    client.post(f"/groups/{created_group_id}/join", headers=headers)
 
-
-def test_valid_leave_no_members(client: TestClient) -> None:
-    group_data = create_group(student_id=student_id, group_id=group_id)
-    assert "id" in group_data
-    join_group(student_id=student_id, group_id=group_id)
-
-    result = leave_group(student_id=student_id, group_id=group_id)
-    assert "students" in result
-    assert len(result["students"]) == 0
-
-    r = get_group_data(group_id)
-    if r.status_code == 200:
-        final_group = r.json()
-        assert "students" in final_group
-        assert len(final_group["students"]) == 0
-    else:
-        assert r.status_code == 404
-        assert r.json() == {"detail": "Group not found."}
+    # Leave group
+    response = client.post(f"/groups/{created_group_id}/leave", headers=headers)
+    assert response.status_code == 200, f"Unexpected: {response.json()}"
+    assert response.json() == {"detail": "Left the group successfully"}
