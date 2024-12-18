@@ -1,11 +1,16 @@
+import time
+
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
 
+from .base_page import BasePage
 
-class GroupPageDetail:
+
+class GroupPageDetail(BasePage):
     def __init__(self, driver: WebDriver) -> None:
         self.driver = driver
         self.wait = WebDriverWait(driver, 1000)
@@ -20,7 +25,16 @@ class GroupPageDetail:
 
     def get_join_requests(self) -> list[WebElement] | None:
         """Return all join requests as elements."""
-        return self.driver.find_elements(By.CSS_SELECTOR, ".scroll-area ul li")
+        return self.driver.find_elements(By.ID, "request")
+
+    def get_status(self, request_index: int) -> str:
+        """Approve a join request by its index."""
+        requests = self.get_join_requests()
+        if requests is None:
+            raise TypeError
+        if request_index >= len(requests):
+            raise IndexError("Request index out of range.")
+        return requests[request_index].find_element(By.ID, "request_status").text
 
     def approve_request(self, request_index: int) -> None:
         """Approve a join request by its index."""
@@ -29,9 +43,7 @@ class GroupPageDetail:
             raise TypeError
         if request_index >= len(requests):
             raise IndexError("Request index out of range.")
-        approve_button = requests[request_index].find_element(
-            By.XPATH, ".//button[contains(@alt, 'Approved')]"
-        )
+        approve_button = requests[request_index].find_element(By.ID, "approve_button")
         approve_button.click()
 
     def reject_request(self, request_index: int) -> None:
@@ -41,9 +53,7 @@ class GroupPageDetail:
             raise TypeError
         if request_index >= len(requests):
             raise IndexError("Request index out of range.")
-        reject_button = requests[request_index].find_element(
-            By.XPATH, ".//button[contains(@alt, 'Reject')]"
-        )
+        reject_button = requests[request_index].find_element(By.ID, "reject_button")
         reject_button.click()
 
     def block_request(self, request_index: int) -> None:
@@ -53,9 +63,7 @@ class GroupPageDetail:
             raise TypeError
         if request_index >= len(requests):
             raise IndexError("Request index out of range.")
-        block_button = requests[request_index].find_element(
-            By.XPATH, ".//button[contains(@alt, 'Block')]"
-        )
+        block_button = requests[request_index].find_element(By.ID, "block_button")
         block_button.click()
 
     def get_toast_message(self) -> str:
@@ -75,6 +83,12 @@ class GroupPageDetail:
 
     def click_join(self) -> None:
         create_button = self.driver.find_element(By.ID, "join-group-button")
+        create_button.send_keys(Keys.ENTER)
+        create_button.click()
+
+    def click_ask_to_join(self) -> None:
+        create_button = self.driver.find_element(By.ID, "ask-to-join-button")
+        time.sleep(0.5)
         # create_button.send_keys(Keys.ENTER)
         create_button.click()
 
@@ -109,3 +123,16 @@ class GroupPageDetail:
     def check_manage(self) -> bool:
         manage_button = self.driver.find_element(By.ID, "Manage_requests")
         return manage_button.is_displayed()
+
+    def check_req(self) -> bool:
+        request_status = self.driver.find_element(By.ID, "request_status_student")
+        return (
+            request_status.is_displayed()
+            and request_status.text == "Your request status: PENDING"
+        )
+
+    def click_manage(self) -> None:
+        self.driver.find_element(By.ID, "Manage_requests").click()
+
+    def check_no_reqs(self) -> bool:
+        return self.driver.find_element(By.ID, "no_requests").is_displayed()

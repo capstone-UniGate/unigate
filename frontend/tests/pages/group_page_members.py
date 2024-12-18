@@ -45,6 +45,9 @@ class GroupPageMembers(BasePage):
     def get_blocked(self) -> list[WebElement]:
         return self.driver.find_elements(By.ID, "blocked_student")
 
+    def get_blocked_emails(self) -> list[WebElement]:
+        return self.driver.find_elements(By.ID, "blocked_student_email")
+
     def unblock_member(self) -> None:
         member = self.get_blocked()[0]
         member.find_element(By.ID, "unblock_student").click()

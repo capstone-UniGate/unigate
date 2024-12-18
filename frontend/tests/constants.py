@@ -27,6 +27,5 @@ class Urls:
     GROUP_PAGE = f"{BASE_URL}/groups"
     SEE_MY_GROUP = f"{GROUP_PAGE}/see-my-group"
     CREATE_GROUP_PAGE = f"{GROUP_PAGE}/create"
-    JOIN_REQUESTS_PAGE = f"{GROUP_PAGE}/1/requests"
     LOGIN_PAGE = f"{BASE_URL}/login"
     LOGOUT_PAGE = f"{BASE_URL}/login?message=You have successfully logged out."
