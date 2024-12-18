@@ -1,13 +1,13 @@
 import secrets
 import string
+from typing import Literal
 from uuid import UUID
+
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
-from typing import Literal
-
+from unigate.core.database import engine
 from unigate.main import app
 from unigate.models import Student
-from unigate.core.database import engine
 
 client = TestClient(app)
 
@@ -16,6 +16,7 @@ ADMIN_USERNAME = "S4989646"  # Admin (Super Student) username
 NON_ADMIN_USERNAME = "S1234567"  # Non-admin student username
 PASSWORD = "testpassword"
 STUDENT_ID = "dd2cb931-3373-4fc1-a689-864102fadd95"
+
 
 def authenticate_user(user_type: Literal["admin", "non-admin"] = "admin") -> str:
     """
@@ -31,6 +32,7 @@ def authenticate_user(user_type: Literal["admin", "non-admin"] = "admin") -> str
         response.status_code == 200
     ), f"Failed to authenticate user: {response.json()}"
     return response.json()["access_token"]
+
 
 def create_student(student_id: str) -> None:
     """
@@ -55,6 +57,7 @@ def create_student(student_id: str) -> None:
         session.add(student)
         session.commit()
 
+
 def test_get_group_info() -> str:
     """
     Test retrieving a group by its ID.
@@ -73,7 +76,9 @@ def test_get_group_info() -> str:
         "type": "Public",
         "creator_id": STUDENT_ID,
     }
-    create_group_response = client.post("/groups", json=valid_group_payload, headers=headers)
+    create_group_response = client.post(
+        "/groups", json=valid_group_payload, headers=headers
+    )
     created_group = create_group_response.json()
 
     # Now retrieve the group by its ID
@@ -85,6 +90,7 @@ def test_get_group_info() -> str:
     assert response.json() == created_group
 
     return group_id
+
 
 def test_student_request_join_group() -> str:
     """Test that a student can successfully request to join a group."""
@@ -106,6 +112,7 @@ def test_student_request_join_group() -> str:
     assert "students" in data, "Group 'students' list is missing."
 
     return group_id
+
 
 def test_block_user() -> None:
     """Test that the group admin can successfully block a user."""
@@ -131,6 +138,7 @@ def test_block_user() -> None:
     assert any(
         student["id"] == STUDENT_ID for student in blocked_students
     ), "Student was not successfully blocked."
+
 
 def test_unblock_user() -> None:
     """Test that the group admin can successfully unblock a user."""
@@ -160,6 +168,7 @@ def test_unblock_user() -> None:
         student["id"] == STUDENT_ID for student in blocked_students
     ), "Student was not successfully unblocked."
 
+
 def test_non_admin_cannot_block_user() -> None:
     """Test that a non-admin user cannot block another user."""
     # Retrieve a group ID and ensure a student requests to join
@@ -178,6 +187,7 @@ def test_non_admin_cannot_block_user() -> None:
     assert response.status_code == 403, "Expected 403 Forbidden for non-admin user."
     assert response.json()["detail"] == "You are not a super student of this group"
 
+
 def test_non_admin_cannot_unblock_user() -> None:
     """Test that a non-admin user cannot unblock another user."""
     # Retrieve a group ID and ensure a student is blocked
@@ -186,7 +196,9 @@ def test_non_admin_cannot_unblock_user() -> None:
     # Authenticate as group admin and block the student
     admin_token = authenticate_user(user_type="admin")
     admin_headers = {"Authorization": f"Bearer {admin_token}"}
-    client.post(f"/groups/{group_id}/students/{STUDENT_ID}/block", headers=admin_headers)
+    client.post(
+        f"/groups/{group_id}/students/{STUDENT_ID}/block", headers=admin_headers
+    )
 
     # Authenticate as a non-admin user
     non_admin_token = authenticate_user(user_type="non-admin")
