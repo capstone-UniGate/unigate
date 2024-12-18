@@ -5,11 +5,13 @@ from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 
 from tests.pages.group_page import GroupPage
+from tests.test_cases.base_test import BaseTest
 
 
-class TestGroupPage:
+class TestGroupPage(BaseTest):
     @fixture(autouse=True)
     def setup(self, driver: webdriver.Chrome) -> None:
+        self.login(driver)
         self.page = GroupPage(driver)
         self.load_success = self.page.load()
 

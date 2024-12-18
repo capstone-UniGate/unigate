@@ -97,6 +97,7 @@
               <NuxtLink
                 :to="`/groups/${groupId}/students`"
                 class="text-blue-500 hover:underline"
+                id="members_list"
               >
                 members
               </NuxtLink>
@@ -110,6 +111,7 @@
           >
             <Button
               @click="toggleRequests"
+              id="Manage_requests"
               class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-blue-600 hover:shadow-xl active:scale-95 transition-all"
             >
               {{ showRequests ? "Hide Requests" : "Manage Requests" }}
@@ -226,6 +228,15 @@
             >
               Ask to Join
             </Button>
+
+            <Button
+              v-else-if="userRequestStatus === 'PENDING'"
+              @click="undoJoinRequest"
+              class="bg-orange-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-orange-600 hover:shadow-xl active:scale-95 transition-all"
+              id="undo-request-button"
+            >
+              Undo Request
+            </Button>
           </div>
         </div>
       </div>
@@ -261,9 +272,15 @@ const isLoading = ref(false);
 const isError = ref(false);
 const group = ref<any>(null);
 const is_member_of = computed(() => {
-  return group.value?.students?.some(
+  const isStudent = group.value.students?.some(
     (student) => student.number === currentStudent.value?.number,
   );
+
+  const isSuperStudent = group.value.super_students?.some(
+    (superStudent) => superStudent.number === currentStudent.value?.number,
+  );
+
+  return isStudent || isSuperStudent;
 });
 
 const isViewingMembers = ref(false);
@@ -334,7 +351,7 @@ const loadRequests = async () => {
   try {
     isLoadingRequests.value = true;
     const response = await getGroupRequests(groupId.toString());
-    requests.value = response;
+    requests.value = response.filter((request) => request.status === "PENDING");
   } catch (error) {
     toast({
       title: "Error",
@@ -378,17 +395,48 @@ const handleRequest = async (
 
 const askToJoinGroup = async () => {
   try {
-    const response = await joinGroup(groupId.toString());
+    const groupData = await joinGroup(groupId.toString());
 
-    // Check response string and display the appropriate toast
-    if (response === "Join request submitted successfully") {
-      toast({
-        title: "Joined Group",
-        description: response,
-      });
-    } else {
-    }
-  } catch (error) {}
+    // Manually set the userRequestStatus to "PENDING"
+    userRequestStatus.value = "PENDING";
+
+    toast({
+      title: "Request Submitted",
+      description: "Your join request has been successfully submitted.",
+    });
+  } catch (error) {
+    console.error("Error submitting join request:", error);
+    toast({
+      title: "Error",
+      description: "An error occurred while submitting the join request.",
+      variant: "destructive",
+    });
+  }
+};
+
+const undoJoinRequest = async () => {
+  try {
+    // Call the backend to delete the join request
+    await fetch(`/api/groups/${groupId}/requests/undo`, {
+      method: "DELETE",
+    });
+
+    // Update the userRequestStatus to null (frontend update)
+    userRequestStatus.value = null;
+
+    toast({
+      title: "Request Cancelled",
+      description: "Your join request has been successfully cancelled.",
+      variant: "success",
+    });
+  } catch (error) {
+    console.error("Error cancelling join request:", error);
+    toast({
+      title: "Error",
+      description: "Failed to cancel the join request.",
+      variant: "destructive",
+    });
+  }
 };
 
 const joinGroups = async () => {

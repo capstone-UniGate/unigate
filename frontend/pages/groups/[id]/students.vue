@@ -119,6 +119,7 @@ onMounted(async () => {
               ? 'bg-blue-500 text-white'
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
           ]"
+          id="members_tab"
           @click="activeTab = 'members'"
         >
           Active Members ({{ members.length }})
@@ -130,6 +131,7 @@ onMounted(async () => {
               ? 'bg-blue-500 text-white'
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
           ]"
+          id="blocked_tab"
           @click="activeTab = 'blocked'"
         >
           Blocked Users ({{ blockedStudents.length }})
@@ -146,10 +148,15 @@ onMounted(async () => {
     <ScrollArea
       v-else
       class="h-96 w-full rounded-lg border border-gray-300 bg-white shadow-sm p-4 m-4"
+      id="members_area"
     >
       <!-- Active Members List -->
       <div v-if="activeTab === 'members'">
-        <div v-if="members.length === 0" class="text-center text-gray-500 py-4">
+        <div
+          v-if="members.length === 0"
+          class="text-center text-gray-500 py-4"
+          id="no_members"
+        >
           No members found in this group.
         </div>
 
@@ -157,6 +164,7 @@ onMounted(async () => {
           v-else
           v-for="member in members"
           :key="member.id"
+          id="member"
           class="py-3 px-4 bg-gray-100 rounded-md mb-2 flex items-center justify-between hover:bg-gray-200 transition duration-200"
         >
           <!-- Avatar with Default Image -->
@@ -164,6 +172,7 @@ onMounted(async () => {
             <AvatarImage
               src="https://via.placeholder.com/50"
               alt="Default Avatar"
+              id="avatar"
             />
             <AvatarFallback
               >{{ member.name?.[0] }}{{ member.surname?.[0] }}</AvatarFallback
@@ -174,15 +183,15 @@ onMounted(async () => {
           <div class="flex-grow">
             <div class="flex flex-col">
               <!-- Member Name -->
-              <span class="text-gray-800 font-bold">
+              <span id="member_name" class="text-gray-800 font-bold">
                 {{ member.name }} {{ member.surname }}
               </span>
               <!-- Member Email -->
-              <span class="text-gray-600 text-sm">
+              <span id="member_email" class="text-gray-600 text-sm">
                 {{ member.email }}
               </span>
               <!-- Student Number -->
-              <span class="text-gray-500 text-xs">
+              <span id="member_number" class="text-gray-500 text-xs">
                 Student #{{ member.number }}
               </span>
             </div>
@@ -193,6 +202,7 @@ onMounted(async () => {
             v-if="isSuperStudent()"
             @click="handleBlock(member.id)"
             class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition"
+            id="block_member"
           >
             Block
           </button>
@@ -204,6 +214,7 @@ onMounted(async () => {
         <div
           v-if="blockedStudents.length === 0"
           class="text-center text-gray-500 py-4"
+          id="no_blocked_users"
         >
           No blocked users.
         </div>
@@ -212,6 +223,7 @@ onMounted(async () => {
           v-else
           v-for="user in blockedStudents"
           :key="user.id"
+          id="blocked_student"
           class="py-3 px-4 bg-gray-100 rounded-md mb-2 flex items-center justify-between hover:bg-gray-200 transition duration-200"
         >
           <Avatar class="mr-4">
@@ -242,6 +254,7 @@ onMounted(async () => {
           <button
             @click="handleUnblock(user.id)"
             class="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-lg hover:bg-green-600 transition"
+            id="unblock_student"
           >
             Unblock
           </button>

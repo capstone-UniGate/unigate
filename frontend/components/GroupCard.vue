@@ -81,6 +81,7 @@ const goToGroupPage = async () => {
       </div>
       <CardFooter class="mt-auto p-0 flex justify-center">
         <Button
+          id="details"
           class="w-1/2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-semibold py-1 px-2 rounded-2xl shadow-lg hover:from-blue-500 hover:to-blue-600 hover:shadow-xl active:scale-95 transition-all mb-4"
           @click="goToGroupPage"
         >
