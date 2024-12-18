@@ -351,7 +351,7 @@ const loadRequests = async () => {
   try {
     isLoadingRequests.value = true;
     const response = await getGroupRequests(groupId.toString());
-    requests.value = response;
+    requests.value = response.filter((request) => request.status === "PENDING");
   } catch (error) {
     toast({
       title: "Error",

@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 
 from unigate import crud
 from unigate.core.database import SessionDep
-from unigate.enums import GroupType
+from unigate.enums import GroupType, RequestStatus
 from unigate.models import Group, Request
 from unigate.routes.deps import CurrStudentDep, GroupDep, RequestDep, StudentDep
 from unigate.schemas.group import (
@@ -119,6 +119,11 @@ def accept_group_request(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You are not a super student of this group",
+        )
+    if request.status != RequestStatus.PENDING:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Request is not pending",
         )
     return crud.group.approve_request(session=session, request=request)
 
