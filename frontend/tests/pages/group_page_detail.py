@@ -7,13 +7,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 class GroupPageDetail:
     # Element Locators
-    # BLOCK_BUTTON = (By.CSS_SELECTOR, '[data-test="block-user-button"]')
+
 
     REQUESTS_SECTION = (By.XPATH, "//div[@v-if='showRequests']")
-    BLOCK_BUTTON_XPATH = (
-        By.XPATH,
-        "//button[normalize-space(text())='Block']",
-    )  # Using text-based XPath
 
     REQUEST_ITEM = (By.CSS_SELECTOR, ".request-item")
     SUCCESS_TOAST = (By.CSS_SELECTOR, ".toast-success")
@@ -22,10 +18,6 @@ class GroupPageDetail:
     REQUEST_LIST = (By.CSS_SELECTOR, ".requests-list")
     MANAGE_REQUESTS_BUTTON = (By.ID, "Manage_requests")
 
-    BLOCK_BUTTONS = (
-        By.XPATH,
-        "//button[contains(@class, 'bg-red-500') and text()='Block']",
-    )
 
     def __init__(self, driver: WebDriver) -> None:
         self.driver = driver
@@ -161,12 +153,15 @@ class GroupPageDetail:
         )
         request_item.click()
 
-    def click_block_button(self, request_index: int = 0) -> None:
-        self.wait.until(EC.presence_of_element_located(self.REQUESTS_SECTION))
-        # Wait for the Block button to be clickable based on text (assumes first button found is correct)
-        block_button = self.wait.until(
-            EC.element_to_be_clickable(self.BLOCK_BUTTON_XPATH)
-        )
+    def click_block_button(self, request_id: int) -> None:
+        
+        # Dynamically generate the selector
+        dynamic_selector = f".bg-white:nth-child({request_id}) .inline-flex:nth-child(3)"
+        block_button_selector = (By.CSS_SELECTOR, dynamic_selector)
 
-        # Click the Block button
+        # Wait for the button to be clickable
+        block_button = self.wait.until(EC.element_to_be_clickable(block_button_selector))
+        
+        # Click the button
         block_button.click()
+

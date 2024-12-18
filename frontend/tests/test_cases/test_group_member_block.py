@@ -13,7 +13,7 @@ class TestGroupMemberBlock(BaseTest):
     @pytest.fixture(autouse=True)
     def setup(self, base_page: webdriver.Chrome) -> None:
         # Perform login and initialize pages
-        self.login(base_page)
+        self.login(base_page, "S4891185")
         self.page = GroupPage(base_page)
         self.group_page_detail = GroupPageDetail(base_page)
         self.group_page_members = GroupPageMembers(base_page)

@@ -13,8 +13,8 @@ class BaseTest:
         self.wait = WebDriverWait(driver, 10)
         return driver
 
-    def login(self, driver: webdriver.Chrome) -> None:
+    def login(self, driver: webdriver.Chrome, username: str = "S1234567") -> None:
         self.page = LoginPage(driver)
         self.page.navigate()
-        self.page.login("S4891185", "testpassword")
+        self.page.login(username, "testpassword")
         self.wait.until(EC.url_to_be(url=Urls.GROUP_PAGE))
