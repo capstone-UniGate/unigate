@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, status
 from unigate import crud
 from unigate.core.database import SessionDep
 from unigate.enums import GroupType, RequestStatus
-from unigate.models import Group, Request, Block
+from unigate.models import Block, Group, Request
 from unigate.routes.deps import CurrStudentDep, GroupDep, RequestDep, StudentDep
 from unigate.schemas.group import (
     GroupCreate,
@@ -56,20 +56,19 @@ def create_group(
     response_model=GroupReadWithStudents,
 )
 def join_group(
-        session: SessionDep,
-        group: GroupDep,
-        current_user: CurrStudentDep,
+    session: SessionDep,
+    group: GroupDep,
+    current_user: CurrStudentDep,
 ) -> Group:
     # Check if the student is blocked from this group
-    is_blocked = session.query(Block).filter_by(
-        student_id=current_user.id, group_id=group.id
-    ).first()
+    is_blocked = (
+        session.query(Block)
+        .filter_by(student_id=current_user.id, group_id=group.id)
+        .first()
+    )
 
     if is_blocked:
-        raise HTTPException(
-            status_code=403,
-            detail="You are blocked in this group."
-        )
+        raise HTTPException(status_code=403, detail="You are blocked in this group.")
 
     # Proceed based on group type
     if group.type == GroupType.PRIVATE:

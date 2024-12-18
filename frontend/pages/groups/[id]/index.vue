@@ -220,13 +220,13 @@
                 userRequestStatus == null ||
                 (userRequestStatus.includes('REJECTED') &&
                   !is_member_of &&
-                  group.type === 'Private')&&
-                  !isBlocked
+                  group.type === 'Private' &&
+                  !isBlocked)
               "
               @click="askToJoinGroup"
               class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-yellow-600 hover:shadow-xl active:scale-95 transition-all"
               id="ask-to-join-button"
-               :disabled="isBlocked"
+              :disabled="isBlocked"
             >
               Ask to Join
             </Button>
@@ -305,8 +305,11 @@ const isLoadingRequests = ref(false);
 // Function to check if the current student is blocked
 const checkBlockStatus = () => {
   const blockedStudents = group.value?.blocked_students || [];
-  isBlocked.value = blockedStudents.some((student: { number: any; }) => student.number === currentStudent.value?.number)
-}
+  isBlocked.value = blockedStudents.some(
+    (student: { number: any }) =>
+      student.number === currentStudent.value?.number,
+  );
+};
 
 async function loadGroup() {
   try {
