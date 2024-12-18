@@ -1,4 +1,5 @@
 from uuid import uuid4
+
 from fastapi.testclient import TestClient
 from unigate.main import app
 
@@ -44,7 +45,6 @@ def create_group() -> dict:
 
 
 def test_get_group_info() -> None:
-
     created_group = create_group()
 
     token_data = authenticate_user()
@@ -58,7 +58,6 @@ def test_get_group_info() -> None:
 
 
 def test_group_not_found() -> None:
-
     token_data = authenticate_user()
     token = token_data["access_token"]
 

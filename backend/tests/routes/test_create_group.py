@@ -1,16 +1,16 @@
 import secrets
 import string
 from uuid import UUID
+
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
-
+from unigate.core.database import engine
 from unigate.main import app
 from unigate.models import Student
-from unigate.core.database import engine
 
 client: TestClient = TestClient(app)
 
-# Test user credentials 
+# Test user credentials
 test_student_username = "S1234567"
 test_student_password = "testpassword"
 test_student_id = "d6dcf3b1-425a-4864-88d3-525decebef18"
@@ -24,7 +24,9 @@ def authenticate_user() -> dict:
 
     response = client.post("/auth/login", data=login_payload)
 
-    assert response.status_code == 200, f"Failed to authenticate user: {response.json()}"
+    assert (
+        response.status_code == 200
+    ), f"Failed to authenticate user: {response.json()}"
     return response.json()
 
 
@@ -34,7 +36,6 @@ def create_student(student_id: str) -> None:
         existing_student = session.query(Student).filter_by(id=UUID(student_id)).first()
         if existing_student:
             return
-
 
         student = Student(
             id=UUID(student_id),
@@ -64,8 +65,9 @@ def test_create_group_success() -> None:
 
     response = client.post("/groups", json=valid_group_payload, headers=headers)
 
-
-    assert response.status_code == 200, f"Expected status code 201, but got {response.status_code}"
+    assert (
+        response.status_code == 200
+    ), f"Expected status code 201, but got {response.status_code}"
     data = response.json()
     assert data["name"] == valid_group_payload["name"]
     assert data["description"] == valid_group_payload["description"]
@@ -77,7 +79,6 @@ def test_create_group_success() -> None:
 
 
 def test_create_group_invalid_type() -> None:
-
     create_student(test_student_id)
     token_data = authenticate_user()
     token = token_data["access_token"]
@@ -91,10 +92,10 @@ def test_create_group_invalid_type() -> None:
         "creator_id": test_student_id,
     }
 
-
     response = client.post("/groups", json=invalid_group_payload, headers=headers)
 
     assert response.status_code == 422
+
 
 def test_get_group_info() -> None:
     create_student(test_student_id)
@@ -109,13 +110,14 @@ def test_get_group_info() -> None:
         "type": "Public",
         "creator_id": test_student_id,
     }
-    create_group_response = client.post("/groups", json=valid_group_payload, headers=headers)
+    create_group_response = client.post(
+        "/groups", json=valid_group_payload, headers=headers
+    )
     created_group = create_group_response.json()
 
     # Now retrieve the group by its ID
     group_id = created_group["id"]
     response = client.get(f"/groups/{group_id}", headers=headers)
-
 
     assert response.status_code == 200
     assert response.json() == created_group

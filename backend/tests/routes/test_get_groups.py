@@ -1,4 +1,5 @@
 from uuid import uuid4
+
 from fastapi.testclient import TestClient
 from unigate.main import app
 
@@ -18,12 +19,13 @@ def authenticate_user() -> dict:
 
     response = client.post("/auth/login", data=login_payload)
 
-    assert response.status_code == 200, f"Failed to authenticate user: {response.json()}"
+    assert (
+        response.status_code == 200
+    ), f"Failed to authenticate user: {response.json()}"
     return response.json()
 
 
 def create_group(student_id: str) -> dict:
-
     token_data = authenticate_user()
     token = token_data["access_token"]
 
@@ -52,6 +54,8 @@ def test_get_groups_list() -> None:
     headers = {"Authorization": f"Bearer {token}"}
     response = client.get("/groups", headers=headers)
 
-    assert response.status_code == 200, f"Failed to retrieve groups list: {response.json()}"
+    assert (
+        response.status_code == 200
+    ), f"Failed to retrieve groups list: {response.json()}"
     assert isinstance(response.json(), list), "Response should be a list of groups"
     assert len(response.json()) > 0, "There should be at least one group"
