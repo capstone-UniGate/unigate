@@ -26,9 +26,8 @@ class TestManageGroupRequest(BaseTest):
         time.sleep(1)  # Allow page to load fully
 
         # Click on "Manage Requests" in the group detail page
-        request_id = "request-id-123"  # Replace with an actual request ID or locator
 
-        self.group_page_detail.click_request_item(request_id)
+        self.group_page_detail.click_request_item()
 
         time.sleep(1)  # Allow requests to load
 

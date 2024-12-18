@@ -1,97 +1,69 @@
-import secrets
-import string
-from unittest.mock import MagicMock
-from uuid import UUID
+from uuid import uuid4
 
-import pytest
 from fastapi.testclient import TestClient
-from sqlmodel import Session, select
-from unigate.core.database import engine
 from unigate.main import app
-from unigate.models import Group, Student
 
 client: TestClient = TestClient(app)
 
-
-@pytest.fixture
-def mock_session() -> MagicMock:
-    session: MagicMock = MagicMock(spec=Session)
-    return session
-
-
-def create_student(student_id: str) -> None:
-    """
-    Check if a Student record exists, and create one if it does not.
-
-    Args:
-        student_id (str): The UUID of the student to check or insert.
-    """
-    with Session(engine) as session:
-        # Check if the student already exists
-        existing_student = session.exec(
-            select(Student).where(Student.id == UUID(student_id))
-        ).first()
-        if existing_student:
-            return
-
-        # Create a new student record
-        student = Student(
-            id=UUID(student_id),
-            hashed_password="hashedpassword123",  # noqa: S106  # Replace with actual hashed password logic
-            number=12345,  # Unique student number
-            email="teststudent@example.com",  # Unique email
-            name="Test",
-            surname="Student",
-        )
-        session.add(student)
-        session.commit()
+# Test user credentials
+test_student_username = "S1234567"
+test_student_password = "testpassword"
+test_student_id = "d6dcf3b1-425a-4864-88d3-525decebef18"
 
 
-def create_group(student_id: str, group_id: str) -> dict[str, str | None | bool]:
+def authenticate_user() -> dict:
+    login_payload = {
+        "username": test_student_username,
+        "password": test_student_password,
+    }
+
+    response = client.post("/auth/login", data=login_payload)
+
+    assert (
+        response.status_code == 200
+    ), f"Failed to authenticate user: {response.json()}"
+    return response.json()
+
+
+def create_group() -> dict:
+    token_data = authenticate_user()
+    token = token_data["access_token"]
+
     group_payload = {
-        "id": group_id,
-        "name": f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}",
+        "id": str(uuid4()),
+        "name": f"TestGroup-{uuid4().hex[:6]}",
         "description": "A test group description",
         "category": "Test Category",
         "type": "Public",
-        "creator_id": student_id,
     }
 
-    with Session(engine) as session:
-        existing_group = session.exec(
-            select(Group).where(Group.id == UUID(group_id))
-        ).first()
-        if existing_group is not None:
-            return {
-                "id": str(existing_group.id),
-                "name": existing_group.name,
-                "description": existing_group.description,
-                "category": existing_group.category,
-                "type": str(existing_group.type.value),
-                "creator_id": str(student_id),
-                "is_member_of": False,
-                "is_super_student": False,
-            }
+    headers = {"Authorization": f"Bearer {token}"}
+    response = client.post("/groups", json=group_payload, headers=headers)
 
-    response = client.post("/groups/create", json=group_payload)
-    r = response.json()
-    r["is_member_of"] = False
-    r["is_super_student"] = False
-    return r
+    assert response.status_code == 200, f"Failed to create group: {response.json()}"
+    return response.json()
 
 
 def test_get_group_info() -> None:
-    student_id = "12345678-1234-5678-1234-567812345678"
-    create_student(student_id=student_id)
-    group_id = "11111111-1111-1111-1111-111111111111"
-    group = create_group(student_id=student_id, group_id=group_id)
-    response = client.get("/groups/" + str(group_id))
-    assert response.status_code == 200
-    assert response.json() == group
+    created_group = create_group()
+
+    token_data = authenticate_user()
+    token = token_data["access_token"]
+
+    headers = {"Authorization": f"Bearer {token}"}
+    response = client.get(f"/groups/{created_group['id']}", headers=headers)
+
+    assert response.status_code == 200, f"Failed to retrieve group: {response.json()}"
+    assert response.json() == created_group
 
 
 def test_group_not_found() -> None:
-    group_id = "11111111-1111-1111-2111-111111111111"
-    response = client.get("/groups/" + str(group_id))
+    token_data = authenticate_user()
+    token = token_data["access_token"]
+
+    non_existent_group_id = uuid4()
+    headers = {"Authorization": f"Bearer {token}"}
+    response = client.get(f"/groups/{non_existent_group_id}", headers=headers)
+
     assert response.status_code == 404
     assert response.json() == {"detail": "Group not found."}

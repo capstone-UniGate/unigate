@@ -18,3 +18,21 @@ class BaseTest:
         self.page.navigate()
         self.page.login(username, "testpassword")
         self.wait.until(EC.url_to_be(url=Urls.GROUP_PAGE))
+
+    def login_fabio(self, driver: webdriver.Chrome) -> None:
+        self.login_page = LoginPage(driver)
+        self.login_page.navigate()
+        self.login_page.login("S4891185", "testpassword")
+        self.wait.until(EC.url_to_be(url=Urls.GROUP_PAGE))
+
+    def login_lorenzo(self, driver: webdriver.Chrome) -> None:
+        self.login_page = LoginPage(driver)
+        self.login_page.navigate()
+        self.login_page.login("S4989646", "testpassword")
+        self.wait.until(EC.url_to_be(url=Urls.GROUP_PAGE))
+
+    def login_mimmo(self, driver: webdriver.Chrome) -> None:
+        self.login_page = LoginPage(driver)
+        self.login_page.navigate()
+        self.login_page.login("S5806782", "testpassword")
+        self.wait.until(EC.url_to_be(url=Urls.GROUP_PAGE))

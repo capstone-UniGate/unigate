@@ -1,4 +1,7 @@
+import time
+
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
@@ -8,7 +11,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 class GroupPageDetail:
     # Element Locators
 
-
     REQUESTS_SECTION = (By.XPATH, "//div[@v-if='showRequests']")
 
     REQUEST_ITEM = (By.CSS_SELECTOR, ".request-item")
@@ -17,7 +19,6 @@ class GroupPageDetail:
     LOADING_INDICATOR = (By.CSS_SELECTOR, ".loading-indicator")
     REQUEST_LIST = (By.CSS_SELECTOR, ".requests-list")
     MANAGE_REQUESTS_BUTTON = (By.ID, "Manage_requests")
-
 
     def __init__(self, driver: WebDriver) -> None:
         self.driver = driver
@@ -33,7 +34,16 @@ class GroupPageDetail:
 
     def get_join_requests(self) -> list[WebElement] | None:
         """Return all join requests as elements."""
-        return self.driver.find_elements(By.CSS_SELECTOR, ".scroll-area ul li")
+        return self.driver.find_elements(By.ID, "request")
+
+    def get_status(self, request_index: int) -> str:
+        """Approve a join request by its index."""
+        requests = self.get_join_requests()
+        if requests is None:
+            raise TypeError
+        if request_index >= len(requests):
+            raise IndexError("Request index out of range.")
+        return requests[request_index].find_element(By.ID, "request_status").text
 
     def approve_request(self, request_index: int) -> None:
         """Approve a join request by its index."""
@@ -42,9 +52,7 @@ class GroupPageDetail:
             raise TypeError
         if request_index >= len(requests):
             raise IndexError("Request index out of range.")
-        approve_button = requests[request_index].find_element(
-            By.XPATH, ".//button[contains(@alt, 'Approved')]"
-        )
+        approve_button = requests[request_index].find_element(By.ID, "approve_button")
         approve_button.click()
 
     def reject_request(self, request_index: int) -> None:
@@ -54,9 +62,7 @@ class GroupPageDetail:
             raise TypeError
         if request_index >= len(requests):
             raise IndexError("Request index out of range.")
-        reject_button = requests[request_index].find_element(
-            By.XPATH, ".//button[contains(@alt, 'Reject')]"
-        )
+        reject_button = requests[request_index].find_element(By.ID, "reject_button")
         reject_button.click()
 
     def block_request(self, request_index: int) -> None:
@@ -66,9 +72,7 @@ class GroupPageDetail:
             raise TypeError
         if request_index >= len(requests):
             raise IndexError("Request index out of range.")
-        block_button = requests[request_index].find_element(
-            By.XPATH, ".//button[contains(@alt, 'Block')]"
-        )
+        block_button = requests[request_index].find_element(By.ID, "block_button")
         block_button.click()
 
     def get_toast_message(self) -> str:
@@ -88,6 +92,12 @@ class GroupPageDetail:
 
     def click_join(self) -> None:
         create_button = self.driver.find_element(By.ID, "join-group-button")
+        create_button.send_keys(Keys.ENTER)
+        create_button.click()
+
+    def click_ask_to_join(self) -> None:
+        create_button = self.driver.find_element(By.ID, "ask-to-join-button")
+        time.sleep(0.5)
         # create_button.send_keys(Keys.ENTER)
         create_button.click()
 
@@ -123,45 +133,60 @@ class GroupPageDetail:
         manage_button = self.driver.find_element(By.ID, "Manage_requests")
         return manage_button.is_displayed()
 
-    def click_block_user_button(self):
+    def click_block_user_button(self) -> None:
         block_button = self.wait.until(EC.element_to_be_clickable(self.BLOCK_BUTTON))
         block_button.click()
 
-    def confirm_block_action(self):
+    def confirm_block_action(self) -> None:
         block_button = self.wait.until(EC.element_to_be_clickable(self.BLOCK_BUTTON))
         block_button.click()
 
-    def verify_user_blocked(self):
+    def verify_user_blocked(self) -> None:
         toast = self.wait.until(EC.visibility_of_element_located(self.SUCCESS_TOAST))
         assert "User has been successfully blocked from the group." in toast.text
 
-    def verify_request_removed(self, request_id):
+    def verify_request_removed(self, request_id: int) -> None:
         requests = self.driver.find_elements(*self.REQUEST_LIST)
         for request in requests:
             assert request_id not in request.text
 
-    def verify_loading_indicator_visible(self):
+    def verify_loading_indicator_visible(self) -> None:
         self.wait.until(EC.visibility_of_element_located(self.LOADING_INDICATOR))
 
-    def verify_error_message(self, message):
+    def verify_error_message(self, message: str) -> None:
         toast = self.wait.until(EC.visibility_of_element_located(self.ERROR_TOAST))
         assert message in toast.text
 
-    def click_request_item(self, request_id):
+    def click_request_item(self) -> None:
         request_item = self.wait.until(
             EC.element_to_be_clickable(self.MANAGE_REQUESTS_BUTTON)
         )
         request_item.click()
 
     def click_block_button(self, request_id: int) -> None:
-        
         # Dynamically generate the selector
-        dynamic_selector = f".bg-white:nth-child({request_id}) .inline-flex:nth-child(3)"
+        dynamic_selector = (
+            f".bg-white:nth-child({request_id}) .inline-flex:nth-child(3)"
+        )
         block_button_selector = (By.CSS_SELECTOR, dynamic_selector)
 
         # Wait for the button to be clickable
-        block_button = self.wait.until(EC.element_to_be_clickable(block_button_selector))
-        
+        block_button = self.wait.until(
+            EC.element_to_be_clickable(block_button_selector)
+        )
+
         # Click the button
         block_button.click()
 
+    def check_req(self) -> bool:
+        request_status = self.driver.find_element(By.ID, "request_status_student")
+        return (
+            request_status.is_displayed()
+            and request_status.text == "Your request status: PENDING"
+        )
+
+    def click_manage(self) -> None:
+        self.driver.find_element(By.ID, "Manage_requests").click()
+
+    def check_no_reqs(self) -> bool:
+        return self.driver.find_element(By.ID, "no_requests").is_displayed()

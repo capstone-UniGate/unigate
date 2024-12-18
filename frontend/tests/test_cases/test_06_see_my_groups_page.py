@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
@@ -37,9 +39,7 @@ class TestSeeMyGroups(BaseTest):
     def test_group_cards_display(self) -> None:
         """Test that group cards are displayed after loading"""
         # Wait for loading to complete
-        WebDriverWait(self.page.driver, 10).until_not(
-            EC.presence_of_element_located(self.page.LOADING_INDICATOR)
-        )
+        time.sleep(0.5)
         group_cards = self.page.get_group_cards()
         # Test passes whether there are cards or not
         assert isinstance(
