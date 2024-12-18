@@ -220,11 +220,13 @@
                 userRequestStatus == null ||
                 (userRequestStatus.includes('REJECTED') &&
                   !is_member_of &&
-                  group.type === 'Private')
+                  group.type === 'Private')&&
+                  !isBlocked
               "
               @click="askToJoinGroup"
               class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-yellow-600 hover:shadow-xl active:scale-95 transition-all"
               id="ask-to-join-button"
+               :disabled="isBlocked"
             >
               Ask to Join
             </Button>
@@ -271,6 +273,7 @@ const groupId = route.params.id;
 const isLoading = ref(false);
 const isError = ref(false);
 const group = ref<any>(null);
+const isBlocked = ref(false);
 const is_member_of = computed(() => {
   const isStudent = group.value.students?.some(
     (student) => student.number === currentStudent.value?.number,
@@ -299,6 +302,12 @@ const showRequests = ref(false);
 const requests = ref([]);
 const isLoadingRequests = ref(false);
 
+// Function to check if the current student is blocked
+const checkBlockStatus = () => {
+  const blockedStudents = group.value?.blocked_students || [];
+  isBlocked.value = blockedStudents.some((student: { number: any; }) => student.number === currentStudent.value?.number)
+}
+
 async function loadGroup() {
   try {
     isError.value = false;
@@ -311,6 +320,9 @@ async function loadGroup() {
     const [groupData] = await Promise.all([getGroupById(groupId.toString())]);
 
     group.value = groupData;
+
+    // Check if the student is blocked
+    checkBlockStatus();
   } catch (error) {
     isError.value = true;
     toast({
