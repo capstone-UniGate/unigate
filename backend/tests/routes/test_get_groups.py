@@ -1,86 +1,61 @@
-import secrets
-import string
-from unittest.mock import MagicMock
-from uuid import UUID
+from uuid import uuid4
 
-import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
-from unigate.core.database import engine
 from unigate.main import app
-from unigate.models import Group, Student
 
 client: TestClient = TestClient(app)
 
-
-@pytest.fixture
-def mock_session() -> MagicMock:
-    session: MagicMock = MagicMock(spec=Session)
-    return session
-
-
-def test_get_groups() -> None:
-    student_id = "89785676-1234-5678-1234-567812345678"
-    group_id = "45677655-1234-5678-1234-567812345679"
-    create_student(student_id, number=7, mail="teststudent123")
-
-    group = create_group(student_id, group_id)
-
-    response = client.get("/groups/get")
-    assert response.status_code == 200
-
-    data = response.json()
-    assert isinstance(data, list)
-    assert data[0] == group
+# Test user credentials
+test_student_username = "S1234567"
+test_student_password = "testpassword"
+test_student_id = "d6dcf3b1-425a-4864-88d3-525decebef18"
 
 
-def create_student(student_id: str, number: int, mail: str) -> None:
-    """
-    Check if a Student record exists, and create one if it does not.
+def authenticate_user() -> dict:
+    login_payload = {
+        "username": test_student_username,
+        "password": test_student_password,
+    }
 
-    Args:
-        student_id (str): The UUID of the student to check or insert.
-    """
-    with Session(engine) as session:
-        # Check if the student already exists
-        existing_student = session.query(Student).filter_by(id=UUID(student_id)).first()
-        if existing_student:
-            return
+    response = client.post("/auth/login", data=login_payload)
 
-        # Create a new student record
-        student = Student(
-            id=UUID(student_id),
-            hashed_password="hashedpassword123",  # noqa: S106  # Replace with actual hashed password logic
-            number=number,  # Unique student number
-            email=mail + "@example.com",  # Unique email
-            name="Test",
-            surname="Student",
-        )
-        session.add(student)
-        session.commit()
+    assert (
+        response.status_code == 200
+    ), f"Failed to authenticate user: {response.json()}"
+    return response.json()
 
 
-def create_group(student_id: str, group_id: str) -> dict[str, str]:
+def create_group(student_id: str) -> dict:
+    token_data = authenticate_user()
+    token = token_data["access_token"]
+
     group_payload = {
-        "id": group_id,
-        "name": f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}",
+        "id": str(uuid4()),  # Generate a new UUID for the group
+        "name": f"TestGroup-{uuid4().hex[:6]}",
         "description": "A test group description",
         "category": "Test Category",
         "type": "Public",
         "creator_id": student_id,
     }
 
-    with Session(engine) as session:
-        existing_group = session.query(Group).filter_by(id=UUID(group_id)).first()
-        if existing_group is not None:
-            return {
-                "id": str(existing_group.id),
-                "name": existing_group.name,
-                "description": existing_group.description,
-                "category": existing_group.category,
-                "type": str(existing_group.type.value),
-                "creator_id": str(student_id),
-            }
+    headers = {"Authorization": f"Bearer {token}"}
+    response = client.post("/groups", json=group_payload, headers=headers)
 
-    response = client.post("/groups/create", json=group_payload)
+    assert response.status_code == 200, f"Failed to create group: {response.json()}"
     return response.json()
+
+
+def test_get_groups_list() -> None:
+    create_group(student_id=test_student_id)
+
+    token_data = authenticate_user()
+    token = token_data["access_token"]
+
+    headers = {"Authorization": f"Bearer {token}"}
+    response = client.get("/groups", headers=headers)
+
+    assert (
+        response.status_code == 200
+    ), f"Failed to retrieve groups list: {response.json()}"
+    assert isinstance(response.json(), list), "Response should be a list of groups"
+    assert len(response.json()) > 0, "There should be at least one group"
