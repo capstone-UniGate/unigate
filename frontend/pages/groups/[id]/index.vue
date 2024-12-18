@@ -342,7 +342,7 @@ const closeAvatarModal = () => {
 
 const navigateToRequests = () => {
   router.push(`/groups/${groupId}/requests`);
-
+};
 const toggleRequests = async () => {
   showRequests.value = !showRequests.value;
   if (showRequests.value) {
