@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 
 from unigate import crud
 from unigate.core.database import SessionDep
-from unigate.enums import GroupType
+from unigate.enums import GroupType, RequestStatus
 from unigate.models import Group, Request
 from unigate.routes.deps import CurrStudentDep, GroupDep, RequestDep, StudentDep
 from unigate.schemas.group import (
@@ -120,6 +120,11 @@ def accept_group_request(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You are not a super student of this group",
         )
+    if request.status != RequestStatus.PENDING:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Request is not pending",
+        )
     return crud.group.approve_request(session=session, request=request)
 
 
@@ -193,3 +198,16 @@ def unblock_user(
             detail="You are not a super student of this group",
         )
     return crud.group.unblock_user(session=session, group=group, student=student)
+
+
+@router.delete(
+    "/{group_id}/requests/undo",
+    status_code=204,
+    summary="Undo join request",
+)
+def undo_join_request(
+    session: SessionDep,
+    group: GroupDep,
+    current_user: CurrStudentDep,
+) -> None:
+    crud.group.delete_request(session=session, group=group, student=current_user)

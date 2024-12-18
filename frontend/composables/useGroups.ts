@@ -65,6 +65,7 @@ export function useGroups() {
 
   async function createGroup(groupData: any) {
     try {
+      await ensureAuthenticated();
       isError.value = false;
       isLoading.value = true;
       const response = await useApiFetch("/groups", {

@@ -90,5 +90,14 @@ class CRUDGroup(CRUDBase[Group, GroupCreate, Group]):
         session.refresh(group)
         return group
 
+    def delete_request(
+        self, *, group: Group, student: Student, session: Session
+    ) -> None:
+        request = next((r for r in group.requests if r.student_id == student.id), None)
+        group.requests.remove(request)  # type: ignore
+        session.delete(request)
+        session.commit()
+        session.refresh(group)
+
 
 group = CRUDGroup(Group)

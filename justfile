@@ -15,6 +15,15 @@ frontend_python := frontend_venv + python
 @_default:
     just --list
 
+docker-up:
+    docker compose up --watch --build
+
+docker-stop:
+    docker compose stop
+
+docker-down:
+    docker compose down -v
+
 reset-database:
     docker compose exec postgres-unigate psql -U $POSTGRES_USER -d $POSTGRES_DB -c "DO \$\$ BEGIN EXECUTE 'DROP SCHEMA public CASCADE'; EXECUTE 'CREATE SCHEMA public'; END \$\$;"
     docker compose exec postgres-unigate psql -U $POSTGRES_USER -d $UNIGATE_DB -c "DO \$\$ BEGIN EXECUTE 'DROP SCHEMA public CASCADE'; EXECUTE 'CREATE SCHEMA public'; END \$\$;"
@@ -43,8 +52,15 @@ backend-fix: backend-deps
     {{ backend_venv }}/ruff check backend --config backend/pyproject.toml
     {{ backend_venv }}/ruff format backend --config backend/pyproject.toml
 
-backend-test: backend-deps init-database
+backend-only-test:
     cd backend && ../{{ backend_venv }}/pytest tests/
+
+backend-test: backend-deps init-database seed-real backend-only-test
+
+backend-only-test-single FILE:
+    cd backend && ../{{ backend_venv }}/pytest tests/routes/{{ FILE }}
+
+backend-test-single FILE: init-database seed-real (backend-only-test-single FILE)
 
 pre-commit: backend-deps
     {{ backend_venv }}/pre-commit run --all-files
@@ -72,9 +88,22 @@ frontend-deps:
 frontend-dev: frontend-deps
     cd frontend && pnpm run dev
 
+frontend-prod: frontend-deps
+    cd frontend && pnpm run build && pnpm run preview
+
 frontend-fix:
     cd frontend && npx prettier . --write
     cd frontend && npx eslint --fix
 
-frontend-test: init-database seed-real
+frontend-only-test:
+    cd frontend && ../{{ frontend_venv }}/pytest tests/
+
+frontend-test: init-database seed-real frontend-only-test
+
+frontend-only-test-single FILE:
+    cd frontend && ../{{ frontend_venv }}/pytest tests/test_cases/{{ FILE }}
+
+frontend-test-single FILE: init-database seed-real (frontend-only-test-single FILE)
+
+frontend-test-no-db:
     cd frontend && ../{{ frontend_venv }}/pytest tests/

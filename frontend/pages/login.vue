@@ -78,7 +78,7 @@
             {{ passwordError }}
           </p>
           <!-- Password Strength Progress Bar -->
-          <div class="mt-2">
+          <!-- <div class="mt-2">
             <Progress
               :modelValue="passwordStrength"
               :colorClass="passwordStrengthColorClass"
@@ -86,11 +86,12 @@
             <p class="text-sm mt-1" :class="passwordStrengthTextClass">
               {{ passwordStrengthText }}
             </p>
-          </div>
+          </div>-->
         </FormField>
 
         <Button
           @click="handleLogin"
+          id="login_button"
           type="button"
           class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white"
           :disabled="!isFormValid"
@@ -201,6 +202,8 @@ export default {
         router.push("/groups");
       } catch (error: any) {
         passwordError.value = error?.data?.message || "Login failed.";
+        clearInput("username");
+        clearInput("password");
       }
     };
 
