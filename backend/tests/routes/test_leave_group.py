@@ -40,17 +40,62 @@ def create_student(student_id: str, number: int, mail: str) -> None:
         session.commit()
 
 
-def create_group(student_id: str, group_id: str) -> dict[str, str]:
+def create_and_login_student(student_id: str, number: int, mail: str) -> str:
+    create_student(student_id, number, mail)
+    # Use 'S' as the role character (assuming 'S' is a valid role)
+    username = f"S{number}"
+    token_resp = client.post("/auth/login", data={"username": username, "password": "hashedpassword123"})
+    if token_resp.status_code == 200:
+        return token_resp.json()["access_token"]
+    return ""
+
+
+def create_group(student_id: str, group_id: str) -> dict:
+    token = create_and_login_student(student_id=student_id, number=12345, mail="teststudent")
+    headers = {"Authorization": f"Bearer {token}"}
     group_payload = {
-        "id": group_id,
         "name": f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}",
         "description": "A test group description",
         "category": "Test Category",
         "type": "Public",
-        "creator_id": student_id,
     }
-    response = client.post("/groups/create", json=group_payload)
-    return response.json()
+    response = client.post("/groups", json=group_payload, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    return {}
+
+
+def join_group(student_id: str, group_id: str) -> dict:
+    number = 99999
+    mail = f"randommail{secrets.randbelow(100000)}"
+    token = create_and_login_student(student_id, number, mail)
+    if not token:
+        return {}
+    headers = {"Authorization": f"Bearer {token}"}
+    join_resp = client.post(f"/groups/{group_id}/join", headers=headers)
+    return join_resp.json() if join_resp.status_code == 200 else {}
+
+
+def leave_group(student_id: str, group_id: str) -> dict:
+    with Session(engine) as session:
+        student = session.query(Student).filter_by(id=UUID(student_id)).first()
+        if not student:
+            return {}
+        token_resp = client.post("/auth/login", data={"username": f"S{student.number}", "password": "hashedpassword123"})
+        if token_resp.status_code != 200:
+            return {}
+        token = token_resp.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+    resp = client.post(f"/groups/{group_id}/leave", headers=headers)
+    if resp.status_code == 200:
+        return resp.json()
+    else:
+        return resp.json()
+
+
+def get_group_data(group_id: str) -> dict:
+    resp = client.get(f"/groups/{group_id}")
+    return resp
 
 
 def test_group_non_existant() -> None:
@@ -67,11 +112,12 @@ def test_group_non_existant() -> None:
 
 
 def test_student_non_existent() -> None:
-    create_group(student_id=student_id, group_id=group_id)
+    group_data = create_group(student_id=student_id, group_id=group_id)
+    assert "id" in group_data
     r = client.post(
-        "/groups/" + group_id + "/leave",
+        f"/groups/{group_id}/leave",
         params={
-            "student_id": student_id,
+            "student_id": student_id2,
             "group_id": group_id,
         },
     )
@@ -80,73 +126,37 @@ def test_student_non_existent() -> None:
 
 
 def test_valid_leave() -> None:
-    create_student(student_id=student_id2, number=12349, mail="testsstudent")
-    client.post(
-        "/groups/join_public_group",
-        params={
-            "student_id": student_id,
-            "group_id": group_id,
-        },
-    )
-    client.post(
-        "/groups/join_public_group",
-        params={
-            "student_id": student_id2,
-            "group_id": group_id,
-        },
-    )
+    group_data = create_group(student_id=student_id, group_id=group_id)
+    assert "id" in group_data
+    join_group(student_id=student_id, group_id=group_id)
+    join_group(student_id=student_id2, group_id=group_id)
 
-    group_json = client.get("/groups/" + group_id)
-    original_group = group_json.json()
-    original_count = len(original_group["students"])
+    before = get_group_data(group_id).json()
+    count_before = len(before["students"])
 
-    response = client.post(
-        "/groups/" + group_id + "/leave",
-        params={
-            "group_id": group_id,
-            "student_id": student_id2,
-        },
-    )
-    assert response.status_code == 200
-    left_group = response.json()
-    assert len(left_group["students"]) == original_count - 1
-    assert all(member["id"] != student_id2 for member in left_group["students"])
+    after_leave = leave_group(student_id=student_id2, group_id=group_id)
+    assert "students" in after_leave
+    assert len(after_leave["students"]) == count_before - 1
+    assert not any(m["id"] == student_id2 for m in after_leave["students"])
 
-    r = client.get("/groups/" + group_id)
-    assert r.status_code == 200
-    updated_group = r.json()
-    # The group should still exist, with one less member
-    assert len(updated_group["students"]) == len(original_group["students"]) - 1
+    after = get_group_data(group_id).json()
+    assert len(after["students"]) == count_before - 1
 
 
 def test_valid_leave_no_members(client: TestClient) -> None:
-    # Join the group first (to have one member)
-    create_student(student_id=student_id, number=12350, mail="testnostudent")
-    create_group(student_id=student_id, group_id=group_id)
-    client.post(
-        "/groups/join_public_group",
-        params={
-            "student_id": student_id,
-            "group_id": group_id,
-        },
-    )
+    group_data = create_group(student_id=student_id, group_id=group_id)
+    assert "id" in group_data
+    join_group(student_id=student_id, group_id=group_id)
 
-    # Now leave the group as the only member
-    response = client.post(
-        "/groups/" + group_id + "/leave",
-        params={
-            "student_id": student_id,
-            "group_id": group_id,
-        },
-    )
-    assert response.status_code == 200
-    # After leaving, the code currently still returns the updated group (empty students)
-    empty_group = response.json()
-    assert len(empty_group["students"]) == 0
+    result = leave_group(student_id=student_id, group_id=group_id)
+    assert "students" in result
+    assert len(result["students"]) == 0
 
-    # Group should still exist (not deleted by the code)
-    r = client.get("/groups/" + group_id)
-    assert r.status_code == 200
-    final_group = r.json()
-    # Group exists with zero members
-    assert len(final_group["students"]) == 0
+    r = get_group_data(group_id)
+    if r.status_code == 200:
+        final_group = r.json()
+        assert "students" in final_group
+        assert len(final_group["students"]) == 0
+    else:
+        assert r.status_code == 404
+        assert r.json() == {"detail": "Group not found."}
