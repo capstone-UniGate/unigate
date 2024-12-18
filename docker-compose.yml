@@ -84,7 +84,7 @@ services:
       postgres-unigate:
         condition: service_healthy
         restart: true
-    restart: always
+    restart: unless-stopped
 
   frontend-unigate:
     container_name: frontend-unigate
@@ -104,7 +104,7 @@ services:
       - .env
     environment:
       - FRONTEND_PORT=${FRONTEND_PORT?Variable not set}
-    restart: always
+    restart: unless-stopped
 
 volumes:
   pgdata:
