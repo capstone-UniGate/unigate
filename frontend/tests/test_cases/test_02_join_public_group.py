@@ -27,10 +27,10 @@ class TestGroupCreate(BaseTest):
         time.sleep(0.5)
         # Click the button
         self.group_page_detail.click_join()
-        time.sleep(4)
+        time.sleep(0.2)
         # Small wait to allow alert to appear
         self.group_page_detail.click_members()
-        time.sleep(3)
+        time.sleep(0.2)
         members_emails = self.group_page_members.get_members_email()
         assert (
             any(x.text == "s1234567@studenti.unige.it" for x in members_emails) == 1
