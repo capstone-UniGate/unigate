@@ -380,7 +380,10 @@ const handleRequest = async (
       requests.value = requests.value.filter(
         (request) => request.id !== requestId,
       );
-
+  
+    toast({
+      title: "Success",
+    })
       // Reload group data to get fresh information
       await loadGroup();
     }

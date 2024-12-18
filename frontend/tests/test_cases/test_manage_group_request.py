@@ -41,10 +41,10 @@ class TestManageGroupRequest(BaseTest):
         time.sleep(1)  # Allow time for the system to process
 
         # Verify the toast message appears for successful blocking
-        # toast_message = self.group_page_detail.get_toast_message()
-        # assert (
-        #     toast_message == "User has been successfully blocked from the group"
-        # ), "Toast message did not appear or was incorrect."
+        toast_message = self.group_page_detail.get_toast_message()
+        assert (
+            toast_message == "Success"
+        ), "Toast message did not appear or was incorrect."
 
         # Verify the user request is no longer in the list
         # remaining_requests = self.group_page_detail.get_request_list()
