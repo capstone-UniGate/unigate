@@ -72,11 +72,10 @@ def test_join_private_group_success() -> None:
 
     # User joins the private group
     response = client.post(
-        "/groups/join_private_group",
+        f"/groups/{group_id}/join",
         params={
-            "student_id": user_id,
-            "group_id": group_id,
-        },
+            "student_id": user_id
+        },  # If needed, or pass in headers if token required
     )
     assert response.status_code in [200, 400]
 
