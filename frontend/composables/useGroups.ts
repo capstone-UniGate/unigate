@@ -122,6 +122,7 @@ export function useGroups() {
 
   async function getGroupStudents(groupId: string) {
     try {
+      await ensureAuthenticated();
       isError.value = false;
       isLoading.value = true;
       const response = await useApiFetch(`/groups/${groupId}/students`, {

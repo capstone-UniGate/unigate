@@ -363,6 +363,9 @@ const closeAvatarModal = () => {
   isAvatarModalOpen.value = false;
 };
 
+const navigateToRequests = () => {
+  router.push(`/groups/${groupId}/requests`);
+};
 const toggleRequests = async () => {
   showRequests.value = !showRequests.value;
   if (showRequests.value) {
@@ -493,7 +496,7 @@ async function fetchUserRequestStatus() {
 
     // Find the logged-in user's request
     const userRequest = requests.find(
-      (request) => request.student_id === currentStudent.value?.id,
+      (request) => request.student_id === studentId,
     );
     // Update the status if found
     userRequestStatus.value = userRequest ? userRequest.status : null;
