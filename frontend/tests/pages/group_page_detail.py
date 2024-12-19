@@ -7,10 +7,19 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
 
-from .base_page import BasePage
 
+class GroupPageDetail:
+    # Element Locators
 
-class GroupPageDetail(BasePage):
+    REQUESTS_SECTION = (By.XPATH, "//div[@v-if='showRequests']")
+
+    REQUEST_ITEM = (By.CSS_SELECTOR, ".request-item")
+    SUCCESS_TOAST = (By.CSS_SELECTOR, ".toast-success")
+    ERROR_TOAST = (By.CSS_SELECTOR, ".toast-error")
+    LOADING_INDICATOR = (By.CSS_SELECTOR, ".loading-indicator")
+    REQUEST_LIST = (By.CSS_SELECTOR, ".requests-list")
+    MANAGE_REQUESTS_BUTTON = (By.ID, "Manage_requests")
+
     def __init__(self, driver: WebDriver) -> None:
         self.driver = driver
         self.wait = WebDriverWait(driver, 1000)
@@ -123,6 +132,51 @@ class GroupPageDetail(BasePage):
     def check_manage(self) -> bool:
         manage_button = self.driver.find_element(By.ID, "Manage_requests")
         return manage_button.is_displayed()
+
+    def click_block_user_button(self) -> None:
+        block_button = self.wait.until(EC.element_to_be_clickable(self.BLOCK_BUTTON))
+        block_button.click()
+
+    def confirm_block_action(self) -> None:
+        block_button = self.wait.until(EC.element_to_be_clickable(self.BLOCK_BUTTON))
+        block_button.click()
+
+    def verify_user_blocked(self) -> None:
+        toast = self.wait.until(EC.visibility_of_element_located(self.SUCCESS_TOAST))
+        assert "User has been successfully blocked from the group." in toast.text
+
+    def verify_request_removed(self, request_id: int) -> None:
+        requests = self.driver.find_elements(*self.REQUEST_LIST)
+        for request in requests:
+            assert request_id not in request.text
+
+    def verify_loading_indicator_visible(self) -> None:
+        self.wait.until(EC.visibility_of_element_located(self.LOADING_INDICATOR))
+
+    def verify_error_message(self, message: str) -> None:
+        toast = self.wait.until(EC.visibility_of_element_located(self.ERROR_TOAST))
+        assert message in toast.text
+
+    def click_request_item(self) -> None:
+        request_item = self.wait.until(
+            EC.element_to_be_clickable(self.MANAGE_REQUESTS_BUTTON)
+        )
+        request_item.click()
+
+    def click_block_button(self, request_id: int) -> None:
+        # Dynamically generate the selector
+        dynamic_selector = (
+            f".bg-white:nth-child({request_id}) .inline-flex:nth-child(3)"
+        )
+        block_button_selector = (By.CSS_SELECTOR, dynamic_selector)
+
+        # Wait for the button to be clickable
+        block_button = self.wait.until(
+            EC.element_to_be_clickable(block_button_selector)
+        )
+
+        # Click the button
+        block_button.click()
 
     def check_req(self) -> bool:
         request_status = self.driver.find_element(By.ID, "request_status_student")
