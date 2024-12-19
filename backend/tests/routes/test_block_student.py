@@ -43,9 +43,24 @@ def create_group() -> dict:
     return response.json()
 
 
+def add_student_to_group(group_id: str, student_id: str):
+    token_data = authenticate_user()
+    headers = {"Authorization": f"Bearer {token_data['access_token']}"}
+
+    add_student_payload = {"student_id": student_id}
+    response = client.post(
+        f"/groups/{group_id}/students", json=add_student_payload, headers=headers
+    )
+
+    assert response.status_code == 200, f"Failed to add student: {response.json()}"
+
+
 def test_block_user_success():
     group_response = create_group()
     created_group_id = group_response["id"]
+
+    # Ensure the student is added to the group
+    add_student_to_group(created_group_id, test_student_id)
 
     token_data = authenticate_user()
     headers = {"Authorization": f"Bearer {token_data['access_token']}"}

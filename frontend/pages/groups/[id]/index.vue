@@ -407,6 +407,9 @@ const handleRequest = async (
         (request) => request.id !== requestId,
       );
 
+      toast({
+        title: "Success",
+      });
       // Reload group data to get fresh information
       await loadGroup();
     }

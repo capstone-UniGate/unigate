@@ -58,12 +58,6 @@ const handleBlock = async (studentId: string) => {
       // Remove the blocked user from the members list
       members.value = members.value.filter((member) => member.id !== studentId);
 
-      toast({
-        title: "Success",
-        description: "User has been blocked",
-        variant: "success",
-      });
-
       // Reload members to get updated list
       await loadMembers();
     }
