@@ -1,44 +1,75 @@
 <template>
   <div class="container mx-auto px-4 py-8 mt-16">
-    <div v-if="isLoading">
-      <LoadingIndicator />
-    </div>
-    <div v-else-if="isError">
-      <ErrorMessage @retry="initializeData" />
-    </div>
-    <div v-else class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
-      <!-- User Profile Header -->
-      <div class="flex items-center space-x-4 mb-6">
-        <Avatar class="w-20 h-20">
-          <AvatarImage
-            src="https://github.com/radix-vue.png"
-            alt="@radix-vue"
-          />
-          <AvatarFallback>{{ getInitials }}</AvatarFallback>
-        </Avatar>
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900">
-            {{ currentStudent?.name }} {{ currentStudent?.surname }}
-          </h1>
-          <p class="text-gray-500">
-            Student Number: {{ currentStudent?.number }}
-          </p>
-          <!-- Role Badge -->
-          <span
-            :class="[
-              'inline-block px-3 py-1 mt-2 rounded-full text-sm font-medium',
-              userRole === 'Student'
-                ? 'bg-blue-100 text-blue-800'
-                : 'bg-purple-100 text-purple-800',
-            ]"
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+      <!-- User Profile Header with Edit Button -->
+      <div class="flex justify-between items-start mb-6">
+        <div class="flex items-center space-x-4">
+          <div
+            class="relative group cursor-pointer"
+            @click="triggerFileInput"
+            v-if="!isUploading"
           >
-            {{ userRole }}
-          </span>
+            <Avatar class="w-20 h-20">
+              <AvatarImage
+                :src="
+                  currentStudent?.avatarUrl ||
+                  'https://github.com/radix-vue.png'
+                "
+                alt="@radix-vue"
+              />
+              <AvatarFallback>{{ getInitials }}</AvatarFallback>
+            </Avatar>
+            <div
+              class="absolute inset-0 bg-black bg-opacity-40 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+            >
+              <span class="text-white text-sm">Change Photo</span>
+            </div>
+          </div>
+          <div
+            v-else
+            class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center"
+          >
+            <span class="animate-spin">⌛</span>
+          </div>
+          <input
+            type="file"
+            ref="fileInput"
+            class="hidden"
+            accept="image/*"
+            @change="handleFileUpload"
+          />
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">
+              {{ currentStudent?.name }} {{ currentStudent?.surname }}
+            </h1>
+            <p class="text-gray-500">
+              Student Number: {{ currentStudent?.number }}
+            </p>
+            <span
+              :class="[
+                'inline-block px-3 py-1 mt-2 rounded-full text-sm font-medium',
+                userRole === 'Student'
+                  ? 'bg-blue-100 text-blue-800'
+                  : 'bg-purple-100 text-purple-800',
+              ]"
+            >
+              {{ userRole }}
+            </span>
+          </div>
         </div>
+
+        <!-- Edit Button -->
+        <Button
+          @click="isEditing = true"
+          class="bg-blue-500 hover:bg-blue-600 text-white"
+          v-if="!isEditing"
+        >
+          Edit Profile
+        </Button>
       </div>
 
       <!-- User Details -->
-      <div class="space-y-4">
+      <div class="space-y-4" v-if="!isEditing">
         <div class="border-t pt-4">
           <h2 class="text-lg font-semibold text-gray-900 mb-2">
             Contact Information
@@ -68,6 +99,68 @@
           <p v-else class="text-gray-500">Not a member of any groups yet.</p>
         </div>
       </div>
+
+      <!-- Edit Form -->
+      <div v-else class="space-y-4">
+        <div class="border-t pt-4">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Edit Profile</h2>
+          <form @submit.prevent="handleSubmit" class="space-y-4">
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-gray-700">Name</label>
+              <input
+                v-model="editForm.name"
+                type="text"
+                class="w-full p-2 border rounded-md"
+                required
+              />
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-gray-700">Surname</label>
+              <input
+                v-model="editForm.surname"
+                type="text"
+                class="w-full p-2 border rounded-md"
+                required
+              />
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-gray-700">Email</label>
+              <input
+                v-model="editForm.email"
+                type="email"
+                class="w-full p-2 border rounded-md bg-gray-100"
+                disabled
+              />
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-gray-700"
+                >Student Number</label
+              >
+              <input
+                v-model="editForm.number"
+                type="text"
+                class="w-full p-2 border rounded-md bg-gray-100"
+                disabled
+              />
+            </div>
+
+            <div class="flex space-x-4 pt-4">
+              <Button
+                type="submit"
+                class="bg-green-500 hover:bg-green-600 text-white"
+              >
+                Save Changes
+              </Button>
+              <Button type="button" @click="cancelEdit" variant="outline">
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -78,14 +171,23 @@ import { useRouter } from "vue-router";
 import { useCurrentStudent } from "@/composables/useCurrentStudent";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import LoadingIndicator from "@/components/LoadingIndicator.vue";
-import ErrorMessage from "@/components/ErrorMessage.vue";
+import { useToast } from "@/components/ui/toast/use-toast";
 
 const router = useRouter();
 const { currentStudent, getCurrentStudent } = useCurrentStudent();
+const { toast } = useToast();
 const userGroups = ref([]);
-const isLoading = ref(true);
-const isError = ref(false);
+const isEditing = ref(false);
+const fileInput = ref<HTMLInputElement | null>(null);
+const isUploading = ref(false);
+
+// Edit form state
+const editForm = ref({
+  name: "",
+  surname: "",
+  email: "",
+  number: "",
+});
 
 // Compute user role based on email prefix
 const userRole = computed(() => {
@@ -99,28 +201,107 @@ const userRole = computed(() => {
 });
 
 // Compute initials from student name
+const getInitials = computed(() => {
+  if (!currentStudent.value?.name) return "U";
+  const names =
+    `${currentStudent.value.name} ${currentStudent.value.surname}`.split(" ");
+  return names
+    .map((name) => name[0])
+    .join("")
+    .toUpperCase();
+});
 
-// Initialize data
-const initializeData = async () => {
-  try {
-    isLoading.value = true;
-    isError.value = false;
-
-    if (!currentStudent.value) {
-      await getCurrentStudent();
-    }
-
-    // Here you would fetch user's groups
-    // const groups = await fetchUserGroups()
-    // userGroups.value = groups
-  } catch (error) {
-    console.error("Error initializing user data:", error);
-    isError.value = true;
-  } finally {
-    isLoading.value = false;
+// Initialize edit form with current user data
+const initializeEditForm = () => {
+  if (currentStudent.value) {
+    editForm.value = {
+      name: currentStudent.value.name,
+      surname: currentStudent.value.surname,
+      email: currentStudent.value.email,
+      number: currentStudent.value.number,
+    };
   }
 };
 
-// Initialize on component mount
-onMounted(initializeData);
+// Handle form submission
+const handleSubmit = async () => {
+  try {
+    // Add your API call here to update user information
+    // await updateUserProfile(editForm.value)
+
+    // Update local state
+    if (currentStudent.value) {
+      currentStudent.value = {
+        ...currentStudent.value,
+        name: editForm.value.name,
+        surname: editForm.value.surname,
+      };
+    }
+
+    toast({
+      title: "Success",
+      description: "Profile updated successfully",
+    });
+
+    isEditing.value = false;
+  } catch (error) {
+    toast({
+      title: "Error",
+      description: "Failed to update profile",
+      variant: "destructive",
+    });
+    console.error("Error updating profile:", error);
+  }
+};
+
+// Cancel edit mode
+const cancelEdit = () => {
+  isEditing.value = false;
+  initializeEditForm(); // Reset form to current values
+};
+
+const triggerFileInput = () => {
+  fileInput.value?.click();
+};
+
+const handleFileUpload = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+
+  if (!file) return;
+
+  try {
+    isUploading.value = true;
+
+    // TODO: Implement file upload
+    // Here:
+    // 1. Upload the file to your server/storage
+    // 2. Get back the URL
+    // 3. Update the user's profile with the new avatar URL
+
+    toast({
+      title: "Success",
+      description: "Profile photo updated successfully",
+    });
+  } catch (error) {
+    toast({
+      title: "Error",
+      description: "Failed to update profile photo",
+      variant: "destructive",
+    });
+    console.error("Error uploading avatar:", error);
+  } finally {
+    isUploading.value = false;
+    if (fileInput.value) fileInput.value.value = ""; // Reset file input
+  }
+};
+
+onMounted(async () => {
+  if (!currentStudent.value) {
+    await getCurrentStudent();
+  }
+  initializeEditForm();
+  // Here you would typically fetch the user's groups
+  // Add the actual API call to get user's groups
+});
 </script>
