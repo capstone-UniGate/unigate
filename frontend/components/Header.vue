@@ -44,15 +44,27 @@
           >
         </nav>
 
-        <!-- Logout Button (Desktop) -->
-        <button
-          v-if="isLoggedIn"
-          @click="handleLogout"
-          id="logout-button"
-          class="hidden md:block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
-        >
-          Logout
-        </button>
+        <div class="flex items-center space-x-6">
+          <!-- Logout Button (Desktop) -->
+          <button
+            v-if="isLoggedIn"
+            @click="handleLogout"
+            id="logout-button"
+            class="hidden md:block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+          >
+            Logout
+          </button>
+
+          <router-link to="/user" class="cursor-pointer">
+            <Avatar>
+              <AvatarImage
+                src="https://github.com/radix-vue.png"
+                alt="@radix-vue"
+              />
+              <AvatarFallback>{{ getInitials }}</AvatarFallback>
+            </Avatar>
+          </router-link>
+        </div>
 
         <!-- Mobile Menu Button -->
         <button @click="toggleMenu" class="md:hidden text-blue-800">
@@ -107,12 +119,24 @@
 <script setup lang="ts">
 import { useAuth } from "@/composables/useAuth";
 import { useCurrentStudent } from "@/composables/useCurrentStudent";
-import { onMounted, watch } from "vue";
+import { onMounted, watch, computed } from "vue";
 import { useRouter } from "vue-router";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const { logout, isLoggedIn } = useAuth();
 const { currentStudent, getCurrentStudent } = useCurrentStudent();
 const router = useRouter();
+
+// Compute initials from student name
+const getInitials = computed(() => {
+  if (!currentStudent.value?.name) return "U";
+  const names =
+    `${currentStudent.value.name} ${currentStudent.value.surname}`.split(" ");
+  return names
+    .map((name) => name[0])
+    .join("")
+    .toUpperCase();
+});
 
 // Watch for login state changes
 watch(isLoggedIn, async (newValue) => {
