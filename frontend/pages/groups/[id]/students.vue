@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/toast/use-toast";
 import { ref, onMounted } from "vue";
 import { useCurrentStudent } from "@/composables/useCurrentStudent";
 import { useGroups } from "@/composables/useGroups";
+import { User } from "lucide-vue-next";
 
 const { getGroupStudents, handleUserBlock } = useGroups();
 const { currentStudent, getCurrentStudent } = useCurrentStudent();
@@ -24,6 +25,12 @@ const activeTab = ref("members");
 const isSuperStudent = () => {
   return superStudents.value.some(
     (student) => student.id === currentStudent.value?.id,
+  );
+};
+
+const notSamestudent = (member_id: string) => {
+  return superStudents.value.some(
+    (student) => member_id !== currentStudent.value?.id,
   );
 };
 
@@ -193,7 +200,7 @@ onMounted(async () => {
 
           <!-- Block Button - Only visible to super students -->
           <button
-            v-if="isSuperStudent()"
+            v-if="isSuperStudent() && notSamestudent(member.id)"
             @click="handleBlock(member.id)"
             class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition"
             id="block_member"
