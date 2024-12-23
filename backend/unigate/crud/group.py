@@ -94,9 +94,12 @@ class CRUDGroup(CRUDBase[Group, GroupCreate, Group]):
         self, *, group: Group, student: Student, session: Session
     ) -> None:
         request = next(
-            r
-            for r in group.requests
-            if r.student_id == student.id and r.status == "PENDING"
+            (
+                r
+                for r in group.requests
+                if r.student_id == student.id and r.status == "PENDING"
+            ),
+            None,
         )
         group.requests.remove(request)  # type: ignore
         session.delete(request)
