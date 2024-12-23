@@ -93,7 +93,11 @@ class CRUDGroup(CRUDBase[Group, GroupCreate, Group]):
     def delete_request(
         self, *, group: Group, student: Student, session: Session
     ) -> None:
-        request = next((r for r in group.requests if r.student_id == student.id), None)
+        request = next(
+            r
+            for r in group.requests
+            if r.student_id == student.id and r.status == "PENDING"
+        )
         group.requests.remove(request)  # type: ignore
         session.delete(request)
         session.commit()
