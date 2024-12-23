@@ -90,8 +90,7 @@ def undo_join_request(
     request = next((r for r in group.requests if r.student_id == current_user.id), None)
 
     if not request:
-        raise HTTPException(
-            status_code=404, detail="No join request found.")
+        raise HTTPException(status_code=404, detail="No join request found.")
 
     if request.status != RequestStatus.PENDING:
         raise HTTPException(
