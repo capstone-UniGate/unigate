@@ -111,7 +111,7 @@
                 v-model="editForm.name"
                 type="text"
                 class="w-full p-2 border rounded-md"
-                required
+                disabled
               />
             </div>
 
@@ -121,7 +121,7 @@
                 v-model="editForm.surname"
                 type="text"
                 class="w-full p-2 border rounded-md"
-                required
+                disabled
               />
             </div>
 
@@ -223,41 +223,9 @@ const initializeEditForm = () => {
   }
 };
 
-// Handle form submission
-const handleSubmit = async () => {
-  try {
-    // Add your API call here to update user information
-    // await updateUserProfile(editForm.value)
-
-    // Update local state
-    if (currentStudent.value) {
-      currentStudent.value = {
-        ...currentStudent.value,
-        name: editForm.value.name,
-        surname: editForm.value.surname,
-      };
-    }
-
-    toast({
-      title: "Success",
-      description: "Profile updated successfully",
-    });
-
-    isEditing.value = false;
-  } catch (error) {
-    toast({
-      title: "Error",
-      description: "Failed to update profile",
-      variant: "destructive",
-    });
-    console.error("Error updating profile:", error);
-  }
-};
-
 // Cancel edit mode
 const cancelEdit = () => {
   isEditing.value = false;
-  initializeEditForm(); // Reset form to current values
 };
 
 const triggerFileInput = () => {

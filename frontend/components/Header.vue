@@ -12,7 +12,9 @@
               alt="Logo"
               class="h-8 w-8 mr-2"
             />
-            <router-link to="/" class="text-blue-800">UniGate</router-link>
+            <router-link to="/homepage" class="text-blue-800"
+              >UniGate</router-link
+            >
           </div>
           <!-- Student Name -->
           <div
@@ -55,7 +57,8 @@
             Logout
           </button>
 
-          <router-link to="/user" class="cursor-pointer">
+          <!-- Updated Avatar with click handler -->
+          <div class="cursor-pointer" @click="router.push('/user')">
             <Avatar>
               <AvatarImage
                 src="https://github.com/radix-vue.png"
@@ -63,7 +66,7 @@
               />
               <AvatarFallback>{{ getInitials }}</AvatarFallback>
             </Avatar>
-          </router-link>
+          </div>
         </div>
 
         <!-- Mobile Menu Button -->
