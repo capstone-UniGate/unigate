@@ -45,14 +45,16 @@
         </nav>
 
         <!-- Logout Button (Desktop) -->
-        <button
-          v-if="isLoggedIn"
-          @click="handleLogout"
-          id="logout-button"
-          class="hidden md:block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
-        >
-          Logout
-        </button>
+        <div class="flex items-center space-x-4">
+          <button
+            v-if="isLoggedIn"
+            @click="handleLogout"
+            id="logout-button"
+            class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+          >
+            Logout
+          </button>
+        </div>
 
         <!-- Mobile Menu Button -->
         <button @click="toggleMenu" class="md:hidden text-blue-800">
@@ -91,7 +93,7 @@
         <button
           v-if="isLoggedIn"
           @click="handleLogout"
-          class="block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-center"
+          class="w-full bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-center"
         >
           Logout
         </button>
