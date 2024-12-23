@@ -45,16 +45,14 @@
         </nav>
 
         <!-- Logout Button (Desktop) -->
-        <div class="flex items-center space-x-4">
-          <button
-            v-if="isLoggedIn"
-            @click="handleLogout"
-            id="logout-button"
-            class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
-          >
-            Logout
-          </button>
-        </div>
+        <button
+          v-if="isLoggedIn"
+          @click="handleLogout"
+          id="logout-button"
+          class="hidden md:block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+        >
+          Logout
+        </button>
 
         <!-- Mobile Menu Button -->
         <button @click="toggleMenu" class="md:hidden text-blue-800">
@@ -80,7 +78,7 @@
         v-if="isMenuOpen"
         class="md:hidden bg-light-blue-100 text-blue-800 p-4 space-y-4 border-t border-blue-300"
       >
-        <router-link to="/" class="block hover:text-blue-500 transition"
+        <router-link to="/homepage" class="block hover:text-blue-500 transition"
           >Home</router-link
         >
         <router-link to="/about" class="block hover:text-blue-500 transition"
@@ -93,7 +91,7 @@
         <button
           v-if="isLoggedIn"
           @click="handleLogout"
-          class="w-full bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-center"
+          class="block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-center"
         >
           Logout
         </button>
@@ -115,6 +113,7 @@ import { useRouter } from "vue-router";
 const { logout, isLoggedIn } = useAuth();
 const { currentStudent, getCurrentStudent } = useCurrentStudent();
 const router = useRouter();
+const isMenuOpen = ref(false);
 
 // Watch for login state changes
 watch(isLoggedIn, async (newValue) => {
@@ -139,6 +138,9 @@ const handleLogout = async () => {
   } catch (error) {
     console.error("Logout error:", error);
   }
+};
+const toggleMenu = async () => {
+  isMenuOpen.value = !isMenuOpen.value;
 };
 </script>
 
