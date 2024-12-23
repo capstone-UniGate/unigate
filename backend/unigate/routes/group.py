@@ -78,6 +78,32 @@ def join_group(
     return crud.group.join(session=session, group=group, student=current_user)
 
 
+@router.delete(
+    "/{group_id}/undo-join",
+)
+def undo_join_request(
+    session: SessionDep,
+    group: GroupDep,
+    current_user: CurrStudentDep,
+) -> dict:
+    # Check if the student has a pending request
+    request = next((r for r in group.requests if r.student_id == current_user.id), None)
+
+    if not request:
+        raise HTTPException(
+            status_code=404, detail="No join request found.")
+
+    if request.status != RequestStatus.PENDING:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Request is not pending",
+        )
+
+    crud.group.delete_request(session=session, group=group, student=current_user)
+
+    return {"message": "Join request undo successfully."}
+
+
 @router.post(
     "/{group_id}/leave",
     response_model=GroupReadWithStudents,
