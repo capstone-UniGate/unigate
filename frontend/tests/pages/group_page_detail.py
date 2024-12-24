@@ -190,3 +190,7 @@ class GroupPageDetail:
 
     def check_no_reqs(self) -> bool:
         return self.driver.find_element(By.ID, "no_requests").is_displayed()
+
+    def click_undo_request(self) -> None:
+        undo_button = self.driver.find_element(By.ID, "undo-request-button")
+        undo_button.click()
