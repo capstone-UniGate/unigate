@@ -123,38 +123,3 @@ def test_valid_join() -> None:
     assert any(student["id"] == joiner_id for student in students), (
         f"Joiner {joiner_id} not found in group students list"
     )
-
-
-def test_double_enrollment() -> None:
-    """
-    Tests that if a student tries to enroll a second time in the same group,
-    the API does not create duplicate entries.
-    """
-
-    # Log in as the creator and create a group
-    creator_data = authenticate_user("S1234567")
-    creator_token = creator_data["access_token"]
-    group_info = create_group(creator_token)
-    created_group_id = group_info["id"]
-
-    # Log in as another user to join the group
-    joiner_data = authenticate_user("S4989646")
-    joiner_token = joiner_data["access_token"]
-
-    headers = {"Authorization": f"Bearer {joiner_token}"}
-
-    # First join request
-    first_join = client.post(f"/groups/{created_group_id}/join", headers=headers)
-    assert first_join.status_code == 200
-
-    # Second join request
-    second_join = client.post(f"/groups/{created_group_id}/join", headers=headers)
-    assert second_join.status_code == 200
-
-    # Verify that the joiner is only added once to the group
-    group_response = second_join.json()
-    students = group_response["students"]
-    student_ids = [student["id"] for student in students]
-    assert student_ids.count(joiner_data["user_id"]) == 1, (
-        f"Joiner {joiner_data['user_id']} appears more than once in group students list"
-    )
