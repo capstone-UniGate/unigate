@@ -317,6 +317,7 @@ const checkBlockStatus = () => {
     (student: { number: any }) =>
       student.number === currentStudent.value?.number,
   );
+  return isBlocked.value;
 };
 
 async function loadGroup() {
@@ -327,13 +328,16 @@ async function loadGroup() {
     // First get current student
     await getCurrentStudent();
 
-    // Then load group data and check membership in parallel
-    const [groupData] = await Promise.all([getGroupById(groupId.toString())]);
-
+    // Load group data
+    const groupData = await getGroupById(groupId.toString());
     group.value = groupData;
 
-    // Check if the student is blocked
-    checkBlockStatus();
+    // Check if user is blocked for this specific group
+    const blockStatus = await checkBlockStatus();
+    if (blockStatus) {
+      router.push("/groups/blocked");
+      return;
+    }
   } catch (error) {
     isError.value = true;
     toast({
@@ -445,7 +449,8 @@ const askToJoinGroup = async () => {
 
 const undoJoinRequest = async () => {
   try {
-    await useApiFetch(`/groups/${groupId}/undo-join`, {
+    // Call the backend to delete the join request
+    await useApiFetch(`/groups/${groupId}/requests/undo`, {
       method: "DELETE",
     });
 

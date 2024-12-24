@@ -1,5 +1,11 @@
 <script setup lang="ts">
+const router = useRouter();
 const { groups, isLoading, isError, getAllGroups } = useGroups();
+
+const gotoYourGroups = () => {
+  // Fetch groups for the authenticated user
+  router.push("/groups/see-my-group");
+};
 
 onMounted(() => {
   getAllGroups();
@@ -15,6 +21,13 @@ onMounted(() => {
 
     <!-- Loading Indicator Component -->
     <LoadingIndicator v-if="isLoading" />
+
+    <Button
+      @click="gotoYourGroups"
+      class="ml-auto bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-semibold py-1 px-2 rounded-lg shadow-lg hover:from-blue-500 hover:to-blue-600 hover:shadow-xl active:scale-95 transition-all mb-4"
+    >
+      See Your Groups
+    </Button>
 
     <!-- Group Cards List -->
     <div

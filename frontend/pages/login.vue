@@ -21,12 +21,14 @@
               v-model="form.username"
               placeholder="Enter your username"
               :type="'text'"
+              tabindex="1"
             />
             <button
               v-if="form.username"
               @click="clearInput('username')"
               class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               type="button"
+              tabindex="-1"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -53,12 +55,14 @@
               v-model="form.password"
               placeholder="Enter your password"
               :type="'password'"
+              tabindex="1"
             />
             <button
               v-if="form.password"
               @click="clearInput('password')"
               class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               type="button"
+              tabindex="-1"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -95,6 +99,7 @@
           type="button"
           class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white"
           :disabled="!isFormValid"
+          tabindex="3"
         >
           Login
         </Button>
