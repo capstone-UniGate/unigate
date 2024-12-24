@@ -18,6 +18,7 @@ const groupId = route.params.id;
 const members = ref([]);
 const superStudents = ref([]);
 const blockedStudents = ref([]);
+const sameStudent = ref([]);
 const isLoading = ref(true);
 const activeTab = ref("members");
 
@@ -27,7 +28,6 @@ const isSuperStudent = () => {
     (student) => student.id === currentStudent.value?.id,
   );
 };
-ù;
 
 const notSamestudent = (member_id: string) => {
   return superStudents.value.some(
