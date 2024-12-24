@@ -1,124 +1,160 @@
-import secrets
-import string
-from unittest.mock import MagicMock
-from uuid import UUID
-
-import pytest
+import uuid
 from fastapi.testclient import TestClient
+from unittest.mock import MagicMock
+import pytest
 from sqlalchemy.orm import Session
+
 from unigate.core.database import engine
 from unigate.main import app
 from unigate.models import Student
 
 client = TestClient(app)
 
+test_student_password = "testpassword"
 
-@pytest.fixture
-def mock_session() -> MagicMock:
-    session: MagicMock = MagicMock(spec=Session)
-    return session
+# -------------------------------------------------------------------
+# Helper Functions
+# -------------------------------------------------------------------
 
-
-def create_student(student_id: str, number: int, mail: str) -> None:
+def authenticate_user(username="S1234567") -> dict:
     """
-    Check if a Student record exists, and create one if it does not.
-
-    Args:
-        student_id (str): The UUID of the student to check or insert.
+    Logs in a user and returns the authentication token.
     """
-    with Session(engine) as session:
-        # Check if the student already exists
-        existing_student = session.query(Student).filter_by(id=UUID(student_id)).first()
-        if existing_student:
-            return
-
-        # Create a new student record
-        student = Student(
-            id=UUID(student_id),
-            hashed_password="hashedpassword123",  # noqa: S106  # Replace with actual hashed password logic
-            number=number,  # Unique student number
-            email=mail + "@example.com",  # Unique email
-            name="Test",
-            surname="Student",
-        )
-        session.add(student)
-        session.commit()
-
-
-def create_group(student_id: str, group_id: str) -> dict[str, str]:
-    group_payload = {
-        "id": group_id,
-        "name": f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}",
-        "description": "A test group description",
-        "category": "Test Category",
-        "type": "Public",
-        "creator_id": student_id,
+    login_payload = {
+        "username": username,
+        "password": test_student_password,
     }
-    response = client.post("/groups/create", json=group_payload)
+
+    response = client.post("/auth/login", data=login_payload)
+    assert (
+        response.status_code == 200
+    ), f"Failed to authenticate user: {response.json()}"
     return response.json()
 
 
+def create_group(token: str) -> dict:
+    """
+    Creates a public group and returns the group data.
+    """
+    group_payload = {
+        "id": str(uuid.uuid4()),
+        "name": f"TestGroup-{uuid.uuid4().hex[:6]}",
+        "description": "A test group description",
+        "category": "Test Category",
+        "type": "Public",
+    }
+
+    headers = {"Authorization": f"Bearer {token}"}
+    response = client.post("/groups", json=group_payload, headers=headers)
+
+    assert response.status_code == 200, f"Failed to create group: {response.json()}"
+    return response.json()
+
+# -------------------------------------------------------------------
+# Test Cases
+# -------------------------------------------------------------------
+
 def test_student_non_existent() -> None:
-    student_id = "12345678-1234-5678-1234-567812345678"
-    create_student(student_id=student_id, number=12345, mail="teststudent")
-    student_id_2 = "12345678-1234-5678-1234-567812345676"
-    group_id = "12345678-1234-5678-1234-567812345678"
+    """
+    If the student doesn't exist in the DB, joining a public group should fail
+    with a 403 or 404 response.
+    """
 
-    create_group(student_id=student_id, group_id=group_id)
-    r = client.post(
-        "/groups/join_public_group",
-        params={
-            "student_id": student_id_2,
-            "group_id": group_id,
-        },
-    )
-    assert r.status_code == 200
-    assert r.json() == "Either the group or the student don't exist"
+    # Log in as the creator and create a group
+    creator_data = authenticate_user("S1234567")
+    creator_token = creator_data["access_token"]
+    group_info = create_group(creator_token)
+    created_group_id = group_info["id"]
+
+    # Use a fake token to simulate a non-existent student
+    headers = {"Authorization": "Bearer Cerioli Sium"}
+
+    response = client.post(f"/groups/{created_group_id}/join", headers=headers)
+    assert response.status_code == 403, f"Unexpected status code: {response.status_code}"
+    assert response.json() == {"detail": "Could not validate credentials"}
 
 
-def test_group_non_existant() -> None:
-    student_id = "12345678-1234-5678-1234-567812345678"
-    create_student(student_id=student_id, number=12345, mail="teststudent")
-    group_id = "12345678-1234-5678-1234-567812345677"
+def test_group_non_existent() -> None:
+    """
+    If the group doesn't exist in the DB, joining should fail with 404 response.
+    """
 
-    r = client.post(
-        "/groups/join_public_group",
-        params={
-            "student_id": student_id,
-            "group_id": group_id,
-        },
-    )
-    assert r.status_code == 200
-    assert r.json() == "Either the group or the student don't exist"
+    # Log in as a valid user
+    user_data = authenticate_user("S4989646")
+    user_token = user_data["access_token"]
+
+    # Use a random group ID that doesn't exist
+    random_group_id = str(uuid.uuid4())
+
+    headers = {"Authorization": f"Bearer {user_token}"}
+    response = client.post(f"/groups/{random_group_id}/join", headers=headers)
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Group not found."}
 
 
 def test_valid_join() -> None:
-    student_id = "12345678-1234-5678-1234-567812345677"
-    create_student(student_id=student_id, number=12346, mail="teststudentss")
-    group_id = "12345678-1234-5678-1234-567812345678"
+    """
+    A valid scenario where a user successfully joins a public group.
+    Should return the group object with the updated list of students.
+    """
 
-    r = client.post(
-        "/groups/join_public_group",
-        params={
-            "student_id": student_id,
-            "group_id": group_id,
-        },
+    # Log in as the creator and create a group
+    creator_data = authenticate_user("S1234567")
+    creator_token = creator_data["access_token"]
+    group_info = create_group(creator_token)
+    created_group_id = group_info["id"]
+
+    # Log in as another user to join the group
+    joiner_data = authenticate_user("S4989646")
+    joiner_token = joiner_data["access_token"]
+
+    headers = {"Authorization": f"Bearer {joiner_token}"}
+    response = client.post(f"/groups/{created_group_id}/join", headers=headers)
+
+    assert response.status_code == 200
+    group_response = response.json()
+
+    joiner_id = client.get(f"/students/me", headers=headers).json()["id"]
+
+    # Check that the group contains the joiner's details
+    assert "students" in group_response, "Expected 'students' field in response"
+    students = group_response["students"]
+    assert any(student["id"] == joiner_id for student in students), (
+        f"Joiner {joiner_id} not found in group students list"
     )
-    assert r.status_code == 200
-    assert r.json() == "Insert successful"
 
 
-def test_double_enrollment(client: TestClient) -> None:
-    student_id = "12345678-1234-5678-1234-567812345677"
-    create_student(student_id=student_id, number=12346, mail="teststudentss")
-    group_id = "12345678-1234-5678-1234-567812345678"
+def test_double_enrollment() -> None:
+    """
+    Tests that if a student tries to enroll a second time in the same group,
+    the API does not create duplicate entries.
+    """
 
-    r = client.post(
-        "/groups/join_public_group",
-        params={
-            "student_id": student_id,
-            "group_id": group_id,
-        },
+    # Log in as the creator and create a group
+    creator_data = authenticate_user("S1234567")
+    creator_token = creator_data["access_token"]
+    group_info = create_group(creator_token)
+    created_group_id = group_info["id"]
+
+    # Log in as another user to join the group
+    joiner_data = authenticate_user("S4989646")
+    joiner_token = joiner_data["access_token"]
+
+    headers = {"Authorization": f"Bearer {joiner_token}"}
+
+    # First join request
+    first_join = client.post(f"/groups/{created_group_id}/join", headers=headers)
+    assert first_join.status_code == 200
+
+    # Second join request
+    second_join = client.post(f"/groups/{created_group_id}/join", headers=headers)
+    assert second_join.status_code == 200
+
+    # Verify that the joiner is only added once to the group
+    group_response = second_join.json()
+    students = group_response["students"]
+    student_ids = [student["id"] for student in students]
+    assert student_ids.count(joiner_data["user_id"]) == 1, (
+        f"Joiner {joiner_data['user_id']} appears more than once in group students list"
     )
-    assert r.status_code == 200
-    assert r.json() == "You are already enrolled in a team for the same course"

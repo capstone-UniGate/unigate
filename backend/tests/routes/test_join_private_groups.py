@@ -51,19 +51,11 @@ def create_group() -> dict:
 
 
 def test_join_private_group_success() -> None:
-    """
-    1) Create a private group.
-    2) Log in as user 'S4989646'.
-    3) Request to join the group.
-    4) Ensure that a join request is created (PENDING).
-    5) (Optional) Approve that request and verify it's approved.
-    """
-
-    # 1) Create the private group
+    # Create the private group
     group_response = create_group()
     created_group_id = group_response["id"]
 
-    # 2) Log in as user 'S4989646'
+    # Log in as user 'S4989646'
     token_data = authenticate_user("S4989646")
     headers = {"Authorization": f"Bearer {token_data['access_token']}"}
 
@@ -71,26 +63,24 @@ def test_join_private_group_success() -> None:
     assert me_response.status_code == 200, f"Could not fetch 'me': {me_response.json()}"
     joiner_id = me_response.json()["id"]
 
-    # 3) Ask to join the newly created private group
+    # Ask to join the newly created private group
     join_response = client.post(
         f"/groups/{created_group_id}/join",
         headers=headers,
     )
-    # For a private group, your API might return 200 or 400 depending on how you handle "request created" vs. "already requested".
-    # Adjust as needed based on your endpoint's actual response:
+    # For a private group
     assert join_response.status_code in [200, 400], f"Join request failed: {join_response.json()}"
 
     token_data = authenticate_user()
     headers = {"Authorization": f"Bearer {token_data['access_token']}"}
 
-    # 4) Verify that the join request is present (and is PENDING)
-    #    - Typically, you might fetch the user's ID by calling GET /students/me
+    # Verify that the join request is present (and is PENDING)
     me_response = client.get("/students/me", headers=headers)
     assert me_response.status_code == 200, f"Could not fetch 'me': {me_response.json()}"
     me_data = me_response.json()
     user_id = me_data["id"]
 
-    #    - Now, retrieve the pending requests for this group
+    # Retrieve the pending requests for this group
     requests_response = client.get(f"/groups/{created_group_id}/requests", headers=headers)
     assert requests_response.status_code == 200, f"Could not retrieve requests: {requests_response.json()}"
     requests_data = requests_response.json()
@@ -101,7 +91,7 @@ def test_join_private_group_success() -> None:
     ), f"Join request not found for user {joiner_id}. Requests data: {requests_data}"
     assert join_request["status"] == "PENDING"
 
-    # 5) (Optional) Approve the request and verify it's approved
+    # Approve the request and verify it's approved
     approve_path = f"groups/{created_group_id}/requests/{join_request['id']}/approve"
     approve_response = client.post(approve_path, headers=headers)
     assert approve_response.status_code == 200, f"Failed to approve request: {approve_response.json()}"

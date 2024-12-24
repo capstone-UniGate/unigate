@@ -198,30 +198,3 @@ def test_reject_request_already_rejected() -> None:
 
     assert second_response.status_code == 400
     assert second_response.json() == {"detail": "Request is already rejected."}
-
-
-def test_approve_request_success() -> None:
-    create_student(student_id=student_id, email_par="ciao@example.com")
-    create_student(student_id=student_id2, email_par="ciao2@example.com")
-    group_data = create_private_group(group_id, student_id)
-    created_group_id = group_data["id"]
-
-    token_data = authenticate_user()
-    token = token_data["access_token"]
-    headers = {"Authorization": f"Bearer {token}"}
-
-    # Create a join request
-    client.post(f"/groups/{created_group_id}/join", headers=headers)
-
-    # Get the request ID
-    response = client.get(f"/groups/{created_group_id}/requests", headers=headers)
-    requests_data = response.json()
-    if len(requests_data) == 0:
-        # If no requests, can't approve. Just return.
-        return
-    request_id = requests_data[0]["id"]
-
-    approve_response = client.post(
-        f"/groups/{created_group_id}/requests/{request_id}/approve", headers=headers
-    )
-    assert approve_response.status_code == 200
