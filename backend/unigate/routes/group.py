@@ -79,7 +79,7 @@ def join_group(
 
 
 @router.delete(
-    "/{group_id}/undo-join",
+    "/{group_id}/requests/undo",
 )
 def undo_join_request(
     session: SessionDep,
@@ -87,7 +87,14 @@ def undo_join_request(
     current_user: CurrStudentDep,
 ) -> dict:
     # Check if the student has a pending request
-    request = next((r for r in group.requests if r.student_id == current_user.id), None)
+    request = next(
+        (
+            r
+            for r in group.requests
+            if r.student_id == current_user.id and r.status == "PENDING"
+        ),
+        None,
+    )
 
     if not request:
         raise HTTPException(status_code=404, detail="No join request found.")
@@ -98,7 +105,9 @@ def undo_join_request(
             detail="Request is not pending",
         )
 
-    crud.group.delete_request(session=session, group=group, student=current_user)
+    crud.group.delete_request(
+        session=session, group=group, student=current_user, request=request
+    )
 
     return {"message": "Join request undo successfully."}
 
@@ -239,16 +248,3 @@ def unblock_user(
             detail="You are not a super student of this group",
         )
     return crud.group.unblock_user(session=session, group=group, student=student)
-
-
-@router.delete(
-    "/{group_id}/requests/undo",
-    status_code=204,
-    summary="Undo join request",
-)
-def undo_join_request(
-    session: SessionDep,
-    group: GroupDep,
-    current_user: CurrStudentDep,
-) -> None:
-    crud.group.delete_request(session=session, group=group, student=current_user)

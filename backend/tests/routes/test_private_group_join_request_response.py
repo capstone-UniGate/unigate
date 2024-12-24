@@ -197,4 +197,4 @@ def test_reject_request_already_rejected() -> None:
     )
 
     assert second_response.status_code == 400
-    assert second_response.json() == {"detail": "Request is already rejected."}
+    assert second_response.json() == {"detail": "Request is not pending"}
