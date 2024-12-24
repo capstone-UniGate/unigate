@@ -5,10 +5,7 @@ from unigate.main import app
 
 client = TestClient(app)
 
-test_student_username = "S1234567"
 test_student_password = "testpassword"
-test_student_id = "d6dcf3b1-425a-4864-88d3-525decebef18"
-
 
 def authenticate_user(username = "S1234567") -> dict:
     login_payload = {

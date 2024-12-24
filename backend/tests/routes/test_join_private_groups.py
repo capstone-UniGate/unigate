@@ -1,8 +1,7 @@
 import secrets
 import string
 from unittest.mock import MagicMock
-from uuid import UUID
-
+import uuid
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
@@ -12,102 +11,104 @@ from unigate.models import Student
 
 client: TestClient = TestClient(app)
 
+test_student_password = "testpassword"
 
-@pytest.fixture
-def mock_session() -> MagicMock:
-    session: MagicMock = MagicMock(spec=Session)
-    return session
-
-
-@pytest.fixture
-def valid_private_group_payload() -> dict[str, str]:
-    return {
-        "name": f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}",
-        "description": "A test group description",
-        "category": "Test Category",
-        "type": "Private",
-        "creator_id": "12345678-1234-5678-1234-567812345678",
+def authenticate_user(username = "S1234567") -> dict:
+    """
+    Logs in the user with the given username and returns the token data.
+    """
+    login_payload = {
+        "username": username,
+        "password": test_student_password,
     }
 
+    response = client.post("/auth/login", data=login_payload)
+    assert (
+        response.status_code == 200
+    ), f"Failed to authenticate user: {response.json()}"
+    return response.json()
 
-def create_student(student_id: str, email_par: str) -> None:
-    with Session(engine) as session:
-        existing_student = session.query(Student).filter_by(id=UUID(student_id)).first()
-        if existing_student:
-            return
+def create_group() -> dict:
+    """
+    Creates a private group (or any type you want) and returns the created group data.
+    """
+    token_data = authenticate_user()
+    token = token_data["access_token"]
 
-        student = Student(
-            id=UUID(student_id),
-            hashed_password="hashedpassword123",  # noqa: S106
-            number=secrets.choice(range(10000, 99999)),
-            email=email_par,
-            name="mirco",
-            surname="alessandrini",
-        )
-        session.add(student)
-        session.commit()
-
-
-def create_private_group(group_id: str, student_id: str) -> None:
     group_payload = {
-        "id": group_id,
-        "name": f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}",
+        "id": str(uuid.uuid4()),
+        "name": f"TestGroup-{uuid.uuid4().hex[:6]}",
         "description": "A test group description",
         "category": "Test Category",
         "type": "Private",
-        "creator_id": student_id,
     }
-    response = client.post("/groups/create", json=group_payload)
+
+    headers = {"Authorization": f"Bearer {token}"}
+    response = client.post("/groups", json=group_payload, headers=headers)
+
+    assert response.status_code == 200, f"Failed to create group: {response.json()}"
     return response.json()
 
 
 def test_join_private_group_success() -> None:
-    creator_id = "508fc8f8-8e52-4adb-aa02-e9c9c41a0b19"
-    group_id = "12345678-1234-5678-1234-567812345679"
-    user_id = "b94e5917-ddbf-4fef-969d-fb67f78d0bd7"
+    """
+    1) Create a private group.
+    2) Log in as user 'S4989646'.
+    3) Request to join the group.
+    4) Ensure that a join request is created (PENDING).
+    5) (Optional) Approve that request and verify it's approved.
+    """
 
-    create_student(creator_id, "teststudenta1@example.com")
-    create_private_group(group_id, creator_id)
-    create_student(user_id, "teststudenta2@example.com")
+    # 1) Create the private group
+    group_response = create_group()
+    created_group_id = group_response["id"]
 
-    # User joins the private group
-    response = client.post(
-        f"/groups/{group_id}/join",
-        params={
-            "student_id": user_id
-        },  # If needed, or pass in headers if token required
+    # 2) Log in as user 'S4989646'
+    token_data = authenticate_user("S4989646")
+    headers = {"Authorization": f"Bearer {token_data['access_token']}"}
+
+    me_response = client.get("/students/me", headers=headers)
+    assert me_response.status_code == 200, f"Could not fetch 'me': {me_response.json()}"
+    joiner_id = me_response.json()["id"]
+
+    # 3) Ask to join the newly created private group
+    join_response = client.post(
+        f"/groups/{created_group_id}/join",
+        headers=headers,
     )
-    assert response.status_code in [200, 400]
+    # For a private group, your API might return 200 or 400 depending on how you handle "request created" vs. "already requested".
+    # Adjust as needed based on your endpoint's actual response:
+    assert join_response.status_code in [200, 400], f"Join request failed: {join_response.json()}"
 
-    response = client.get(
-        f"/groups/{group_id}/requests",
-        params={"group_id": group_id},
-    )
-    assert response.status_code == 200
+    token_data = authenticate_user()
+    headers = {"Authorization": f"Bearer {token_data['access_token']}"}
 
-    requests_data = response.json()
+    # 4) Verify that the join request is present (and is PENDING)
+    #    - Typically, you might fetch the user's ID by calling GET /students/me
+    me_response = client.get("/students/me", headers=headers)
+    assert me_response.status_code == 200, f"Could not fetch 'me': {me_response.json()}"
+    me_data = me_response.json()
+    user_id = me_data["id"]
 
-    join_request = next(
-        (req for req in requests_data if req["student_id"] == user_id), None
-    )
+    #    - Now, retrieve the pending requests for this group
+    requests_response = client.get(f"/groups/{created_group_id}/requests", headers=headers)
+    assert requests_response.status_code == 200, f"Could not retrieve requests: {requests_response.json()}"
+    requests_data = requests_response.json()
+
+    join_request = next((req for req in requests_data if req["student_id"] == joiner_id), None)
     assert (
         join_request is not None
-    ), f"Join request not found. Requests data: {requests_data}"
+    ), f"Join request not found for user {joiner_id}. Requests data: {requests_data}"
     assert join_request["status"] == "PENDING"
 
-    approve_path = f"/requests/{join_request['id']}/approve"
+    # 5) (Optional) Approve the request and verify it's approved
+    approve_path = f"groups/{created_group_id}/requests/{join_request['id']}/approve"
+    approve_response = client.post(approve_path, headers=headers)
+    assert approve_response.status_code == 200, f"Failed to approve request: {approve_response.json()}"
 
-    approve_response = client.post(approve_path)
-    assert approve_response.status_code == 200
-
-    response = client.get(
-        f"/groups/{group_id}/requests",
-        params={"group_id": group_id},
-    )
-    assert response.status_code == 200
-
-    requests_data = response.json()
-    join_request = next(
-        (req for req in requests_data if req["student_id"] == user_id), None
-    )
-    assert join_request["status"] == "APPROVED"
+    # Confirm it's now approved
+    requests_response = client.get(f"/groups/{created_group_id}/requests", headers=headers)
+    assert requests_response.status_code == 200
+    requests_data = requests_response.json()
+    updated_request = next((req for req in requests_data if req["id"] == join_request["id"]), None)
+    assert updated_request["status"] == "APPROVED"
