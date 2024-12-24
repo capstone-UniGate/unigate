@@ -347,6 +347,11 @@ async function loadGroup() {
 }
 
 onMounted(async () => {
+  if (isBlocked) {
+    router.push("/groups/blocked");
+    return;
+  }
+
   await loadGroup();
   await getCurrentStudent();
   await fetchUserRequestStatus();
