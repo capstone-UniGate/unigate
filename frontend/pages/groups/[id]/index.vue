@@ -317,6 +317,7 @@ const checkBlockStatus = () => {
     (student: { number: any }) =>
       student.number === currentStudent.value?.number,
   );
+  return isBlocked.value;
 };
 
 async function loadGroup() {
@@ -332,7 +333,7 @@ async function loadGroup() {
     group.value = groupData;
 
     // Check if user is blocked for this specific group
-    const blockStatus = await checkBlockStatus(groupId);
+    const blockStatus = await checkBlockStatus();
     if (blockStatus) {
       router.push("/groups/blocked");
       return;
