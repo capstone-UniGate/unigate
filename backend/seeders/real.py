@@ -37,6 +37,12 @@ students = [
         name="Musse",
         surname="Gher",
     ),
+    StudentCreate(
+        number=4820312,
+        email="s4820312@studenti.unige.it",
+        name="Giovanni",
+        surname="Bosi",
+    ),
 ]
 
 groups = [
@@ -72,19 +78,20 @@ def seed_unigate() -> None:
     session = next(get_session())
     for student in students:
         current_student = crud.student.create(obj_in=student, session=session)
-        for group in groups:
-            group = crud.group.create(
-                obj_in=group,
-                update={
-                    "creator_id": current_student.id,
-                    "name": f"{group.name} {current_student.number}",
-                },
-                session=session,
-            )
-            group.students.append(current_student)
-            group.super_students.append(current_student)
-            session.add(group)
-            session.commit()
+        if student.number != 4820312:
+            for group in groups:
+                group = crud.group.create(
+                    obj_in=group,
+                    update={
+                        "creator_id": current_student.id,
+                        "name": f"{group.name} {current_student.number}",
+                    },
+                    session=session,
+                )
+                group.students.append(current_student)
+                group.super_students.append(current_student)
+                session.add(group)
+                session.commit()
 
 
 if __name__ == "__main__":
