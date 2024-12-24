@@ -29,13 +29,14 @@ export function useGroups() {
     }
   };
 
-  async function getAllGroups() {
+  async function getAllGroups(filters = {}) {
     try {
       await ensureAuthenticated();
       isError.value = false;
       isLoading.value = true;
       const response = await useApiFetch("/groups", {
         method: "GET",
+        params: filters,
       });
       groups.value = response;
     } catch (error) {
