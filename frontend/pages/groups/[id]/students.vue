@@ -28,9 +28,9 @@ const isSuperStudent = () => {
   );
 };
 
-const notSamestudent = (member_id: string) => {
+const notSamestudent = () => {
   return superStudents.value.some(
-    (student) => member_id !== currentStudent.value?.id,
+    (student) => student.id !== currentStudent.value?.id,
   );
 };
 

@@ -327,13 +327,16 @@ async function loadGroup() {
     // First get current student
     await getCurrentStudent();
 
-    // Then load group data and check membership in parallel
-    const [groupData] = await Promise.all([getGroupById(groupId.toString())]);
-
+    // Load group data
+    const groupData = await getGroupById(groupId.toString());
     group.value = groupData;
 
-    // Check if the student is blocked
-    checkBlockStatus();
+    // Check if user is blocked for this specific group
+    const blockStatus = await checkBlockStatus(groupId);
+    if (blockStatus) {
+      router.push("/groups/blocked");
+      return;
+    }
   } catch (error) {
     isError.value = true;
     toast({
@@ -347,11 +350,6 @@ async function loadGroup() {
 }
 
 onMounted(async () => {
-  if (isBlocked) {
-    router.push("/groups/blocked");
-    return;
-  }
-
   await loadGroup();
   await getCurrentStudent();
   await fetchUserRequestStatus();
