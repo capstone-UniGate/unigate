@@ -1,12 +1,7 @@
 import uuid
-from fastapi.testclient import TestClient
-from unittest.mock import MagicMock
-import pytest
-from sqlalchemy.orm import Session
 
-from unigate.core.database import engine
+from fastapi.testclient import TestClient
 from unigate.main import app
-from unigate.models import Student
 
 client = TestClient(app)
 
@@ -15,6 +10,7 @@ test_student_password = "testpassword"
 # -------------------------------------------------------------------
 # Helper Functions
 # -------------------------------------------------------------------
+
 
 def authenticate_user(username="S1234567") -> dict:
     """
@@ -50,9 +46,11 @@ def create_group(token: str) -> dict:
     assert response.status_code == 200, f"Failed to create group: {response.json()}"
     return response.json()
 
+
 # -------------------------------------------------------------------
 # Test Cases
 # -------------------------------------------------------------------
+
 
 def test_student_non_existent() -> None:
     """
@@ -70,7 +68,9 @@ def test_student_non_existent() -> None:
     headers = {"Authorization": "Bearer Cerioli Sium"}
 
     response = client.post(f"/groups/{created_group_id}/join", headers=headers)
-    assert response.status_code == 403, f"Unexpected status code: {response.status_code}"
+    assert (
+        response.status_code == 403
+    ), f"Unexpected status code: {response.status_code}"
     assert response.json() == {"detail": "Could not validate credentials"}
 
 
@@ -115,11 +115,11 @@ def test_valid_join() -> None:
     assert response.status_code == 200
     group_response = response.json()
 
-    joiner_id = client.get(f"/students/me", headers=headers).json()["id"]
+    joiner_id = client.get("/students/me", headers=headers).json()["id"]
 
     # Check that the group contains the joiner's details
     assert "students" in group_response, "Expected 'students' field in response"
     students = group_response["students"]
-    assert any(student["id"] == joiner_id for student in students), (
-        f"Joiner {joiner_id} not found in group students list"
-    )
+    assert any(
+        student["id"] == joiner_id for student in students
+    ), f"Joiner {joiner_id} not found in group students list"

@@ -1,19 +1,14 @@
-import secrets
-import string
-from unittest.mock import MagicMock
 import uuid
-import pytest
+
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
-from unigate.core.database import engine
 from unigate.main import app
-from unigate.models import Student
 
 client: TestClient = TestClient(app)
 
 test_student_password = "testpassword"
 
-def authenticate_user(username = "S1234567") -> dict:
+
+def authenticate_user(username="S1234567") -> dict:
     """
     Logs in the user with the given username and returns the token data.
     """
@@ -27,6 +22,7 @@ def authenticate_user(username = "S1234567") -> dict:
         response.status_code == 200
     ), f"Failed to authenticate user: {response.json()}"
     return response.json()
+
 
 def create_group() -> dict:
     """
@@ -69,7 +65,10 @@ def test_join_private_group_success() -> None:
         headers=headers,
     )
     # For a private group
-    assert join_response.status_code in [200, 400], f"Join request failed: {join_response.json()}"
+    assert join_response.status_code in [
+        200,
+        400,
+    ], f"Join request failed: {join_response.json()}"
 
     token_data = authenticate_user()
     headers = {"Authorization": f"Bearer {token_data['access_token']}"}
@@ -81,11 +80,17 @@ def test_join_private_group_success() -> None:
     user_id = me_data["id"]
 
     # Retrieve the pending requests for this group
-    requests_response = client.get(f"/groups/{created_group_id}/requests", headers=headers)
-    assert requests_response.status_code == 200, f"Could not retrieve requests: {requests_response.json()}"
+    requests_response = client.get(
+        f"/groups/{created_group_id}/requests", headers=headers
+    )
+    assert (
+        requests_response.status_code == 200
+    ), f"Could not retrieve requests: {requests_response.json()}"
     requests_data = requests_response.json()
 
-    join_request = next((req for req in requests_data if req["student_id"] == joiner_id), None)
+    join_request = next(
+        (req for req in requests_data if req["student_id"] == joiner_id), None
+    )
     assert (
         join_request is not None
     ), f"Join request not found for user {joiner_id}. Requests data: {requests_data}"
@@ -94,11 +99,17 @@ def test_join_private_group_success() -> None:
     # Approve the request and verify it's approved
     approve_path = f"groups/{created_group_id}/requests/{join_request['id']}/approve"
     approve_response = client.post(approve_path, headers=headers)
-    assert approve_response.status_code == 200, f"Failed to approve request: {approve_response.json()}"
+    assert (
+        approve_response.status_code == 200
+    ), f"Failed to approve request: {approve_response.json()}"
 
     # Confirm it's now approved
-    requests_response = client.get(f"/groups/{created_group_id}/requests", headers=headers)
+    requests_response = client.get(
+        f"/groups/{created_group_id}/requests", headers=headers
+    )
     assert requests_response.status_code == 200
     requests_data = requests_response.json()
-    updated_request = next((req for req in requests_data if req["id"] == join_request["id"]), None)
+    updated_request = next(
+        (req for req in requests_data if req["id"] == join_request["id"]), None
+    )
     assert updated_request["status"] == "APPROVED"

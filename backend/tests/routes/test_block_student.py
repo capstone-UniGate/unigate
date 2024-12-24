@@ -7,7 +7,8 @@ client = TestClient(app)
 
 test_student_password = "testpassword"
 
-def authenticate_user(username = "S1234567") -> dict:
+
+def authenticate_user(username="S1234567") -> dict:
     login_payload = {
         "username": username,
         "password": test_student_password,
@@ -44,13 +45,11 @@ def add_student_to_group(group_id: str):
     token_data = authenticate_user("S4989646")
     headers = {"Authorization": f"Bearer {token_data['access_token']}"}
 
-    response = client.post(
-        f"/groups/{group_id}/join", headers=headers
-    )
+    response = client.post(f"/groups/{group_id}/join", headers=headers)
 
     assert response.status_code == 200, f"Failed to add student: {response.json()}"
 
-    return client.get(f"/students/me", headers=headers).json()["id"]
+    return client.get("/students/me", headers=headers).json()["id"]
 
 
 def test_block_user_success():
