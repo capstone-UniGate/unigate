@@ -7,6 +7,7 @@ from tests.pages.group_page import GroupPage
 from tests.pages.group_page_detail import GroupPageDetail
 from tests.test_cases.base_test import BaseTest
 
+
 class TestUndoJoinRequest(BaseTest):
     @pytest.fixture(autouse=True)
     def setup(self, driver: webdriver.Chrome) -> None:
