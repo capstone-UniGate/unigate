@@ -15,7 +15,7 @@ from unigate.core.database import (
     SessionDep,
 )
 from unigate.enums import Role
-from unigate.models import Request, Student
+from unigate.models import AuthUser, Request, Student
 from unigate.models.group import Group
 from unigate.schemas.token import TokenPayload
 from unigate.utils.auth import get_user
@@ -26,11 +26,11 @@ TokenDep = Annotated[str, Depends(oauth2_scheme)]
 
 
 def get_current_user(
-    wanted_model: type[Student] | None = None,
-) -> Callable[[SessionDep, AuthSessionDep, TokenDep], Student]:
+    wanted_model: type[Student] | type[AuthUser] | None = None,
+) -> Callable[[SessionDep, AuthSessionDep, TokenDep], Student | AuthUser]:
     def get_current_user_aux(
         session: SessionDep, auth_session: AuthSessionDep, token: TokenDep
-    ) -> Student:
+    ) -> Student | AuthUser:
         try:
             payload = jwt.decode(  # type: ignore
                 token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM]
@@ -63,6 +63,7 @@ def get_current_user(
 
 
 CurrStudentDep = Annotated[Student, Depends(get_current_user(wanted_model=Student))]
+CurrProfessorDep = Annotated[AuthUser, Depends(get_current_user(wanted_model=AuthUser))]
 
 
 def get_group(

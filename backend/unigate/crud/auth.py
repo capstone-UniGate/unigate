@@ -31,7 +31,7 @@ class ReadAuthUser(CRUDBase[AuthUser, AuthUserCreate, AuthUser]):
             auth_session=auth_session,
             number=number,
             role=Role(role),
-            check_auth=False,
+            # check_auth=False,
         )
         if not unigate_user:
             return None
