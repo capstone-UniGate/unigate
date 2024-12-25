@@ -200,6 +200,17 @@ export function useGroups() {
     }
   }
 
+  //Function to fetch courses
+  async function getCourses() {
+    try {
+      const response = await useApiFetch('/api/courses');
+      return response;
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+      throw error;
+    }
+  }
+
   return {
     groups,
     isLoading,
@@ -215,5 +226,6 @@ export function useGroups() {
     handleGroupRequest,
     handleUserBlock,
     checkAuthStatus,
+    getCourses,
   };
 }

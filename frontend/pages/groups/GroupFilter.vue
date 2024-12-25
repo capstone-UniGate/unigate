@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, defineEmits } from 'vue';
+import { ref, computed, defineEmits, onMounted } from 'vue';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, Filter, Trash, X } from 'lucide-vue-next';
 
@@ -27,6 +27,27 @@ const defaultFilters = {
 // Active filters displayed as tags
 const appliedFilters = ref([]);
 
+// List of all courses fetched from the API
+const allCourses = ref<string[]>([]);
+
+// Fetch courses from the API
+const fetchCourses = async () => {
+  try {
+    const response = await useApiFetch('/api/courses');
+    allCourses.value = response;
+  } catch (error) {
+    console.error('Error fetching courses:', error);
+  }
+};
+
+// Computed property to filter courses based on the search word
+const filteredCourses = computed(() => {
+  if (!course.value) return [];
+  return allCourses.value.filter((c) =>
+    c.toLowerCase().includes(course.value.toLowerCase())
+  );
+});
+
 // Computed property to check if filters have changed
 const areFiltersChanged = computed(() => {
   return (
@@ -37,6 +58,9 @@ const areFiltersChanged = computed(() => {
     orderBy.value !== defaultFilters.orderBy
   );
 });
+
+// Fetch courses when the component is mounted
+onMounted(fetchCourses);
 
 // Toggle filter visibility
 const toggleFilter = () => {
@@ -162,6 +186,17 @@ const removeFilter = (key) => {
             class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-500"
             placeholder="Enter course name"
           />
+          <!-- Dropdown for filtered courses -->
+          <ul v-if="filteredCourses.length" class="bg-white border border-gray-300 rounded-lg shadow-lg mt-2">
+            <li
+              v-for="filteredCourse in filteredCourses"
+              :key="filteredCourse"
+              class="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              @click="course.value = filteredCourse"
+            >
+              {{ filteredCourse }}
+            </li>
+          </ul>
         </div>
         <div>
           <label for="examDate" class="block mb-2 text-sm font-medium text-gray-700">Exam Date</label>
