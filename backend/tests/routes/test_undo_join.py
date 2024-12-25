@@ -88,7 +88,7 @@ def test_undo_join_request_success():
         f"/groups/{created_group_id}/requests/undo", headers=other_user_headers
     )
     assert (
-        undo_response.status_code == 204
+        undo_response.status_code == 200
     ), f"Failed to undo join request: {undo_response.json()}"
 
     updated_requests_response = client.get(
