@@ -6,10 +6,7 @@ export function useImageUploader() {
   const previewUrl = ref<string | null>(null);
 
   // Fetch a presigned URL from the API and upload the image
-  const uploadImage = async (
-    studentNumber: string,
-    file: File,
-  ): Promise<void> => {
+  const uploadImage = async (file: File): Promise<void> => {
     try {
       // Fetch the presigned URL
       const { msg: presignedURL } = await useApiFetch<{ msg: string }>(
