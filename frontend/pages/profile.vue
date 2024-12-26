@@ -29,7 +29,7 @@ import { ref } from "vue";
 import { useImageUploader } from "~/composables/useImageUploader";
 
 // Mocked stores - Replace with your actual stores
-const usernameStore = ref("1234567"); // Replace with your actual username store
+const usernameStore = ref("4989646"); // Replace with your actual username store
 const defaultUrl = `localhost:9000/propics/${usernameStore.value}`;
 
 // Use the image uploader composable
