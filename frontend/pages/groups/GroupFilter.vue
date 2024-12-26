@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, defineEmits, onMounted } from 'vue';
+import { ref, computed, defineEmits, onMounted, watch } from 'vue';
+import { useGroups } from '@/composables/useGroups';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, Filter, Trash, X } from 'lucide-vue-next';
 
-// Filter state
-const isFilterVisible = ref(false);
+const { getCourses } = useGroups();
 
-// Filter data
+const isFilterVisible = ref(false);
 const course = ref('');
 const examDate = ref('');
 const participants = ref<number | null>(null);
@@ -15,7 +15,6 @@ const orderBy = ref(null);
 
 const emit = defineEmits(['apply-filters']);
 
-// Default filter state
 const defaultFilters = {
   course: '',
   examDate: '',
@@ -24,102 +23,67 @@ const defaultFilters = {
   orderBy: null,
 };
 
-// Active filters displayed as tags
 const appliedFilters = ref([]);
+const allCourses = ref<{ name: string; exams: { date: string }[] }[]>([]);
+const selectedCourseExamDates = ref<string[]>([]);
 
-// List of all courses fetched from the API
-/*const allCourses = ref<string[]>([]);
+// Computed property to filter courses based on the input
+const filteredCourses = computed(() => {
+  if (!course.value) return [];
+  return allCourses.value.filter((c) =>
+    c.name.toLowerCase().includes(course.value.toLowerCase())
+  );
+});
+
+// Computed property to check if no results are found
+const noResultsFound = computed(() => {
+  return course.value && filteredCourses.value.length === 0;
+});
+
+// Watcher to update exam dates when a course is selected
+watch(course, (newCourseName) => {
+  const matchedCourse = allCourses.value.find(
+    (c) => c.name.toLowerCase() === newCourseName.toLowerCase()
+  );
+  if (!matchedCourse) {
+    selectedCourseExamDates.value = [];
+    examDate.value = '';
+  } else {
+    selectedCourseExamDates.value = matchedCourse.exams.map((exam) => exam.date);
+  }
+});
+
+// Computed property to check if filters have changed
+const areFiltersChanged = computed(() => {
+  return (
+    course.value !== defaultFilters.course ||
+    examDate.value !== defaultFilters.examDate ||
+    participants.value !== defaultFilters.participants ||
+    isPublic.value !== defaultFilters.isPublic ||
+    orderBy.value !== defaultFilters.orderBy
+  );
+});
 
 // Fetch courses from the API
 const fetchCourses = async () => {
   try {
-    const response = await useApiFetch('/api/courses');
-    allCourses.value = response;
+    const response = await getCourses();
+    allCourses.value = response.map((course: { name: string; exams: { date: string }[] }) => ({
+      name: course.name,
+      exams: course.exams,
+    }));
   } catch (error) {
     console.error('Error fetching courses:', error);
+    allCourses.value = [];
   }
 };
 
-// Computed property to filter courses based on the search word
-const filteredCourses = computed(() => {
-  if (!course.value) return [];
-  return allCourses.value.filter((c) =>
-    c.toLowerCase().includes(course.value.toLowerCase())
-  );
-});
-
-
-
-// Computed property to check if filters have changed
-const areFiltersChanged = computed(() => {
-  return (
-    course.value !== defaultFilters.course ||
-    examDate.value !== defaultFilters.examDate ||
-    participants.value !== defaultFilters.participants ||
-    isPublic.value !== defaultFilters.isPublic ||
-    orderBy.value !== defaultFilters.orderBy
-  );
-});*/
-
-// List of all courses fetched from the API
-const allCourses = ref<string[]>([]);
-
-// Mockup data for courses
-const mockCourses = [
-  'Mathematics',
-  'Physics',
-  'Chemistry',
-  'Biology',
-  'Computer Science',
-  'History',
-  'Geography',
-  'Literature',
-  'Art',
-  'Music'
-];
-
-// Fetch courses from the API or use mock data
-const fetchCourses = async () => {
-  try {
-    // Uncomment the following line to use the API
-    // const response = await useApiFetch('/api/courses');
-    // allCourses.value = response;
-
-    // Use mock data for testing
-    allCourses.value = mockCourses;
-  } catch (error) {
-    console.error('Error fetching courses:', error);
-  }
-};
-
-// Computed property to filter courses based on the search word
-const filteredCourses = computed(() => {
-  if (!course.value) return [];
-  return allCourses.value.filter((c) =>
-    c.toLowerCase().includes(course.value.toLowerCase())
-  );
-});
-
-// Computed property to check if filters have changed
-const areFiltersChanged = computed(() => {
-  return (
-    course.value !== defaultFilters.course ||
-    examDate.value !== defaultFilters.examDate ||
-    participants.value !== defaultFilters.participants ||
-    isPublic.value !== defaultFilters.isPublic ||
-    orderBy.value !== defaultFilters.orderBy
-  );
-});
-
-// Fetch courses when the component is mounted
-onMounted(fetchCourses);
-
-// Toggle filter visibility
+// Toggle the visibility of the filter section
 const toggleFilter = () => {
   isFilterVisible.value = !isFilterVisible.value;
 };
 
-// Apply filters and add tags
+// Apply the selected filters
 const applyFilters = () => {
   if (areFiltersChanged.value) {
     emit('apply-filters', {
@@ -130,7 +94,6 @@ const applyFilters = () => {
       orderBy: orderBy.value,
     });
 
-    // Update applied filters
     const filters = [];
     if (course.value) filters.push({ label: `Course: ${course.value}`, key: 'course' });
     if (examDate.value) filters.push({ label: `Exam Date: ${examDate.value}`, key: 'examDate' });
@@ -141,41 +104,32 @@ const applyFilters = () => {
   }
 };
 
-// Clear filters and fetch groups
+// Clear all filters
 const clearFilters = () => {
-  // Reset all filters to their default state
   course.value = '';
   examDate.value = '';
   participants.value = null;
   isPublic.value = null;
   orderBy.value = null;
 
-  // Clear applied filters tags
   appliedFilters.value = [];
 
-  // Fetch groups again with default filters
-  emit('apply-filters', {
-    course: '',
-    examDate: '',
-    participants: null,
-    isPublic: null,
-    orderBy: null,
-  });
+  emit('apply-filters', defaultFilters);
 };
 
-// Remove individual filter
+// Remove a specific filter
 const removeFilter = (key) => {
-  // Update filter values based on the key
-  if (key === 'course') course.value = '';
+  if (key === 'course') {
+    course.value = '';
+    examDate.value = '';
+  }
   if (key === 'examDate') examDate.value = '';
   if (key === 'participants') participants.value = null;
   if (key === 'isPublic') isPublic.value = null;
   if (key === 'orderBy') orderBy.value = null;
 
-  // Create a new array for appliedFilters without the removed filter
-  appliedFilters.value = appliedFilters.value.filter((filter) => filter.key !== key);
+  appliedFilters.value = appliedFilters.value.filter((filter) => filter.key !== key && !(key === 'course' && filter.key === 'examDate'));
 
-  // Emit the updated filters
   emit('apply-filters', {
     course: course.value,
     examDate: examDate.value,
@@ -184,9 +138,17 @@ const removeFilter = (key) => {
     orderBy: orderBy.value,
   });
 };
+
+// Select a course from the filtered list
+const selectCourse = (selectedCourse: { name: string; exams: { date: string }[] }) => {
+  course.value = selectedCourse.name;
+  selectedCourseExamDates.value = selectedCourse.exams.map((exam) => exam.date);
+  examDate.value = '';
+};
+
+// Fetch courses when the component is mounted
+onMounted(fetchCourses);
 </script>
-
-
 
 <template>
   <div class="p-4">
@@ -229,7 +191,7 @@ const removeFilter = (key) => {
       :style="{ maxHeight: isFilterVisible ? '500px' : '0', padding: isFilterVisible ? '16px' : '0' }"
     >
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <!-- Filter Inputs -->
+        <!-- Course Input -->
         <div>
           <label for="course" class="block mb-2 text-sm font-medium text-gray-700">Course</label>
           <input
@@ -239,26 +201,40 @@ const removeFilter = (key) => {
             placeholder="Enter course name"
           />
           <!-- Dropdown for filtered courses -->
-          <ul v-if="filteredCourses.length" class="bg-white border border-gray-300 rounded-lg shadow-lg mt-2">
+          <ul
+            v-if="filteredCourses.length && !selectedCourseExamDates.length"
+            class="bg-white border border-gray-300 rounded-lg shadow-lg mt-2"
+          >
             <li
               v-for="filteredCourse in filteredCourses"
-              :key="filteredCourse"
+              :key="filteredCourse.name"
               class="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              @click="course.value = filteredCourse"
+              @click="selectCourse(filteredCourse)"
             >
-              {{ filteredCourse }}
+              {{ filteredCourse.name }}
             </li>
           </ul>
+          <!-- No results found message -->
+          <p v-if="noResultsFound" class="mt-2 text-red-500">No results found</p>
         </div>
+
+        <!-- Exam Date Dropdown -->
         <div>
           <label for="examDate" class="block mb-2 text-sm font-medium text-gray-700">Exam Date</label>
-          <input
+          <select
             id="examDate"
             v-model="examDate"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-500"
-            type="date"
-          />
+            :disabled="selectedCourseExamDates.length === 0"
+          >
+            <option value="" disabled>Select Exam Date</option>
+            <option v-for="date in selectedCourseExamDates" :key="date" :value="date">
+              {{ date }}
+            </option>
+          </select>
         </div>
+
+        <!-- Number of Participants -->
         <div>
           <label for="participants" class="block mb-2 text-sm font-medium text-gray-700">Number of Participants</label>
           <input
@@ -270,6 +246,8 @@ const removeFilter = (key) => {
             min="0"
           />
         </div>
+
+        <!-- Type Dropdown -->
         <div>
           <label for="isPublic" class="block mb-2 text-sm font-medium text-gray-700">Type</label>
           <select
@@ -282,6 +260,8 @@ const removeFilter = (key) => {
             <option :value="false">Private</option>
           </select>
         </div>
+
+        <!-- Order By Dropdown -->
         <div>
           <label for="orderBy" class="block mb-2 text-sm font-medium text-gray-700">Order By</label>
           <select
@@ -319,5 +299,3 @@ const removeFilter = (key) => {
     </div>
   </div>
 </template>
-
-

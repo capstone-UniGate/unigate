@@ -203,11 +203,18 @@ export function useGroups() {
   //Function to fetch courses
   async function getCourses() {
     try {
-      const response = await useApiFetch('/api/courses');
+      await ensureAuthenticated();
+      isError.value = false;
+      isLoading.value = true;
+      const response = await useApiFetch("/courses", {
+        method: "GET",
+      });
       return response;
     } catch (error) {
-      console.error('Error fetching courses:', error);
+      isError.value = true;
       throw error;
+    } finally {
+      isLoading.value = false;
     }
   }
 
