@@ -12,8 +12,7 @@
             <Avatar class="w-20 h-20">
               <AvatarImage
                 :src="
-                  currentStudent?.avatarUrl ||
-                  'https://github.com/radix-vue.png'
+                  previewUrl || defaultUrl || 'https://github.com/radix-vue.png'
                 "
                 alt="@radix-vue"
               />
@@ -32,6 +31,7 @@
             <span class="animate-spin">⌛</span>
           </div>
           <input
+            id="upload-photo"
             type="file"
             ref="fileInput"
             class="hidden"
@@ -172,6 +172,7 @@ import { useCurrentStudent } from "@/composables/useCurrentStudent";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast/use-toast";
+import { useImageUploader } from "~/composables/useImageUploader";
 
 const router = useRouter();
 const { currentStudent, getCurrentStudent } = useCurrentStudent();
@@ -180,6 +181,11 @@ const userGroups = ref([]);
 const isEditing = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isUploading = ref(false);
+
+const usernameStore = ref("4989646"); // Replace with your actual username store
+const defaultUrl = `localhost:9000/propics/${usernameStore.value}`;
+// Use the image uploader composable
+const { previewUrl, uploadImage, updatePreview } = useImageUploader();
 
 // Edit form state
 const editForm = ref({
@@ -232,6 +238,23 @@ const triggerFileInput = () => {
   fileInput.value?.click();
 };
 
+const onFileChange = async (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+
+    // Update the image preview
+    updatePreview(file);
+
+    // Upload the image
+    try {
+      await uploadImage(usernameStore.value, file);
+    } catch (error) {
+      console.error("Error during image upload:", error);
+    }
+  }
+};
+
 const handleFileUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
@@ -240,7 +263,10 @@ const handleFileUpload = async (event: Event) => {
 
   try {
     isUploading.value = true;
+    // Update the image preview
+    updatePreview(file);
 
+    await uploadImage(usernameStore.value, file);
     // TODO: Implement file upload
     // Here:
     // 1. Upload the file to your server/storage
