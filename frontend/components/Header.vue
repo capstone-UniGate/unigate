@@ -49,7 +49,7 @@
           v-if="isLoggedIn"
           @click="handleLogout"
           id="logout-button"
-          class="hidden md:block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition font-semibold"
+          class="hidden md:block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
         >
           Logout
         </button>
@@ -91,7 +91,7 @@
         <button
           v-if="isLoggedIn"
           @click="handleLogout"
-          class="block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-center font-semibold"
+          class="block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-center"
         >
           Logout
         </button>
@@ -114,10 +114,6 @@ const { logout, isLoggedIn } = useAuth();
 const { currentStudent, getCurrentStudent } = useCurrentStudent();
 const router = useRouter();
 const isMenuOpen = ref(false);
-
-const toggleMenu = () => {
-  isMenuOpen.value = !isMenuOpen.value;
-};
 
 // Watch for login state changes
 watch(isLoggedIn, async (newValue) => {

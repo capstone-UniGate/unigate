@@ -28,13 +28,65 @@ const defaultFilters = {
 const appliedFilters = ref([]);
 
 // List of all courses fetched from the API
-const allCourses = ref<string[]>([]);
+/*const allCourses = ref<string[]>([]);
 
 // Fetch courses from the API
 const fetchCourses = async () => {
   try {
     const response = await useApiFetch('/api/courses');
     allCourses.value = response;
+  } catch (error) {
+    console.error('Error fetching courses:', error);
+  }
+};
+
+// Computed property to filter courses based on the search word
+const filteredCourses = computed(() => {
+  if (!course.value) return [];
+  return allCourses.value.filter((c) =>
+    c.toLowerCase().includes(course.value.toLowerCase())
+  );
+});
+
+
+
+// Computed property to check if filters have changed
+const areFiltersChanged = computed(() => {
+  return (
+    course.value !== defaultFilters.course ||
+    examDate.value !== defaultFilters.examDate ||
+    participants.value !== defaultFilters.participants ||
+    isPublic.value !== defaultFilters.isPublic ||
+    orderBy.value !== defaultFilters.orderBy
+  );
+});*/
+
+// List of all courses fetched from the API
+const allCourses = ref<string[]>([]);
+
+// Mockup data for courses
+const mockCourses = [
+  'Mathematics',
+  'Physics',
+  'Chemistry',
+  'Biology',
+  'Computer Science',
+  'History',
+  'Geography',
+  'Literature',
+  'Art',
+  'Music'
+];
+
+// Fetch courses from the API or use mock data
+const fetchCourses = async () => {
+  try {
+    // Uncomment the following line to use the API
+    // const response = await useApiFetch('/api/courses');
+    // allCourses.value = response;
+
+    // Use mock data for testing
+    allCourses.value = mockCourses;
   } catch (error) {
     console.error('Error fetching courses:', error);
   }
