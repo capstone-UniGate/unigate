@@ -13,7 +13,7 @@ export function useImageUploader() {
     try {
       // Fetch the presigned URL
       const { msg: presignedURL } = await useApiFetch<{ msg: string }>(
-        `students/propic-presigned-url/${studentNumber}`,
+        `students/propic-presigned-url/`,
       );
 
       // Upload the file to the presigned URL
