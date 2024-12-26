@@ -1,3 +1,4 @@
+import re
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -14,8 +15,9 @@ router = APIRouter()
 
 
 def get_role_and_number(username: str) -> tuple[str, int]:
-    if len(username) < 2:
-        raise HTTPException(status_code=401, detail="Invalid username")
+    regex_matcher = re.compile(r"[SP][0-9]{7}")
+    if (username.strip()) == "" or not bool(regex_matcher.match(username)):
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
     role = username[0]
     number = int(username[1:])
     return role, number

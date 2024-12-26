@@ -4,7 +4,13 @@ from unigate import crud
 from unigate.core.database import SessionDep
 from unigate.enums import GroupType, RequestStatus
 from unigate.models import Block, Group, Request
-from unigate.routes.deps import CurrStudentDep, GroupDep, RequestDep, StudentDep
+from unigate.routes.deps import (
+    AuthSessionDep,
+    CurrStudentDep,
+    GroupDep,
+    RequestDep,
+    StudentDep,
+)
 from unigate.schemas.group import (
     GroupCreate,
     GroupReadOnlyStudents,
@@ -37,9 +43,21 @@ def get_group(group: GroupDep) -> Group:
 )
 def create_group(
     session: SessionDep,
+    auth_session: AuthSessionDep,
     group: GroupCreate,
     current_user: CurrStudentDep,
 ) -> Group:
+    if (
+        crud.course.get_by_name_and_exam(
+            name=group.course_name, exam_date=group.exam_date, auth_session=auth_session
+        )
+        is None
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Course not found or exam date is not valid",
+        )
+
     return crud.group.create(
         session=session,
         obj_in=group,
@@ -76,6 +94,40 @@ def join_group(
             session=session, group=group, student=current_user
         )
     return crud.group.join(session=session, group=group, student=current_user)
+
+
+@router.delete(
+    "/{group_id}/requests/undo",
+)
+def undo_join_request(
+    session: SessionDep,
+    group: GroupDep,
+    current_user: CurrStudentDep,
+) -> dict:
+    # Check if the student has a pending request
+    request = next(
+        (
+            r
+            for r in group.requests
+            if r.student_id == current_user.id and r.status == "PENDING"
+        ),
+        None,
+    )
+
+    if not request:
+        raise HTTPException(status_code=404, detail="No join request found.")
+
+    if request.status != RequestStatus.PENDING:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Request is not pending",
+        )
+
+    crud.group.delete_request(
+        session=session, group=group, student=current_user, request=request
+    )
+
+    return {"message": "Join request undo successfully."}
 
 
 @router.post(
@@ -154,6 +206,11 @@ def reject_group_requesr(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You are not a super student of this group",
         )
+    if request.status != RequestStatus.PENDING:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Request is not pending",
+        )
     return crud.group.reject_request(session=session, request=request)
 
 
@@ -209,16 +266,3 @@ def unblock_user(
             detail="You are not a super student of this group",
         )
     return crud.group.unblock_user(session=session, group=group, student=student)
-
-
-@router.delete(
-    "/{group_id}/requests/undo",
-    status_code=204,
-    summary="Undo join request",
-)
-def undo_join_request(
-    session: SessionDep,
-    group: GroupDep,
-    current_user: CurrStudentDep,
-) -> None:
-    crud.group.delete_request(session=session, group=group, student=current_user)

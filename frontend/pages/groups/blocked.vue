@@ -13,7 +13,7 @@
 
     <!-- Return to Home Button -->
     <NuxtLink
-      to="/"
+      to="/groups"
       class="mt-8 bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-medium px-6 py-3 rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-700 hover:shadow-xl active:scale-95 transition-all"
     >
       Return to Home

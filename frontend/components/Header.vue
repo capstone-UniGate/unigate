@@ -93,7 +93,7 @@
         v-if="isMenuOpen"
         class="md:hidden bg-light-blue-100 text-blue-800 p-4 space-y-4 border-t border-blue-300"
       >
-        <router-link to="/" class="block hover:text-blue-500 transition"
+        <router-link to="/homepage" class="block hover:text-blue-500 transition"
           >Home</router-link
         >
         <router-link to="/about" class="block hover:text-blue-500 transition"
@@ -129,6 +129,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 const { logout, isLoggedIn } = useAuth();
 const { currentStudent, getCurrentStudent } = useCurrentStudent();
 const router = useRouter();
+const isMenuOpen = ref(false);
 
 // Compute initials from student name
 const getInitials = computed(() => {
@@ -164,6 +165,9 @@ const handleLogout = async () => {
   } catch (error) {
     console.error("Logout error:", error);
   }
+};
+const toggleMenu = async () => {
+  isMenuOpen.value = !isMenuOpen.value;
 };
 </script>
 

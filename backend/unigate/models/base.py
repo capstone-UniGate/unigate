@@ -1,3 +1,4 @@
+import datetime
 import uuid
 
 from pydantic import EmailStr
@@ -35,8 +36,19 @@ class GroupBase(SQLModel):
     description: str | None = None
     category: str | None = None
     type: GroupType = Field(sa_column=Column(Enum(GroupType, name="group_type")))
+    course_name: str
+    exam_date: datetime.date | None = None
 
 
 class RequestBase(SQLModel):
     student_id: uuid.UUID = Field(foreign_key="students.id", ondelete="CASCADE")
     group_id: uuid.UUID = Field(foreign_key="groups.id", ondelete="CASCADE")
+
+
+class CourseBase(SQLModel):
+    name: str = Field(nullable=False, unique=True, index=True)
+
+
+class ExamBase(SQLModel):
+    course_id: uuid.UUID = Field(foreign_key="courses.id", ondelete="CASCADE")
+    date: datetime.date

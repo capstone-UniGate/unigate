@@ -5,14 +5,12 @@ from unigate.main import app
 
 client = TestClient(app)
 
-test_student_username = "S1234567"
 test_student_password = "testpassword"
-test_student_id = "d6dcf3b1-425a-4864-88d3-525decebef18"
 
 
-def authenticate_user() -> dict:
+def authenticate_user(username="S1234567") -> dict:
     login_payload = {
-        "username": test_student_username,
+        "username": username,
         "password": test_student_password,
     }
 
@@ -43,16 +41,15 @@ def create_group() -> dict:
     return response.json()
 
 
-def add_student_to_group(group_id: str, student_id: str):
-    token_data = authenticate_user()
+def add_student_to_group(group_id: str):
+    token_data = authenticate_user("S4989646")
     headers = {"Authorization": f"Bearer {token_data['access_token']}"}
 
-    add_student_payload = {"student_id": student_id}
-    response = client.post(
-        f"/groups/{group_id}/students", json=add_student_payload, headers=headers
-    )
+    response = client.post(f"/groups/{group_id}/join", headers=headers)
 
     assert response.status_code == 200, f"Failed to add student: {response.json()}"
+
+    return client.get("/students/me", headers=headers).json()["id"]
 
 
 def test_block_user_success():
@@ -60,13 +57,13 @@ def test_block_user_success():
     created_group_id = group_response["id"]
 
     # Ensure the student is added to the group
-    add_student_to_group(created_group_id, test_student_id)
+    added_student_id = add_student_to_group(created_group_id)
 
     token_data = authenticate_user()
     headers = {"Authorization": f"Bearer {token_data['access_token']}"}
 
     response = client.post(
-        f"/groups/{created_group_id}/students/{test_student_id}/block",
+        f"/groups/{created_group_id}/students/{added_student_id}/block",
         headers=headers,
     )
 
@@ -77,8 +74,8 @@ def test_block_user_success():
         student["id"] for student in response.json().get("blocked_students", [])
     ]
     assert (
-        test_student_id in blocked_student_ids
-    ), f"Student {test_student_id} was not blocked."
+        added_student_id in blocked_student_ids
+    ), f"Student {added_student_id} was not blocked."
 
 
 def test_block_user_group_not_found():

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from unigate.core.config import settings
-from unigate.routes import auth, group, student
+from unigate.routes import auth, course, group, professor, student
 
 app = FastAPI()
 
@@ -30,6 +30,8 @@ async def ping() -> dict[str, str]:
 app.include_router(auth.router, prefix="/auth")
 app.include_router(student.router, prefix="/students")
 app.include_router(group.router, prefix="/groups")
+app.include_router(course.router, prefix="/courses")
+app.include_router(professor.router, prefix="/professors")
 
 
 if __name__ == "__main__":

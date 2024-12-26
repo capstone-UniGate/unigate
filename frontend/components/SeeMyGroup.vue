@@ -1,5 +1,11 @@
 <script setup lang="ts">
 const { groups, isLoading, isError, getMyGroups } = useStudentGroups();
+const router = useRouter();
+
+const gotoAllGroups = () => {
+  // Fetch groups for the authenticated user
+  router.push("/groups");
+};
 
 onMounted(() => {
   getMyGroups();
@@ -18,13 +24,22 @@ onMounted(() => {
     <!-- Loading Indicator Component -->
     <LoadingIndicator v-if="isLoading" data-testid="loading-indicator" />
 
-    <div class="flex justify-end items-center mb-6 py-2">
-      <h1
-        class="text-2xl font-semibold text-gray-800"
-        data-testid="page-heading"
-      >
-        Your Enrolled Groups
-      </h1>
+    <div class="flex justify-end items-center py-2">
+      <div>
+        <h1
+          class="text-2xl font-semibold text-gray-800"
+          data-testid="page-heading"
+        >
+          Your Enrolled Groups
+        </h1>
+        <Button
+          @click="gotoAllGroups"
+          class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-semibold py-1 px-2 rounded-lg shadow-lg hover:from-blue-500 hover:to-blue-600 hover:shadow-xl active:scale-95 transition-all m-4"
+        >
+          All Groups
+        </Button>
+      </div>
+
       <Button
         @click="() => $router.push('create')"
         class="ml-auto bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-semibold py-1 px-2 rounded-lg shadow-lg hover:from-blue-500 hover:to-blue-600 hover:shadow-xl active:scale-95 transition-all"

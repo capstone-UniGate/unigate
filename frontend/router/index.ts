@@ -32,6 +32,10 @@ const router = createRouter({
       path: "/groups/:id",
       name: "group-details",
       component: () => import("@/pages/groups/[id]/index.vue"),
+      beforeEnter: (to, from, next) => {
+        console.log("beforeEnter", to, from, next);
+        next();
+      },
     },
     {
       path: "/my-groups",

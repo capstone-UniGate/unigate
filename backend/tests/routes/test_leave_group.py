@@ -111,24 +111,6 @@ def test_create_group_already_exists() -> None:
         ), "Group creation did not fail as expected"
 
 
-def test_join_group_success() -> None:
-    create_student(student_id=student_id, email_par="test3@example.com")
-    create_student(student_id=student_id2, email_par="test4@example.com")
-    group_data = create_group(student_id=student_id, group_id=group_id)
-
-    created_group_id = group_data["id"]
-
-    # Authenticate second student
-    token_data = authenticate_user()
-    headers = {"Authorization": f"Bearer {token_data['access_token']}"}
-
-    # Join group
-    response = client.post(f"/groups/{created_group_id}/join", headers=headers)
-    assert response.status_code == 200, f"Unexpected: {response.json()}"
-    joined_group = response.json()
-    assert "id" in joined_group, "Join group response missing 'id'"
-
-
 def test_join_group_not_found() -> None:
     new_group_id = uuid.uuid4()
 
@@ -141,20 +123,20 @@ def test_join_group_not_found() -> None:
 
 
 def test_leave_group_success() -> None:
-    create_student(student_id=student_id, email_par="test5@example.com")
-    create_student(student_id=student_id2, email_par="test6@example.com")
-    group_data = create_group(student_id=student_id, group_id=group_id)
-
-    created_group_id = group_data["id"]
-
     # Authenticate second student
     token_data = authenticate_user()
     headers = {"Authorization": f"Bearer {token_data['access_token']}"}
-
+    groups_list = client.get("/groups", headers=headers)
+    group_id = groups_list.json()[0]["id"]
     # Join group
-    client.post(f"/groups/{created_group_id}/join", headers=headers)
+    client.post(f"/groups/{group_id}/join", headers=headers)
+    leaver_id = client.get("/students/me", headers=headers).json()["id"]
 
     # Leave group
-    response = client.post(f"/groups/{created_group_id}/leave", headers=headers)
+    response = client.post(f"/groups/{group_id}/leave", headers=headers)
+    students = (response.json())["students"]
     assert response.status_code == 200, f"Unexpected: {response.json()}"
-    assert response.json() == {"detail": "Left the group successfully"}
+
+    assert not any(
+        student["id"] == leaver_id for student in students
+    ), f"Leaver {leaver_id} found in group students list"

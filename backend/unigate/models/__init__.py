@@ -10,6 +10,8 @@ from unigate.models.base import (
     UUIDBase,
 )
 from unigate.models.block import Block
+from unigate.models.course import Course
+from unigate.models.exam import Exam
 from unigate.models.group import Group
 from unigate.models.join import Join
 from unigate.models.request import Request, RequestStatus
@@ -20,8 +22,10 @@ __all__ = [
     "AuthUser",
     "AuthUserBase",
     "Block",
+    "Course",
     "DBAuthBase",
     "DBUnigateBase",
+    "Exam",
     "Group",
     "GroupBase",
     "Join",

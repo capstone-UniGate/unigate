@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = (
         "http://localhost,http://localhost:3000,https://localhost,https://localhost:3000"
     )
+    MINIO_ENDPOINT: str
+    MINIO_ACCESS_KEY: str
+    MINIO_SECRET_KEY: str
 
     @computed_field  # type: ignore
     @property
