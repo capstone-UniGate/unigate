@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends
+from datetime import timedelta
 
+from fastapi import APIRouter, Depends
+from minio import Minio
+
+from unigate.core.config import settings
 from unigate.models import Student
 from unigate.routes.deps import get_current_user
 from unigate.schemas.student import StudentRead, StudentReadOnlyGroups
-from minio import Minio
-from unigate.core.config import settings
-from datetime import timedelta
 
 router = APIRouter()
 
@@ -16,6 +17,7 @@ minio = Minio(
     secret_key=settings.MINIO_SECRET_KEY,
     secure=False,
 )
+
 
 @router.get("/me", response_model=StudentRead)
 def get_me(
