@@ -1,7 +1,9 @@
-from unigate.models.base import CourseBase
 import uuid
+
+from unigate.models.base import CourseBase
 from unigate.schemas.auth import UserReadWithoutCourses
 from unigate.schemas.exam import ExamRead
+
 
 class CourseRead(CourseBase):
     id: uuid.UUID
