@@ -91,12 +91,18 @@ class CRUDGroup(CRUDBase[Group, GroupCreate, Group]):
         return group
 
     def delete_request(
-        self, *, group: Group, student: Student, session: Session, request: Request
+        self, *, group: Group, session: Session, request: Request
     ) -> None:
         group.requests.remove(request)  # type: ignore
         session.delete(request)
         session.commit()
         session.refresh(group)
+
+    def get_groups_num(self, *, course_name: str, session: Session) -> int:
+        statement = select(self.model).where(self.model.course_name == course_name)
+        result = session.exec(statement)
+        groups = result.all()
+        return len(groups)
 
 
 group = CRUDGroup(Group)
