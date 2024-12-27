@@ -61,7 +61,7 @@
           <div class="cursor-pointer" @click="router.push('/user')">
             <Avatar>
               <AvatarImage
-                src="https://github.com/radix-vue.png"
+                :src="photoUrl || 'https://github.com/radix-vue.png'"
                 alt="@radix-vue"
               />
               <AvatarFallback>{{ getInitials }}</AvatarFallback>
@@ -122,7 +122,7 @@
 <script setup lang="ts">
 import { useAuth } from "@/composables/useAuth";
 import { useCurrentStudent } from "@/composables/useCurrentStudent";
-import { onMounted, watch, computed } from "vue";
+import { onMounted, watch, computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
@@ -140,6 +140,12 @@ const getInitials = computed(() => {
     .map((name) => name[0])
     .join("")
     .toUpperCase();
+});
+
+// Add computed property for photo URL
+const photoUrl = computed(() => {
+  if (!currentStudent.value?.number) return null;
+  return `http://localhost:9000/unigate/propics/${currentStudent.value.number}`;
 });
 
 // Watch for login state changes

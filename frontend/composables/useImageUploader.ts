@@ -12,7 +12,7 @@ export function useImageUploader() {
       const { url: presignedURL } = await useApiFetch(
         `students/propic-presigned-url/`,
         {
-          method: "get",
+          method: "GET",
         },
       );
 
@@ -36,33 +36,9 @@ export function useImageUploader() {
     previewUrl.value = URL.createObjectURL(file);
   };
 
-  // Get the photo from db and set it to previewUrl
-  const getPhoto = async () => {
-    try {
-      const response = await useApiFetch(`students/propic-presigned-url/`, {
-        method: "GET",
-      });
-
-      if (response.data?.propic) {
-        // Create a blob from the URL to handle it like a file
-        const imageResponse = await fetch(response.data.propic);
-        const imageBlob = await imageResponse.blob();
-
-        previewUrl.value = URL.createObjectURL(imageBlob);
-      } else {
-        previewUrl.value = null;
-      }
-    } catch (error) {
-      console.error("Error fetching profile photo:", error);
-      previewUrl.value = null;
-      throw error;
-    }
-  };
-
   return {
     previewUrl,
     uploadImage,
     updatePreview,
-    getPhoto,
   };
 }

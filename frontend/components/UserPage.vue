@@ -10,7 +10,7 @@
             <Avatar class="w-20 h-20">
               <AvatarImage
                 :src="
-                  previewUrl || defaultUrl || 'https://github.com/radix-vue.png'
+                  previewUrl || photoUrl || 'https://github.com/radix-vue.png'
                 "
                 alt="@radix-vue"
               />
@@ -28,7 +28,7 @@
             <Avatar class="w-20 h-20">
               <AvatarImage
                 :src="
-                  previewUrl || defaultUrl || 'https://github.com/radix-vue.png'
+                  photoUrl || previewUrl || 'https://github.com/radix-vue.png'
                 "
                 alt="@radix-vue"
               />
@@ -176,14 +176,17 @@ import { useImageUploader } from "~/composables/useImageUploader";
 const router = useRouter();
 const { currentStudent, getCurrentStudent } = useCurrentStudent();
 const { toast } = useToast();
-const userGroups = ref([]);
 const isEditing = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isUploading = ref(false);
 const isSubmitting = ref(false);
 
-const usernameStore = ref("4989646"); // Replace with your actual username store
-const defaultUrl = `localhost:9000/propics/${usernameStore.value}`;
+// Remove usernameStore and create a computed photo URL
+const photoUrl = computed(() => {
+  if (!currentStudent.value?.number) return null;
+  return `http://localhost:9000/unigate/propics/${currentStudent.value.number}`;
+});
+
 // Use the image uploader composable
 const { previewUrl, uploadImage, updatePreview, getPhoto } = useImageUploader();
 
@@ -250,6 +253,8 @@ const handleFileUpload = async (event: Event) => {
     updatePreview(file);
 
     await uploadImage(file);
+    // After successful upload, update the previewUrl to the server URL
+    previewUrl.value = photoUrl.value;
 
     toast({
       title: "Success",
@@ -294,11 +299,7 @@ onMounted(async () => {
   }
   initializeEditForm();
 
-  // Fetch and display the user's profile photo
-  try {
-    await getPhoto();
-  } catch (error) {
-    console.error("Failed to load the profile photo:", error);
-  }
+  // Set initial preview URL
+  previewUrl.value = photoUrl.value;
 });
 </script>
