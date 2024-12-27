@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import { ref, computed, defineEmits, onMounted, watch } from 'vue';
-import { useGroups } from '@/composables/useGroups';
-import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, Filter, Trash, X } from 'lucide-vue-next';
-import SearchBox from '@/components/ui/SearchBox.vue';
+import { ref, computed, defineEmits, onMounted, watch } from "vue";
+import { useGroups } from "@/composables/useGroups";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronUp, Filter, Trash, X } from "lucide-vue-next";
+import SearchBox from "@/components/ui/SearchBox.vue";
 
 const { getCourses } = useGroups();
 
 const isFilterVisible = ref(false);
-const course = ref('');
-const examDate = ref('');
+const course = ref("");
+const examDate = ref("");
 const participants = ref<number | null>(null);
 const isPublic = ref<boolean | null>(null);
 const orderBy = ref(null);
 
-const emit = defineEmits(['apply-filters']);
+const emit = defineEmits(["apply-filters"]);
 
 const defaultFilters = {
-  course: '',
-  examDate: '',
+  course: "",
+  examDate: "",
   participants: null,
   isPublic: null,
   orderBy: null,
@@ -36,13 +36,15 @@ const noResultsFound = computed(() => {
 // Watcher to update exam dates when a course is selected
 watch(course, (newCourseName) => {
   const matchedCourse = allCourses.value.find(
-    (c) => c.name.toLowerCase() === newCourseName.toLowerCase()
+    (c) => c.name.toLowerCase() === newCourseName.toLowerCase(),
   );
   if (!matchedCourse) {
     selectedCourseExamDates.value = [];
-    examDate.value = '';
+    examDate.value = "";
   } else {
-    selectedCourseExamDates.value = matchedCourse.exams.map((exam) => exam.date);
+    selectedCourseExamDates.value = matchedCourse.exams.map(
+      (exam) => exam.date,
+    );
   }
 });
 
@@ -61,12 +63,14 @@ const areFiltersChanged = computed(() => {
 const fetchCourses = async () => {
   try {
     const response = await getCourses();
-    allCourses.value = response.map((course: { name: string; exams: { date: string }[] }) => ({
-      name: course.name,
-      exams: course.exams,
-    }));
+    allCourses.value = response.map(
+      (course: { name: string; exams: { date: string }[] }) => ({
+        name: course.name,
+        exams: course.exams,
+      }),
+    );
   } catch (error) {
-    console.error('Error fetching courses:', error);
+    console.error("Error fetching courses:", error);
     allCourses.value = [];
   }
 };
@@ -79,7 +83,7 @@ const toggleFilter = () => {
 // Apply the selected filters
 const applyFilters = () => {
   if (areFiltersChanged.value) {
-    emit('apply-filters', {
+    emit("apply-filters", {
       course: course.value,
       examDate: examDate.value,
       participants: participants.value,
@@ -88,42 +92,56 @@ const applyFilters = () => {
     });
 
     const filters = [];
-    if (course.value) filters.push({ label: `Course: ${course.value}`, key: 'course' });
-    if (examDate.value) filters.push({ label: `Exam Date: ${examDate.value}`, key: 'examDate' });
-    if (participants.value !== null) filters.push({ label: `Participants: ${participants.value}`, key: 'participants' });
-    if (isPublic.value !== null) filters.push({ label: `Type: ${isPublic.value ? 'Public' : 'Private'}`, key: 'isPublic' });
-    if (orderBy.value) filters.push({ label: `Order By: ${orderBy.value}`, key: 'orderBy' });
+    if (course.value)
+      filters.push({ label: `Course: ${course.value}`, key: "course" });
+    if (examDate.value)
+      filters.push({ label: `Exam Date: ${examDate.value}`, key: "examDate" });
+    if (participants.value !== null)
+      filters.push({
+        label: `Participants: ${participants.value}`,
+        key: "participants",
+      });
+    if (isPublic.value !== null)
+      filters.push({
+        label: `Type: ${isPublic.value ? "Public" : "Private"}`,
+        key: "isPublic",
+      });
+    if (orderBy.value)
+      filters.push({ label: `Order By: ${orderBy.value}`, key: "orderBy" });
     appliedFilters.value = filters;
   }
 };
 
 // Clear all filters
 const clearFilters = () => {
-  course.value = '';
-  examDate.value = '';
+  course.value = "";
+  examDate.value = "";
   participants.value = null;
   isPublic.value = null;
   orderBy.value = null;
 
   appliedFilters.value = [];
 
-  emit('apply-filters', defaultFilters);
+  emit("apply-filters", defaultFilters);
 };
 
 // Remove a specific filter
 const removeFilter = (key) => {
-  if (key === 'course') {
-    course.value = '';
-    examDate.value = '';
+  if (key === "course") {
+    course.value = "";
+    examDate.value = "";
   }
-  if (key === 'examDate') examDate.value = '';
-  if (key === 'participants') participants.value = null;
-  if (key === 'isPublic') isPublic.value = null;
-  if (key === 'orderBy') orderBy.value = null;
+  if (key === "examDate") examDate.value = "";
+  if (key === "participants") participants.value = null;
+  if (key === "isPublic") isPublic.value = null;
+  if (key === "orderBy") orderBy.value = null;
 
-  appliedFilters.value = appliedFilters.value.filter((filter) => filter.key !== key && !(key === 'course' && filter.key === 'examDate'));
+  appliedFilters.value = appliedFilters.value.filter(
+    (filter) =>
+      filter.key !== key && !(key === "course" && filter.key === "examDate"),
+  );
 
-  emit('apply-filters', {
+  emit("apply-filters", {
     course: course.value,
     examDate: examDate.value,
     participants: participants.value,
@@ -174,24 +192,45 @@ onMounted(fetchCourses);
     <div
       v-show="isFilterVisible"
       class="overflow-hidden transition-all duration-500 rounded-lg bg-white shadow-lg border border-gray-200"
-      :style="{ maxHeight: isFilterVisible ? '500px' : '0', padding: isFilterVisible ? '16px' : '0' }"
+      :style="{
+        maxHeight: isFilterVisible ? '500px' : '0',
+        padding: isFilterVisible ? '16px' : '0',
+      }"
     >
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+      >
         <!-- Course SearchBox -->
         <div>
-          <label for="course" class="block mb-2 text-sm font-medium text-gray-700">Course</label>
+          <label
+            for="course"
+            class="block mb-2 text-sm font-medium text-gray-700"
+            >Course</label
+          >
           <SearchBox
             id="course"
             :items="allCourses"
             placeholder="Enter course name"
             v-model="course"
-            @select="(selectedCourse) => { course = selectedCourse.name; examDate = ''; selectedCourseExamDates = selectedCourse.exams.map(e => e.date); }"
+            @select="
+              (selectedCourse) => {
+                course = selectedCourse.name;
+                examDate = '';
+                selectedCourseExamDates = selectedCourse.exams.map(
+                  (e) => e.date,
+                );
+              }
+            "
           />
         </div>
 
         <!-- Exam Date Dropdown -->
         <div>
-          <label for="examDate" class="block mb-2 text-sm font-medium text-gray-700">Exam Date</label>
+          <label
+            for="examDate"
+            class="block mb-2 text-sm font-medium text-gray-700"
+            >Exam Date</label
+          >
           <select
             id="examDate"
             v-model="examDate"
@@ -199,7 +238,11 @@ onMounted(fetchCourses);
             :disabled="selectedCourseExamDates.length === 0"
           >
             <option value="" disabled>Select Exam Date</option>
-            <option v-for="date in selectedCourseExamDates" :key="date" :value="date">
+            <option
+              v-for="date in selectedCourseExamDates"
+              :key="date"
+              :value="date"
+            >
               {{ date }}
             </option>
           </select>
@@ -207,7 +250,11 @@ onMounted(fetchCourses);
 
         <!-- Number of Participants -->
         <div>
-          <label for="participants" class="block mb-2 text-sm font-medium text-gray-700">Number of Participants</label>
+          <label
+            for="participants"
+            class="block mb-2 text-sm font-medium text-gray-700"
+            >Number of Participants</label
+          >
           <input
             id="participants"
             v-model.number="participants"
@@ -220,7 +267,11 @@ onMounted(fetchCourses);
 
         <!-- Type Dropdown -->
         <div>
-          <label for="isPublic" class="block mb-2 text-sm font-medium text-gray-700">Type</label>
+          <label
+            for="isPublic"
+            class="block mb-2 text-sm font-medium text-gray-700"
+            >Type</label
+          >
           <select
             id="isPublic"
             v-model="isPublic"
@@ -234,7 +285,11 @@ onMounted(fetchCourses);
 
         <!-- Order By Dropdown -->
         <div>
-          <label for="orderBy" class="block mb-2 text-sm font-medium text-gray-700">Order By</label>
+          <label
+            for="orderBy"
+            class="block mb-2 text-sm font-medium text-gray-700"
+            >Order By</label
+          >
           <select
             id="orderBy"
             v-model="orderBy"

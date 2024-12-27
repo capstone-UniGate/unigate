@@ -1,8 +1,10 @@
 <template>
   <div class="p-4">
-
     <!-- Filter Component -->
-    <GroupFilter @apply-filters="handleApplyFilters" :fetch-courses="fetchCourses" />
+    <GroupFilter
+      @apply-filters="handleApplyFilters"
+      :fetch-courses="fetchCourses"
+    />
 
     <!-- Error Handling -->
     <ErrorMessage v-if="isError" :message="errorMessage" @retry="fetchGroups" />
@@ -12,14 +14,14 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
-import GroupFilter from './GroupFilter.vue';
-import GroupList from '@/components/GroupList.vue';
-import ErrorMessage from '@/components/ErrorMessage.vue';
-import { useGroups } from '@/composables/useGroups';
+import GroupFilter from "./GroupFilter.vue";
+import GroupList from "@/components/GroupList.vue";
+import ErrorMessage from "@/components/ErrorMessage.vue";
+import { useGroups } from "@/composables/useGroups";
 
-const { groups, isLoading, isError, errorMessage, getAllGroups, getCourses } = useGroups();
+const { groups, isLoading, isError, errorMessage, getAllGroups, getCourses } =
+  useGroups();
 
 // Function to fetch groups
 const fetchGroups = async (filters = {}) => {

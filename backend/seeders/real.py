@@ -50,7 +50,7 @@ students = [
         name="Giovanni",
         surname="Bosi",
     ),
-     StudentCreate(
+    StudentCreate(
         number=5475593,
         email="s5475593@studenti.unige.it",
         name="Forough",

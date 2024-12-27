@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, watch, defineEmits, defineProps } from 'vue';
+import { ref, computed, watch, defineEmits, defineProps } from "vue";
 
 // Props
 const props = defineProps({
   placeholder: {
     type: String,
-    default: 'Search...',
+    default: "Search...",
   },
   items: {
     type: Array as () => { name: string }[],
@@ -13,12 +13,12 @@ const props = defineProps({
   },
   modelValue: {
     type: String,
-    default: '',
+    default: "",
   },
 });
 
 // Emit events
-const emit = defineEmits(['update:modelValue', 'select']);
+const emit = defineEmits(["update:modelValue", "select"]);
 
 // Local refs
 const inputValue = ref(props.modelValue);
@@ -26,7 +26,7 @@ const showDropdown = ref(false); // Controls the visibility of the dropdown
 const filteredItems = computed(() => {
   if (!inputValue.value) return [];
   return props.items.filter((item) =>
-    item.name.toLowerCase().includes(inputValue.value.toLowerCase())
+    item.name.toLowerCase().includes(inputValue.value.toLowerCase()),
   );
 });
 const noResultsFound = computed(() => {
@@ -38,20 +38,20 @@ watch(
   () => props.modelValue,
   (newValue) => {
     inputValue.value = newValue;
-  }
+  },
 );
 
 // Update value on input
 const updateValue = () => {
-  emit('update:modelValue', inputValue.value);
+  emit("update:modelValue", inputValue.value);
   showDropdown.value = true; // Show dropdown when typing
 };
 
 // Select an item
 const selectItem = (item: { name: string }) => {
-  emit('select', item);
+  emit("select", item);
   inputValue.value = item.name;
-  emit('update:modelValue', item.name);
+  emit("update:modelValue", item.name);
   showDropdown.value = false; // Hide dropdown after selection
 };
 
@@ -88,6 +88,8 @@ const handleBlur = () => {
       </li>
     </ul>
     <!-- No results found message -->
-    <p v-if="showDropdown && noResultsFound" class="mt-2 text-red-500">No results found</p>
+    <p v-if="showDropdown && noResultsFound" class="mt-2 text-red-500">
+      No results found
+    </p>
   </div>
 </template>
