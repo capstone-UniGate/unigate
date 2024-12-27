@@ -31,14 +31,22 @@ def get_groups(session: SessionDep) -> list[Group]:
 
 @router.get("/search")
 def search(
-        session: SessionDep,
-        course: str,
-        is_public: bool = None,
-        exam_date: str = None,
-        participants: int = None,
-        order: str = None,
-) ->list[Group]:
-    return crud.group.search(session=session, course=course, is_public=is_public, exam_date=exam_date, participants=participants, order=order)
+    session: SessionDep,
+    course: str,
+    is_public: bool = None,
+    exam_date: str = None,
+    participants: int = None,
+    order: str = None,
+) -> list[Group]:
+    return crud.group.search(
+        session=session,
+        course=course,
+        is_public=is_public,
+        exam_date=exam_date,
+        participants=participants,
+        order=order,
+    )
+
 
 @router.get(
     "/{group_id}",
@@ -277,4 +285,3 @@ def unblock_user(
             detail="You are not a super student of this group",
         )
     return crud.group.unblock_user(session=session, group=group, student=student)
-
