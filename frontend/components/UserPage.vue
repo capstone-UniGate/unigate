@@ -1,4 +1,5 @@
 <template>
+  <Toaster />
   <div class="container mx-auto px-4 py-8 mt-16">
     <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
       <!-- User Profile Header with Edit Button -->
@@ -172,6 +173,7 @@ import { useCurrentStudent } from "@/composables/useCurrentStudent";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast/use-toast";
+import { Toaster } from "@/components/ui/toast";
 import { useImageUploader } from "~/composables/useImageUploader";
 
 const router = useRouter();
@@ -238,23 +240,6 @@ const triggerFileInput = () => {
   fileInput.value?.click();
 };
 
-const onFileChange = async (event: Event) => {
-  const input = event.target as HTMLInputElement;
-  if (input.files && input.files[0]) {
-    const file = input.files[0];
-
-    // Update the image preview
-    updatePreview(file);
-
-    // Upload the image
-    try {
-      await uploadImage(usernameStore.value, file);
-    } catch (error) {
-      console.error("Error during image upload:", error);
-    }
-  }
-};
-
 const handleFileUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
@@ -266,12 +251,7 @@ const handleFileUpload = async (event: Event) => {
     // Update the image preview
     updatePreview(file);
 
-    await uploadImage(usernameStore.value, file);
-    // TODO: Implement file upload
-    // Here:
-    // 1. Upload the file to your server/storage
-    // 2. Get back the URL
-    // 3. Update the user's profile with the new avatar URL
+    await uploadImage(file);
 
     toast({
       title: "Success",
