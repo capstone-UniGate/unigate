@@ -9,14 +9,19 @@ export function useImageUploader() {
   const uploadImage = async (file: File): Promise<void> => {
     try {
       // Fetch the presigned URL
-      const { msg: presignedURL } = await useApiFetch<{ msg: string }>(
+      const { url: presignedURL } = await useApiFetch(
         `students/propic-presigned-url/`,
+        {
+          method: "get",
+        },
       );
 
-      // Upload the file to the presigned URL
-      await fetch(presignedURL, {
+      const x = await fetch(presignedURL, {
         method: "PUT",
         body: file,
+        headers: {
+          "Content-Type": file.type,
+        },
       });
 
       console.log("Image uploaded successfully!");
