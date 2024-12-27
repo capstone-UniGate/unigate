@@ -95,27 +95,6 @@
           <p class="text-gray-600">Email: {{ currentStudent?.email }}</p>
           <p class="text-gray-600">Role: {{ userRole }}</p>
         </div>
-
-        <div class="border-t pt-4">
-          <h2 class="text-lg font-semibold text-gray-900 mb-2">Groups</h2>
-          <div v-if="userGroups.length > 0" class="space-y-2">
-            <div
-              v-for="group in userGroups"
-              :key="group.id"
-              class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-            >
-              <span>{{ group.name }}</span>
-              <Button
-                @click="router.push(`/groups/${group.id}`)"
-                variant="outline"
-                class="text-sm"
-              >
-                View Group
-              </Button>
-            </div>
-          </div>
-          <p v-else class="text-gray-500">Not a member of any groups yet.</p>
-        </div>
       </div>
 
       <!-- Edit Form -->
@@ -169,6 +148,7 @@
               <Button
                 type="submit"
                 class="bg-green-500 hover:bg-green-600 text-white"
+                :disabled="isSubmitting"
               >
                 Save Changes
               </Button>
@@ -200,6 +180,7 @@ const userGroups = ref([]);
 const isEditing = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isUploading = ref(false);
+const isSubmitting = ref(false);
 
 const usernameStore = ref("4989646"); // Replace with your actual username store
 const defaultUrl = `localhost:9000/propics/${usernameStore.value}`;
@@ -284,6 +265,30 @@ const handleFileUpload = async (event: Event) => {
   } finally {
     isUploading.value = false;
     if (fileInput.value) fileInput.value.value = ""; // Reset file input
+  }
+};
+
+const handleSubmit = async () => {
+  isSubmitting.value = true;
+  try {
+    // Add the actual API call to update user profile
+
+    // await updateUserProfile(editForm.value);
+
+    toast({
+      title: "Success",
+      description: "Profile updated successfully",
+    });
+    isEditing.value = false;
+  } catch (error) {
+    toast({
+      title: "Error",
+      description: "Failed to update profile",
+      variant: "destructive",
+    });
+    console.error("Error updating profile:", error);
+  } finally {
+    isSubmitting.value = false;
   }
 };
 
