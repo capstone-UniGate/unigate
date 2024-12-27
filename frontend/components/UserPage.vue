@@ -172,6 +172,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast/use-toast";
 import { Toaster } from "@/components/ui/toast";
 import { useImageUploader } from "~/composables/useImageUploader";
+import { eventBus } from "~/utils/eventBus";
 
 const router = useRouter();
 const { currentStudent, getCurrentStudent } = useCurrentStudent();
@@ -254,7 +255,11 @@ const handleFileUpload = async (event: Event) => {
 
     await uploadImage(file);
     // After successful upload, update the previewUrl to the server URL
-    previewUrl.value = photoUrl.value;
+    if (currentStudent.value?.number) {
+      const newPhotoUrl = `http://localhost:9000/unigate/propics/${currentStudent.value.number}`;
+      eventBus.updatePhoto(newPhotoUrl);
+      previewUrl.value = newPhotoUrl;
+    }
 
     toast({
       title: "Success",
@@ -300,6 +305,9 @@ onMounted(async () => {
   initializeEditForm();
 
   // Set initial preview URL
-  previewUrl.value = photoUrl.value;
+  if (currentStudent.value?.number) {
+    const currentPhotoUrl = `http://localhost:9000/unigate/propics/${currentStudent.value.number}`;
+    eventBus.updatePhoto(currentPhotoUrl);
+  }
 });
 </script>

@@ -125,6 +125,7 @@ import { useCurrentStudent } from "@/composables/useCurrentStudent";
 import { onMounted, watch, computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { eventBus } from "~/utils/eventBus";
 
 const { logout, isLoggedIn } = useAuth();
 const { currentStudent, getCurrentStudent } = useCurrentStudent();
@@ -142,11 +143,8 @@ const getInitials = computed(() => {
     .toUpperCase();
 });
 
-// Add computed property for photo URL
-const photoUrl = computed(() => {
-  if (!currentStudent.value?.number) return null;
-  return `http://localhost:9000/unigate/propics/${currentStudent.value.number}`;
-});
+// Replace photoUrl computed with reactive eventBus
+const photoUrl = computed(() => eventBus.photoUrl || null);
 
 // Watch for login state changes
 watch(isLoggedIn, async (newValue) => {
@@ -160,6 +158,10 @@ watch(isLoggedIn, async (newValue) => {
 onMounted(async () => {
   if (isLoggedIn.value) {
     await getCurrentStudent();
+    if (currentStudent.value?.number) {
+      const currentPhotoUrl = `http://localhost:9000/unigate/propics/${currentStudent.value.number}`;
+      eventBus.updatePhoto(currentPhotoUrl);
+    }
   }
 });
 
