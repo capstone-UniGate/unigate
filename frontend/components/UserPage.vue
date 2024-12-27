@@ -5,7 +5,22 @@
       <!-- User Profile Header with Edit Button -->
       <div class="flex justify-between items-start mb-6">
         <div class="flex items-center space-x-4">
+          <!-- Read-only Avatar (when not editing) -->
+          <div class="relative" v-if="!isEditing">
+            <Avatar class="w-20 h-20">
+              <AvatarImage
+                :src="
+                  previewUrl || defaultUrl || 'https://github.com/radix-vue.png'
+                "
+                alt="@radix-vue"
+              />
+              <AvatarFallback>{{ getInitials }}</AvatarFallback>
+            </Avatar>
+          </div>
+
+          <!-- Editable Avatar (when editing) -->
           <div
+            v-else
             class="relative group cursor-pointer"
             @click="triggerFileInput"
             v-if="!isUploading"
@@ -25,8 +40,10 @@
               <span class="text-white text-sm">Change Photo</span>
             </div>
           </div>
+
+          <!-- Loading spinner (when uploading) -->
           <div
-            v-else
+            v-if="isUploading"
             class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center"
           >
             <span class="animate-spin">⌛</span>
