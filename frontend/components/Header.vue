@@ -12,7 +12,6 @@
               alt="Logo"
               class="h-8 w-8 mr-2"
             />
-            <router-link to="/" class="text-blue-800">UniGate</router-link>
           </div>
           <!-- Student Name -->
           <div
@@ -22,27 +21,6 @@
             Welcome, {{ currentStudent.name }}
           </div>
         </div>
-
-        <!-- Desktop Navigation -->
-        <nav
-          class="hidden md:flex space-x-6 absolute left-1/2 transform -translate-x-1/2"
-        >
-          <router-link
-            to="/homepage"
-            class="text-blue-800 hover:text-blue-500 transition"
-            >Home</router-link
-          >
-          <router-link
-            to="/about"
-            class="text-blue-800 hover:text-blue-500 transition"
-            >About</router-link
-          >
-          <router-link
-            to="/contact"
-            class="text-blue-800 hover:text-blue-500 transition"
-            >Contact</router-link
-          >
-        </nav>
 
         <!-- Logout Button (Desktop) -->
         <button
