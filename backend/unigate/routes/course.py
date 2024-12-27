@@ -2,8 +2,11 @@ from fastapi import APIRouter, HTTPException, status
 
 from unigate import crud
 from unigate.core.database import AuthSessionDep, SessionDep
-from unigate.models import Course
+from unigate.models import Course, Group
 from unigate.schemas.course import CourseReadWithUsersAndExams
+from unigate.schemas.group import (
+    GroupReadWithStudents,
+)
 
 router = APIRouter()
 
@@ -17,15 +20,17 @@ def get_courses(session: AuthSessionDep) -> list[Course]:
 
 
 @router.get(
-    "/get_info",
+    "/get_group_number",
     response_model=dict[str, Course | int | None],
 )
-def get_info(
+def get_group_number(
     session: SessionDep, auth_session: AuthSessionDep, course_name: str
 ) -> dict[str, Course | int | None]:
     result = {
         "course": crud.course.get_by_name(auth_session=auth_session, name=course_name),
-        "count": crud.group.get_groups_num(session=session, course_name=course_name),
+        "count": len(
+            crud.group.get_groups_course(session=session, course_name=course_name)
+        ),
     }
     if not result["course"]:
         raise HTTPException(
@@ -33,3 +38,37 @@ def get_info(
             detail="Course not found",
         )
     return result
+
+
+@router.get(
+    "/get_groups",
+    response_model=list[GroupReadWithStudents],
+)
+def get_groups(
+    session: SessionDep, auth_session: AuthSessionDep, course_name: str
+) -> list[Group]:
+    course = crud.course.get_by_name(auth_session=auth_session, name=course_name)
+    if not course:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Course not found",
+        )
+    return crud.group.get_groups_course(session=session, course_name=course_name)
+
+
+@router.get(
+    "/get_groups_exams",
+    response_model=list[GroupReadWithStudents],
+)
+def get_groups_exams(
+    session: SessionDep, auth_session: AuthSessionDep, course_name: str, date: str
+) -> list[Group]:
+    course = crud.course.get_by_name(auth_session=auth_session, name=course_name)
+    if not course:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Course not found",
+        )
+    return crud.group.get_groups_exam(
+        session=session, course_name=course_name, date=date
+    )
