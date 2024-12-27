@@ -185,7 +185,7 @@ const isSubmitting = ref(false);
 const usernameStore = ref("4989646"); // Replace with your actual username store
 const defaultUrl = `localhost:9000/propics/${usernameStore.value}`;
 // Use the image uploader composable
-const { previewUrl, uploadImage, updatePreview } = useImageUploader();
+const { previewUrl, uploadImage, updatePreview, getPhoto } = useImageUploader();
 
 // Edit form state
 const editForm = ref({
@@ -271,10 +271,6 @@ const handleFileUpload = async (event: Event) => {
 const handleSubmit = async () => {
   isSubmitting.value = true;
   try {
-    // Add the actual API call to update user profile
-
-    // await updateUserProfile(editForm.value);
-
     toast({
       title: "Success",
       description: "Profile updated successfully",
@@ -297,7 +293,12 @@ onMounted(async () => {
     await getCurrentStudent();
   }
   initializeEditForm();
-  // Here you would typically fetch the user's groups
-  // Add the actual API call to get user's groups
+
+  // Fetch and display the user's profile photo
+  try {
+    await getPhoto();
+  } catch (error) {
+    console.error("Failed to load the profile photo:", error);
+  }
 });
 </script>
