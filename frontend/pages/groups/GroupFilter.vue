@@ -3,6 +3,7 @@ import { ref, computed, defineEmits, onMounted, watch } from 'vue';
 import { useGroups } from '@/composables/useGroups';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, Filter, Trash, X } from 'lucide-vue-next';
+import SearchBox from '@/components/ui/SearchBox.vue';
 
 const { getCourses } = useGroups();
 
@@ -27,17 +28,9 @@ const appliedFilters = ref([]);
 const allCourses = ref<{ name: string; exams: { date: string }[] }[]>([]);
 const selectedCourseExamDates = ref<string[]>([]);
 
-// Computed property to filter courses based on the input
-const filteredCourses = computed(() => {
-  if (!course.value) return [];
-  return allCourses.value.filter((c) =>
-    c.name.toLowerCase().includes(course.value.toLowerCase())
-  );
-});
-
 // Computed property to check if no results are found
 const noResultsFound = computed(() => {
-  return course.value && filteredCourses.value.length === 0;
+  return course.value && selectedCourseExamDates.value.length === 0;
 });
 
 // Watcher to update exam dates when a course is selected
@@ -139,13 +132,6 @@ const removeFilter = (key) => {
   });
 };
 
-// Select a course from the filtered list
-const selectCourse = (selectedCourse: { name: string; exams: { date: string }[] }) => {
-  course.value = selectedCourse.name;
-  selectedCourseExamDates.value = selectedCourse.exams.map((exam) => exam.date);
-  examDate.value = '';
-};
-
 // Fetch courses when the component is mounted
 onMounted(fetchCourses);
 </script>
@@ -191,31 +177,16 @@ onMounted(fetchCourses);
       :style="{ maxHeight: isFilterVisible ? '500px' : '0', padding: isFilterVisible ? '16px' : '0' }"
     >
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <!-- Course Input -->
+        <!-- Course SearchBox -->
         <div>
           <label for="course" class="block mb-2 text-sm font-medium text-gray-700">Course</label>
-          <input
+          <SearchBox
             id="course"
-            v-model="course"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-500"
+            :items="allCourses"
             placeholder="Enter course name"
+            v-model="course"
+            @select="(selectedCourse) => { course = selectedCourse.name; examDate = ''; selectedCourseExamDates = selectedCourse.exams.map(e => e.date); }"
           />
-          <!-- Dropdown for filtered courses -->
-          <ul
-            v-if="filteredCourses.length && !selectedCourseExamDates.length"
-            class="bg-white border border-gray-300 rounded-lg shadow-lg mt-2"
-          >
-            <li
-              v-for="filteredCourse in filteredCourses"
-              :key="filteredCourse.name"
-              class="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              @click="selectCourse(filteredCourse)"
-            >
-              {{ filteredCourse.name }}
-            </li>
-          </ul>
-          <!-- No results found message -->
-          <p v-if="noResultsFound" class="mt-2 text-red-500">No results found</p>
         </div>
 
         <!-- Exam Date Dropdown -->
