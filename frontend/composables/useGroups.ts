@@ -29,13 +29,14 @@ export function useGroups() {
     }
   };
 
-  async function getAllGroups() {
+  async function getAllGroups(filters = {}) {
     try {
       await ensureAuthenticated();
       isError.value = false;
       isLoading.value = true;
       const response = await useApiFetch("/groups", {
         method: "GET",
+        params: filters,
       });
       groups.value = response;
     } catch (error) {
@@ -199,6 +200,24 @@ export function useGroups() {
     }
   }
 
+  //Function to fetch courses
+  async function getCourses() {
+    try {
+      await ensureAuthenticated();
+      isError.value = false;
+      isLoading.value = true;
+      const response = await useApiFetch("/courses", {
+        method: "GET",
+      });
+      return response;
+    } catch (error) {
+      isError.value = true;
+      throw error;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   return {
     groups,
     isLoading,
@@ -214,5 +233,6 @@ export function useGroups() {
     handleGroupRequest,
     handleUserBlock,
     checkAuthStatus,
+    getCourses,
   };
 }

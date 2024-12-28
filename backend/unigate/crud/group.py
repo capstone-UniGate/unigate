@@ -1,7 +1,8 @@
 from datetime import date
+import datetime
 
 from fastapi import Depends
-from sqlmodel import Session, select
+from sqlmodel import Session, and_, select
 
 from unigate.core.database import get_session
 from unigate.crud.base import CRUDBase
@@ -93,7 +94,7 @@ class CRUDGroup(CRUDBase[Group, GroupCreate, Group]):
         return group
 
     def delete_request(
-        self, *, group: Group, student: Student, session: Session, request: Request
+        self, *, group: Group, session: Session, request: Request
     ) -> None:
         group.requests.remove(request)  # type: ignore
         session.delete(request)
@@ -134,6 +135,23 @@ class CRUDGroup(CRUDBase[Group, GroupCreate, Group]):
             return [group for group in groups if len(group.students) >= participants]
 
         return groups
+    def get_groups_course(self, *, course_name: str, session: Session) -> list[Group]:
+        statement = select(self.model).where(self.model.course_name == course_name)
+        result = session.exec(statement)
+        return result.all()  # type: ignore
+
+    def get_groups_exam(
+        self, *, course_name: str, session: Session, date: str
+    ) -> list[Group]:
+        parsed_date = datetime.datetime.strptime(date, "%Y-%m-%d").date()  # noqa: DTZ007
+        statement = select(self.model).where(
+            and_(
+                self.model.course_name == course_name,
+                self.model.exam_date == parsed_date,
+            )
+        )
+        result = session.exec(statement)
+        return result.all()  # type: ignore
 
 
 group = CRUDGroup(Group)
