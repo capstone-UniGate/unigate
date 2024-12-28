@@ -30,6 +30,10 @@ def get_groups(session: SessionDep) -> list[Group]:
 
 
 @router.get(
+    "/by_name",
+    response_model=GroupReadWithStudents,
+)
+@router.get(
     "/{group_id}",
     response_model=GroupReadWithStudents,
 )
