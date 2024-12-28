@@ -43,7 +43,10 @@ services:
       - ./pgadmin/entrypoint.sh:/custom-entrypoint.sh
       - pgadmin_data:/var/lib/pgadmin:rw
     depends_on:
-      - postgres-unigate
+      postgres-unigate:
+        condition: service_healthy
+        restart: true
+        required: true
     restart: unless-stopped
 
   minio-unigate:
@@ -82,8 +85,11 @@ services:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER?Variable not set}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD?Variable not set}
     depends_on:
-      - minio-unigate
-    restart: no
+      minio-unigate:
+        condition: service_healthy
+        restart: true
+        required: true
+    restart: unless-stopped
 
   backend-unigate:
     container_name: backend-unigate
@@ -117,6 +123,7 @@ services:
       postgres-unigate:
         condition: service_healthy
         restart: true
+        required: true
     restart: unless-stopped
 
   frontend-unigate:
