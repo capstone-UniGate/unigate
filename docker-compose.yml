@@ -74,7 +74,8 @@ services:
     entrypoint: >
       /bin/sh -c "
       mc alias set minio http://minio-unigate:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
-      (mc mb minio/${MINIO_BUCKET} && mc policy set download minio/${MINIO_BUCKET}) || true;
+      mc mb minio/${MINIO_BUCKET} || true;
+      mc anonymous set download minio/${MINIO_BUCKET} || true;
       tail -f /dev/null;"
     environment:
       - MINIO_BUCKET=${MINIO_BUCKET?Variable not set}
@@ -84,65 +85,58 @@ services:
       - minio-unigate
     restart: no
 
-  # backend-unigate:
-  #   container_name: backend-unigate
-  #   command: fastapi run --reload unigate/main.py
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   develop:
-  #     watch:
-  #       - path: ./backend/unigate
-  #         action: sync
-  #         target: /app
-  #         ignore:
-  #           - ./backend/.venv
-  #           - .venv
-  #           - ./backend/alembic_auth
-  #           - ./backend/alembic_unigate
-  #       - path: ./backend/pyproject.toml
-  #         action: rebuild
-  #   ports:
-  #     - "${BACKEND_PORT}:8000"
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     - BACKEND_PORT=${BACKEND_PORT?Variable not set}
-  #     - POSTGRES_DB=${POSTGRES_DB?Variable not set}
-  #     - POSTGRES_USER=${POSTGRES_USER?Variable not set}
-  #     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-  #     - POSTGRES_HOST=postgres-unigate
-  #     - POSTGRES_PORT=5432
-  #     - UNIGATE_DB=${UNIGATE_DB?Variable not set}
-  #     - AUTH_DB=${AUTH_DB?Variable not set}
-  #     - MODE=test
-  #     - JWT_SECRET=${JWT_SECRET?Variable not set}
-  #     - SENDGRID_API_KEY=${SENDGRID_API_KEY?Variable not set}
-  #   depends_on:
-  #     postgres-unigate:
-  #       condition: service_healthy
-  #       restart: true
-  #   restart: unless-stopped
+  backend-unigate:
+    container_name: backend-unigate
+    command: fastapi run --reload unigate/main.py
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    develop:
+      watch:
+        - path: ./backend/pyproject.toml
+          action: rebuild
+    ports:
+      - "${BACKEND_PORT}:8000"
+    env_file:
+      - .env
+    environment:
+      - BACKEND_PORT=${BACKEND_PORT?Variable not set}
+      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
+      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+      - POSTGRES_HOST=postgres-unigate
+      - POSTGRES_PORT=5432
+      - UNIGATE_DB=${UNIGATE_DB?Variable not set}
+      - AUTH_DB=${AUTH_DB?Variable not set}
+      - MODE=test
+      - JWT_SECRET=${JWT_SECRET?Variable not set}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY?Variable not set}
+    volumes:
+      - ./backend/unigate:/app/unigate
+    depends_on:
+      postgres-unigate:
+        condition: service_healthy
+        restart: true
+    restart: unless-stopped
 
-  # frontend-unigate:
-  #   container_name: frontend-unigate
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   develop:
-  #     watch:
-  #       - path: ./frontend
-  #         action: sync
-  #         target: /app
-  #       - path: ./frontend/package.json
-  #         action: rebuild
-  #   ports:
-  #     - "${FRONTEND_PORT}:3000"
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     - FRONTEND_PORT=${FRONTEND_PORT?Variable not set}
-  #   restart: unless-stopped
+  frontend-unigate:
+    container_name: frontend-unigate
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    develop:
+      watch:
+        - path: ./frontend/package.json
+          action: rebuild
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    env_file:
+      - .env
+    environment:
+      - FRONTEND_PORT=${FRONTEND_PORT?Variable not set}
+    volumes:
+      - ./frontend:/app
+    restart: unless-stopped
 
 volumes:
   pgdata:
