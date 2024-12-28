@@ -1,11 +1,12 @@
 import datetime
+from datetime import date
 
 from fastapi import Depends
 from sqlmodel import Session, and_, select
 
 from unigate.core.database import get_session
 from unigate.crud.base import CRUDBase
-from unigate.enums import RequestStatus
+from unigate.enums import GroupType, RequestStatus
 from unigate.models import Group
 from unigate.models.request import Request
 from unigate.models.student import Student
@@ -99,6 +100,41 @@ class CRUDGroup(CRUDBase[Group, GroupCreate, Group]):
         session.delete(request)
         session.commit()
         session.refresh(group)
+
+    def search(
+        self,
+        session: Session,
+        course: str,
+        is_public: bool = None,
+        exam_date: str = None,
+        participants: int = None,
+        order: str = None,
+    ) -> list[Group]:
+        query = select(Group)
+
+        if course:
+            query = query.where(Group.course_name == course)
+
+        if is_public is not None:
+            if is_public:
+                query = query.where(Group.type == GroupType.PUBLIC)
+            else:
+                query = query.where(Group.type == GroupType.PRIVATE)
+
+        if exam_date:
+            query = query.where(Group.exam_date == date.fromisoformat(exam_date))
+
+        if order == "Newest":
+            query = query.order_by(Group.date.desc())
+        elif order == "Oldest":
+            query = query.order_by(Group.date)
+
+        groups = self.get_multi(session=session, query=query)
+
+        if participants:
+            return [group for group in groups if len(group.students) >= participants]
+
+        return groups
 
     def get_groups_course(self, *, course_name: str, session: Session) -> list[Group]:
         statement = select(self.model).where(self.model.course_name == course_name)
