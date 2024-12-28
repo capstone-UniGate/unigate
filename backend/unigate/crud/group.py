@@ -1,5 +1,5 @@
-from datetime import date
 import datetime
+from datetime import date
 
 from fastapi import Depends
 from sqlmodel import Session, and_, select
@@ -135,6 +135,7 @@ class CRUDGroup(CRUDBase[Group, GroupCreate, Group]):
             return [group for group in groups if len(group.students) >= participants]
 
         return groups
+
     def get_groups_course(self, *, course_name: str, session: Session) -> list[Group]:
         statement = select(self.model).where(self.model.course_name == course_name)
         result = session.exec(statement)
