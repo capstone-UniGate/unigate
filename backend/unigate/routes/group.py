@@ -29,6 +29,25 @@ def get_groups(session: SessionDep) -> list[Group]:
     return crud.group.get_all(session=session)
 
 
+@router.get("/search")
+def search(
+    session: SessionDep,
+    course: str,
+    is_public: bool = None,
+    exam_date: str = None,
+    participants: int = None,
+    order: str = None,
+) -> list[Group]:
+    return crud.group.search(
+        session=session,
+        course=course,
+        is_public=is_public,
+        exam_date=exam_date,
+        participants=participants,
+        order=order,
+    )
+
+
 @router.get(
     "/by_name",
     response_model=GroupReadWithStudents,
