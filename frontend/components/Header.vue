@@ -12,7 +12,9 @@
               alt="Logo"
               class="h-8 w-8 mr-2"
             />
-            <router-link to="/" class="text-blue-800">UniGate</router-link>
+            <router-link to="/homepage" class="text-blue-800"
+              >UniGate</router-link
+            >
           </div>
           <!-- Student Name -->
           <div
@@ -44,15 +46,28 @@
           >
         </nav>
 
-        <!-- Logout Button (Desktop) -->
-        <button
-          v-if="isLoggedIn"
-          @click="handleLogout"
-          id="logout-button"
-          class="hidden md:block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
-        >
-          Logout
-        </button>
+        <div class="flex items-center space-x-6">
+          <!-- Logout Button (Desktop) -->
+          <button
+            v-if="isLoggedIn"
+            @click="handleLogout"
+            id="logout-button"
+            class="hidden md:block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+          >
+            Logout
+          </button>
+
+          <!-- Updated Avatar with click handler -->
+          <div class="cursor-pointer" @click="router.push('/user')">
+            <Avatar>
+              <AvatarImage
+                :src="photoUrl || 'https://github.com/radix-vue.png'"
+                alt="@radix-vue"
+              />
+              <AvatarFallback>{{ getInitials }}</AvatarFallback>
+            </Avatar>
+          </div>
+        </div>
 
         <!-- Mobile Menu Button -->
         <button @click="toggleMenu" class="md:hidden text-blue-800">
@@ -107,13 +122,29 @@
 <script setup lang="ts">
 import { useAuth } from "@/composables/useAuth";
 import { useCurrentStudent } from "@/composables/useCurrentStudent";
-import { onMounted, watch } from "vue";
+import { onMounted, watch, computed, ref } from "vue";
 import { useRouter } from "vue-router";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { eventBus } from "~/utils/eventBus";
 
 const { logout, isLoggedIn } = useAuth();
 const { currentStudent, getCurrentStudent } = useCurrentStudent();
 const router = useRouter();
 const isMenuOpen = ref(false);
+
+// Compute initials from student name
+const getInitials = computed(() => {
+  if (!currentStudent.value?.name) return "U";
+  const names =
+    `${currentStudent.value.name} ${currentStudent.value.surname}`.split(" ");
+  return names
+    .map((name) => name[0])
+    .join("")
+    .toUpperCase();
+});
+
+// Replace photoUrl computed with reactive eventBus
+const photoUrl = computed(() => eventBus.photoUrl || null);
 
 // Watch for login state changes
 watch(isLoggedIn, async (newValue) => {
@@ -127,6 +158,10 @@ watch(isLoggedIn, async (newValue) => {
 onMounted(async () => {
   if (isLoggedIn.value) {
     await getCurrentStudent();
+    if (currentStudent.value?.number) {
+      const currentPhotoUrl = `http://localhost:9000/unigate/propics/${currentStudent.value.number}`;
+      eventBus.updatePhoto(currentPhotoUrl);
+    }
   }
 });
 

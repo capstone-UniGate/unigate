@@ -8,7 +8,9 @@
 
       <!-- Navigation Links -->
       <div class="flex justify-center space-x-8 text-sm font-light mb-4">
-        <router-link to="/" class="hover:text-blue-500">Home</router-link>
+        <router-link to="/homepage" class="hover:text-blue-500"
+          >Home</router-link
+        >
         <router-link to="/about" class="hover:text-blue-500">About</router-link>
         <router-link to="/contact" class="hover:text-blue-500"
           >Contact Us</router-link
