@@ -37,10 +37,7 @@ watch(localSelectedDate, (newVal) => {
 
 <template>
   <div>
-    <label
-      for="examDate"
-      class="block mb-2 text-sm font-medium text-gray-700"
-    >
+    <label for="examDate" class="block mb-2 text-sm font-medium text-gray-700">
       Exam Date
     </label>
     <select
