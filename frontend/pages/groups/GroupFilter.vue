@@ -3,7 +3,8 @@ import { ref, computed, defineEmits, onMounted, watch } from "vue";
 import { useGroups } from "@/composables/useGroups";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, Filter, Trash, X } from "lucide-vue-next";
-import SearchBox from "@/components/ui/SearchBox.vue";
+import CoursSearchBox from "@/components/CourseSearchBox.vue";
+import ExamDateDropdown from "@/components/ExamDateDropdown.vue";
 
 const { getCourses } = useGroups();
 
@@ -207,7 +208,7 @@ onMounted(fetchCourses);
             class="block mb-2 text-sm font-medium text-gray-700"
             >Course</label
           >
-          <SearchBox
+          <CourseSearchBox
             id="course"
             :items="allCourses"
             placeholder="Enter course name"
@@ -226,26 +227,11 @@ onMounted(fetchCourses);
 
         <!-- Exam Date Dropdown -->
         <div>
-          <label
-            for="examDate"
-            class="block mb-2 text-sm font-medium text-gray-700"
-            >Exam Date</label
-          >
-          <select
-            id="examDate"
-            v-model="examDate"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-500"
+          <ExamDateDropdown
+            :examDates="selectedCourseExamDates"
+            v-model:selectedDate="examDate"
             :disabled="selectedCourseExamDates.length === 0"
-          >
-            <option value="" disabled>Select Exam Date</option>
-            <option
-              v-for="date in selectedCourseExamDates"
-              :key="date"
-              :value="date"
-            >
-              {{ date }}
-            </option>
-          </select>
+          />
         </div>
 
         <!-- Number of Participants -->
