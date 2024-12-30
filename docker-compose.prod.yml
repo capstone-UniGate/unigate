@@ -102,7 +102,7 @@ services:
       dockerfile: Dockerfile.prod
     environment:
       - POSTGRES_HOST=postgres-unigate
-      - POSTGRES_PORT=${POSTGRES_PORT?Variable not set}
+      - POSTGRES_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
       - POSTGRES_DB=${POSTGRES_DB?Variable not set}
@@ -134,8 +134,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.prod
     environment:
-      - BASE_URL=${BASE_URL?Variable not set}
-      - MINIO_URL=${MINIO_URL?Variable not set}
+      - NUXT_PUBLIC_BASE_URL=${NUXT_PUBLIC_BASE_URL?Variable not set}
+      - NUXT_PUBLIC_MINIO_URL=${NUXT_PUBLIC_MINIO_URL?Variable not set}
     labels:
       - traefik.enable=true
       - traefik.http.routers.unigate-frontend.entrypoints=websecure
