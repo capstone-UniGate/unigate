@@ -112,7 +112,7 @@ services:
       - AUTH_DB=${AUTH_DB?Variable not set}
       - SENDGRID_API_KEY=${SENDGRID_API_KEY?Variable not set}
       - JWT_SECRET=${JWT_SECRET?Variable not set}
-      - MINIO_ENDPOINT=minio-unigate:9000
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT?Variable not set}
       - MINIO_ACCESS_KEY=${MINIO_ROOT_USER?Variable not set}
       - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD?Variable not set}
     labels:
