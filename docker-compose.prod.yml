@@ -147,6 +147,7 @@ services:
 networks:
   default:
     name: infrastructure
+    external: true
 
 volumes:
   pgdata:
