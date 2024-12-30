@@ -175,7 +175,7 @@ import { useImageUploader } from "~/composables/useImageUploader";
 import { eventBus } from "~/utils/eventBus";
 
 const router = useRouter();
-const { minioURL } = useRuntimeConfig();
+const config = useRuntimeConfig();
 const { currentStudent, getCurrentStudent } = useCurrentStudent();
 const { toast } = useToast();
 const isEditing = ref(false);
@@ -186,8 +186,7 @@ const isSubmitting = ref(false);
 // Remove usernameStore and create a computed photo URL
 const photoUrl = computed(() => {
   if (!currentStudent.value?.number) return null;
-  console.log(`AAAACANE: ${minioURL}`)
-  return `${minioURL}/unigate/propics/${currentStudent.value.number}`;
+  return `${config.public.minioURL}/unigate/propics/${currentStudent.value.number}`;
 });
 
 // Use the image uploader composable
@@ -258,8 +257,7 @@ const handleFileUpload = async (event: Event) => {
     await uploadImage(file);
     // After successful upload, update the previewUrl to the server URL
     if (currentStudent.value?.number) {
-      console.log(`AAAAPIG: ${minioURL}`)
-      const newPhotoUrl = `${minioURL}/unigate/propics/${currentStudent.value.number}`;
+      const newPhotoUrl = `${config.public.minioURL}/unigate/propics/${currentStudent.value.number}`;
       eventBus.updatePhoto(newPhotoUrl);
       previewUrl.value = newPhotoUrl;
     }
@@ -309,8 +307,7 @@ onMounted(async () => {
 
   // Set initial preview URL
   if (currentStudent.value?.number) {
-    console.log(`AAAADOG: ${minioURL}`)
-    const currentPhotoUrl = `${minioURL}/unigate/propics/${currentStudent.value.number}`;
+    const currentPhotoUrl = `${config.public.minioURL}/unigate/propics/${currentStudent.value.number}`;
     eventBus.updatePhoto(currentPhotoUrl);
   }
 });

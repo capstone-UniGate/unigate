@@ -2,8 +2,6 @@ services:
   postgres-unigate:
     container_name: postgres-unigate
     image: postgres:17-bookworm
-    ports:
-      - "${POSTGRES_PORT}:5432"
     env_file:
       - .env
     environment:
@@ -11,7 +9,6 @@ services:
       - POSTGRES_DB=${POSTGRES_DB?Variable not set}
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-      - POSTGRES_PORT=${POSTGRES_PORT?Variable not set}
     volumes:
       - ./postgres/create-databases.sh:/docker-entrypoint-initdb.d/create-databases.sh
       - pgdata:/var/lib/postgresql/data/pgdata
@@ -21,6 +18,7 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s
+    network_mode: host
     restart: unless-stopped
 
   pgadmin-unigate:
@@ -28,14 +26,11 @@ services:
     image: dpage/pgadmin4:8.13
     entrypoint:
       - /custom-entrypoint.sh
-    ports:
-      - "${PGADMIN_PORT}:80"
     env_file:
       - .env
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL?Variable not set}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD?Variable not set}
-      - PGADMIN_PORT=${PGADMIN_PORT?Variable not set}
       - PGADMIN_CONFIG_SERVER_MODE=False
       - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
       - PGADMIN_SERVER_JSON_FILE=/tmp/servers.json
@@ -47,18 +42,14 @@ services:
         condition: service_healthy
         restart: true
         required: true
+    network_mode: host
     restart: unless-stopped
 
   minio-unigate:
     container_name: minio-unigate
     image: minio/minio:RELEASE.2024-12-18T13-15-44Z
     command: server /data --console-address ":9001"
-    ports:
-      - "${MINIO_PORT}:9000"
-      - "${MINIO_CONSOLE_PORT}:9001"
     environment:
-      - MINIO_PORT=${MINIO_PORT?Variable not set}
-      - MINIO_CONSOLE_PORT=${MINIO_CONSOLE_PORT?Variable not set}
       - MINIO_ROOT_USER=${MINIO_ROOT_USER?Variable not set}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD?Variable not set}
     volumes:
@@ -69,6 +60,7 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s
+    network_mode: host
     restart: unless-stopped
 
   mc-unigate:
@@ -76,11 +68,12 @@ services:
     image: minio/mc:RELEASE.2024-11-21T17-21-54Z
     entrypoint: >
       /bin/sh -c "
-      mc alias set minio http://minio-unigate:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      mc alias set minio ${MINIO_URL} ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
       mc mb minio/${MINIO_BUCKET} || true;
       mc anonymous set download minio/${MINIO_BUCKET} || true;
       tail -f /dev/null;"
     environment:
+      - MINIO_URL$=${MINIO_URL?Variable not set}
       - MINIO_BUCKET=${MINIO_BUCKET?Variable not set}
       - MINIO_ROOT_USER=${MINIO_ROOT_USER?Variable not set}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD?Variable not set}
@@ -89,6 +82,7 @@ services:
         condition: service_healthy
         restart: true
         required: true
+    network_mode: host
     restart: unless-stopped
 
   backend-unigate:
@@ -100,23 +94,20 @@ services:
       watch:
         - path: ./backend/pyproject.toml
           action: rebuild
-    ports:
-      - "${BACKEND_PORT}:8000"
     env_file:
       - .env
     environment:
-      - BACKEND_PORT=${BACKEND_PORT?Variable not set}
       - POSTGRES_DB=${POSTGRES_DB?Variable not set}
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-      - POSTGRES_HOST=postgres-unigate
+      - POSTGRES_HOST=${POSTGRES_HOST?Variable not set}
       - POSTGRES_PORT=5432
       - UNIGATE_DB=${UNIGATE_DB?Variable not set}
       - AUTH_DB=${AUTH_DB?Variable not set}
       - MODE=test
       - JWT_SECRET=${JWT_SECRET?Variable not set}
       - SENDGRID_API_KEY=${SENDGRID_API_KEY?Variable not set}
-      - MINIO_ENDPOINT=minio-unigate:9000
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT?Variable not set}
     volumes:
       - ./backend/unigate:/app/unigate
       - ./backend/alembic_unigate:/app/alembic_unigate
@@ -127,6 +118,7 @@ services:
         condition: service_healthy
         restart: true
         required: true
+    network_mode: host
     restart: unless-stopped
 
   frontend-unigate:
@@ -138,14 +130,14 @@ services:
       watch:
         - path: ./frontend/package.json
           action: rebuild
-    ports:
-      - "${FRONTEND_PORT}:3000"
     env_file:
       - .env
     environment:
-      - FRONTEND_PORT=${FRONTEND_PORT?Variable not set}
+      - NUXT_PUBLIC_BASE_URL=${NUXT_PUBLIC_BASE_URL?Variable not set}
+      - NUXT_PUBLIC_MINIO_URL=${NUXT_PUBLIC_MINIO_URL?Variable not set}
     volumes:
       - ./frontend:/app
+    network_mode: host
     restart: unless-stopped
 
 volumes:

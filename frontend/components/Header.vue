@@ -127,7 +127,7 @@ import { useRouter } from "vue-router";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { eventBus } from "~/utils/eventBus";
 
-const { minioURL } = useRuntimeConfig();
+const config = useRuntimeConfig();
 const { logout, isLoggedIn } = useAuth();
 const { currentStudent, getCurrentStudent } = useCurrentStudent();
 const router = useRouter();
@@ -160,8 +160,7 @@ onMounted(async () => {
   if (isLoggedIn.value) {
     await getCurrentStudent();
     if (currentStudent.value?.number) {
-      console.log(`AAAADIO: ${minioURL}`)
-      const currentPhotoUrl = `${minioURL}/unigate/propics/${currentStudent.value.number}`;
+      const currentPhotoUrl = `${config.public.minioURL}/unigate/propics/${currentStudent.value.number}`;
       eventBus.updatePhoto(currentPhotoUrl);
     }
   }
