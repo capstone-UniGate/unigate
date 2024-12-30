@@ -38,4 +38,4 @@ COPY ./unigate /app/unigate
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
 
-CMD ["fastapi", "run", "app/main.py"]
+CMD ["fastapi", "run", "unigate/main.py"]

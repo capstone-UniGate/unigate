@@ -112,8 +112,6 @@ services:
       - MINIO_ENDPOINT=minio-unigate:9000
       - MINIO_ACCESS_KEY=${MINIO_ROOT_USER?Variable not set}
       - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD?Variable not set}
-    volumes:
-      - ./backend/unigate:/app/unigate
     labels:
       - traefik.enable=true
       - traefik.http.routers.unigate-backend.entrypoints=websecure
@@ -138,8 +136,6 @@ services:
     environment:
       - BASE_URL=${BASE_URL?Variable not set}
       - MINIO_URL=${MINIO_URL?Variable not set}
-    volumes:
-      - ./frontend:/app
     labels:
       - traefik.enable=true
       - traefik.http.routers.unigate-frontend.entrypoints=websecure
