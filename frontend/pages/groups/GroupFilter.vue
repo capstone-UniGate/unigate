@@ -37,15 +37,13 @@ const noResultsFound = computed(() => {
 // Watcher to update exam dates when a course is selected
 watch(course, (newCourseName) => {
   const matchedCourse = allCourses.value.find(
-    (c) => c.name.toLowerCase() === newCourseName.toLowerCase(),
+    (c) => c.name.toLowerCase() === newCourseName.toLowerCase()
   );
   if (!matchedCourse) {
     selectedCourseExamDates.value = [];
     examDate.value = "";
   } else {
-    selectedCourseExamDates.value = matchedCourse.exams.map(
-      (exam) => exam.date,
-    );
+    selectedCourseExamDates.value = matchedCourse.exams.map((exam) => exam.date);
   }
 });
 
@@ -81,37 +79,52 @@ const toggleFilter = () => {
   isFilterVisible.value = !isFilterVisible.value;
 };
 
-// Apply the selected filters
-const applyFilters = () => {
-  if (areFiltersChanged.value) {
-    emit("apply-filters", {
-      course: course.value,
-      examDate: examDate.value,
-      participants: participants.value,
-      isPublic: isPublic.value,
-      orderBy: orderBy.value,
-    });
+const groups = ref([]);
 
-    const filters = [];
-    if (course.value)
-      filters.push({ label: `Course: ${course.value}`, key: "course" });
-    if (examDate.value)
-      filters.push({ label: `Exam Date: ${examDate.value}`, key: "examDate" });
-    if (participants.value !== null)
-      filters.push({
-        label: `Participants: ${participants.value}`,
-        key: "participants",
-      });
-    if (isPublic.value !== null)
-      filters.push({
-        label: `Type: ${isPublic.value ? "Public" : "Private"}`,
-        key: "isPublic",
-      });
-    if (orderBy.value)
-      filters.push({ label: `Order By: ${orderBy.value}`, key: "orderBy" });
-    appliedFilters.value = filters;
+const applyFilters = async () => {
+  if (areFiltersChanged.value) {
+    const filters = {
+      course: course.value || undefined,
+      exam_date: examDate.value || undefined,
+      participants: participants.value || undefined,
+      is_public: isPublic.value !== null ? isPublic.value : undefined,
+      order: orderBy.value || undefined,
+    };
+
+    const queryParams = new URLSearchParams(
+      Object.entries(filters).reduce((acc, [key, value]) => {
+        if (value !== undefined) acc[key] = value.toString();
+        return acc;
+      }, {})
+    );
+
+    console.log("Query Parameters Sent:", queryParams.toString());
+
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/groups/search?${queryParams.toString()}`);
+      console.log("Response Status:", response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error Response:", errorText);
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Filtered Groups from Backend:", data);
+
+      if (Array.isArray(data)) {
+        groups.value = data; // Update the state with filtered groups
+        console.log("Updated Groups:", groups.value);
+      } else {
+        console.error("Unexpected Data Format:", data);
+      }
+    } catch (error) {
+      console.error("Fetch Error:", error);
+    }
   }
 };
+
 
 // Clear all filters
 const clearFilters = () => {
@@ -132,22 +145,22 @@ const removeFilter = (key) => {
     course.value = "";
     examDate.value = "";
   }
-  if (key === "examDate") examDate.value = "";
+  if (key === "exam_date") examDate.value = "";
   if (key === "participants") participants.value = null;
-  if (key === "isPublic") isPublic.value = null;
-  if (key === "orderBy") orderBy.value = null;
+  if (key === "is_public") isPublic.value = null;
+  if (key === "order") orderBy.value = "";
 
   appliedFilters.value = appliedFilters.value.filter(
     (filter) =>
-      filter.key !== key && !(key === "course" && filter.key === "examDate"),
+      filter.key !== key && !(key === "course" && filter.key === "exam_date")
   );
 
   emit("apply-filters", {
     course: course.value,
-    examDate: examDate.value,
+    exam_date: examDate.value,
     participants: participants.value,
-    isPublic: isPublic.value,
-    orderBy: orderBy.value,
+    is_public: isPublic.value,
+    order: orderBy.value,
   });
 };
 
