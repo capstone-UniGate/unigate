@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, status
 
@@ -46,7 +46,7 @@ def search(
         except ValueError:
             raise HTTPException(
                 status_code=422,
-                detail="Invalid date format. Please use YYYY-MM-DD for the 'exam_date'."
+                detail="Invalid date format. Please use YYYY-MM-DD for the 'exam_date'.",
             )
 
     return crud.group.search(
@@ -76,16 +76,16 @@ def get_group(group: GroupDep) -> Group:
     response_model=GroupReadWithStudents,
 )
 def create_group(
-        session: SessionDep,
-        auth_session: AuthSessionDep,
-        group: GroupCreate,
-        current_user: CurrStudentDep,
+    session: SessionDep,
+    auth_session: AuthSessionDep,
+    group: GroupCreate,
+    current_user: CurrStudentDep,
 ) -> Group:
     if (
-            crud.course.get_by_name_and_exam(
-                name=group.course_name, exam_date=group.exam_date, auth_session=auth_session
-            )
-            is None
+        crud.course.get_by_name_and_exam(
+            name=group.course_name, exam_date=group.exam_date, auth_session=auth_session
+        )
+        is None
     ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -108,9 +108,9 @@ def create_group(
     response_model=GroupReadWithStudents,
 )
 def join_group(
-        session: SessionDep,
-        group: GroupDep,
-        current_user: CurrStudentDep,
+    session: SessionDep,
+    group: GroupDep,
+    current_user: CurrStudentDep,
 ) -> Group:
     # Check if the student is blocked from this group
     is_blocked = (
@@ -134,9 +134,9 @@ def join_group(
     "/{group_id}/requests/undo",
 )
 def undo_join_request(
-        session: SessionDep,
-        group: GroupDep,
-        current_user: CurrStudentDep,
+    session: SessionDep,
+    group: GroupDep,
+    current_user: CurrStudentDep,
 ) -> dict:
     # Check if the student has a pending request
     request = next(
@@ -169,9 +169,9 @@ def undo_join_request(
     response_model=GroupReadWithStudents,
 )
 def leave_group(
-        session: SessionDep,
-        group: GroupDep,
-        current_user: CurrStudentDep,
+    session: SessionDep,
+    group: GroupDep,
+    current_user: CurrStudentDep,
 ) -> Group:
     return crud.group.leave(session=session, group=group, student=current_user)
 
@@ -181,7 +181,7 @@ def leave_group(
     response_model=GroupReadOnlyStudents,
 )
 def get_group_students(
-        group: GroupDep,
+    group: GroupDep,
 ) -> Group:
     return group
 
@@ -191,8 +191,8 @@ def get_group_students(
     response_model=list[RequestReadWithStudent],
 )
 def get_group_requests(
-        group: GroupDep,
-        current_user: CurrStudentDep,
+    group: GroupDep,
+    current_user: CurrStudentDep,
 ) -> list[Request]:
     if current_user not in group.super_students:
         raise HTTPException(
@@ -207,10 +207,10 @@ def get_group_requests(
     response_model=RequestRead,
 )
 def accept_group_request(
-        session: SessionDep,
-        group: GroupDep,
-        request: RequestDep,
-        current_user: CurrStudentDep,
+    session: SessionDep,
+    group: GroupDep,
+    request: RequestDep,
+    current_user: CurrStudentDep,
 ) -> Request:
     if current_user not in group.super_students:
         raise HTTPException(
@@ -230,10 +230,10 @@ def accept_group_request(
     response_model=RequestRead,
 )
 def reject_group_requesr(
-        session: SessionDep,
-        group: GroupDep,
-        request: RequestDep,
-        current_user: CurrStudentDep,
+    session: SessionDep,
+    group: GroupDep,
+    request: RequestDep,
+    current_user: CurrStudentDep,
 ) -> Request:
     if current_user not in group.super_students:
         raise HTTPException(
@@ -253,10 +253,10 @@ def reject_group_requesr(
     response_model=RequestRead,
 )
 def block_group_request(
-        session: SessionDep,
-        group: GroupDep,
-        request: RequestDep,
-        current_user: CurrStudentDep,
+    session: SessionDep,
+    group: GroupDep,
+    request: RequestDep,
+    current_user: CurrStudentDep,
 ) -> Request:
     if current_user not in group.super_students:
         raise HTTPException(
@@ -271,10 +271,10 @@ def block_group_request(
     response_model=GroupReadWithStudents,
 )
 def block_user(
-        session: SessionDep,
-        group: GroupDep,
-        student: StudentDep,
-        current_user: CurrStudentDep,
+    session: SessionDep,
+    group: GroupDep,
+    student: StudentDep,
+    current_user: CurrStudentDep,
 ) -> Group:
     if current_user not in group.super_students:
         raise HTTPException(
@@ -289,10 +289,10 @@ def block_user(
     response_model=GroupReadWithStudents,
 )
 def unblock_user(
-        session: SessionDep,
-        group: GroupDep,
-        student: StudentDep,
-        current_user: CurrStudentDep,
+    session: SessionDep,
+    group: GroupDep,
+    student: StudentDep,
+    current_user: CurrStudentDep,
 ) -> Group:
     if current_user not in group.super_students:
         raise HTTPException(

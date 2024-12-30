@@ -1,5 +1,4 @@
 import datetime
-from datetime import date
 
 from fastapi import Depends
 from sqlmodel import Session, and_, select
