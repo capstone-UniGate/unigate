@@ -160,6 +160,7 @@ onMounted(async () => {
   if (isLoggedIn.value) {
     await getCurrentStudent();
     if (currentStudent.value?.number) {
+      console.log(`2: ${config.public.minioURL}`);
       const currentPhotoUrl = `${config.public.minioURL}/unigate/propics/${currentStudent.value.number}`;
       eventBus.updatePhoto(currentPhotoUrl);
     }
