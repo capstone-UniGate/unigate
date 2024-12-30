@@ -2,16 +2,11 @@ services:
   postgres-unigate:
     container_name: postgres-unigate
     image: postgres:17-bookworm
-    ports:
-      - "${POSTGRES_PORT}:5432"
-    env_file:
-      - .env
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
       - POSTGRES_DB=${POSTGRES_DB?Variable not set}
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-      - POSTGRES_PORT=${POSTGRES_PORT?Variable not set}
     volumes:
       - ./postgres/create-databases.sh:/docker-entrypoint-initdb.d/create-databases.sh
       - pgdata:/var/lib/postgresql/data/pgdata
@@ -28,20 +23,18 @@ services:
     image: dpage/pgadmin4:8.13
     entrypoint:
       - /custom-entrypoint.sh
-    ports:
-      - "${PGADMIN_PORT}:80"
-    env_file:
-      - .env
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL?Variable not set}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD?Variable not set}
-      - PGADMIN_PORT=${PGADMIN_PORT?Variable not set}
       - PGADMIN_CONFIG_SERVER_MODE=False
       - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
       - PGADMIN_SERVER_JSON_FILE=/tmp/servers.json
+      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
+      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
     volumes:
       - ./pgadmin/entrypoint.sh:/custom-entrypoint.sh
-      - pgadmin_data:/var/lib/pgadmin:rw
+      - pgadmin_data:/var/lib/pgadmin
     depends_on:
       postgres-unigate:
         condition: service_healthy
@@ -95,28 +88,20 @@ services:
     container_name: backend-unigate
     build:
       context: ./backend
-      dockerfile: Dockerfile
-    develop:
-      watch:
-        - path: ./backend/pyproject.toml
-          action: rebuild
-    ports:
-      - "${BACKEND_PORT}:8000"
-    env_file:
-      - .env
+      dockerfile: Dockerfile.prod
     environment:
       - BACKEND_PORT=${BACKEND_PORT?Variable not set}
-      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
+      - POSTGRES_HOST=postgres-unigate
+      - POSTGRES_PORT=${POSTGRES_PORT?Variable not set}
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-      - POSTGRES_HOST=postgres-unigate
-      - POSTGRES_PORT=5432
-      - UNIGATE_DB=${UNIGATE_DB?Variable not set}
+      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
       - AUTH_DB=${AUTH_DB?Variable not set}
-      - MODE=test
-      - JWT_SECRET=${JWT_SECRET?Variable not set}
       - SENDGRID_API_KEY=${SENDGRID_API_KEY?Variable not set}
+      - JWT_SECRET=${JWT_SECRET?Variable not set}
       - MINIO_ENDPOINT=minio-unigate:9000
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER?Variable not set}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD?Variable not set}
     volumes:
       - ./backend/unigate:/app/unigate
     depends_on:
@@ -130,17 +115,10 @@ services:
     container_name: frontend-unigate
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-    develop:
-      watch:
-        - path: ./frontend/package.json
-          action: rebuild
-    ports:
-      - "${FRONTEND_PORT}:3000"
-    env_file:
-      - .env
+      dockerfile: Dockerfile.prod
     environment:
-      - FRONTEND_PORT=${FRONTEND_PORT?Variable not set}
+      - BASE_URL=${BASE_URL?Variable not set}
+      - MINIO_URL=${MINIO_URL?Variable not set}
     volumes:
       - ./frontend:/app
     restart: unless-stopped
