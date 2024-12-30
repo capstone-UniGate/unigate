@@ -117,6 +117,7 @@ services:
       - MODE=test
       - JWT_SECRET=${JWT_SECRET?Variable not set}
       - SENDGRID_API_KEY=${SENDGRID_API_KEY?Variable not set}
+      - MINIO_ENDPOINT=minio-unigate:9000
     volumes:
       - ./backend/unigate:/app/unigate
     depends_on:
