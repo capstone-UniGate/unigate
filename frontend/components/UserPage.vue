@@ -186,6 +186,7 @@ const isSubmitting = ref(false);
 // Remove usernameStore and create a computed photo URL
 const photoUrl = computed(() => {
   if (!currentStudent.value?.number) return null;
+  console.log(`AAAACANE: ${minioURL}`)
   return `${minioURL}/unigate/propics/${currentStudent.value.number}`;
 });
 
@@ -257,6 +258,7 @@ const handleFileUpload = async (event: Event) => {
     await uploadImage(file);
     // After successful upload, update the previewUrl to the server URL
     if (currentStudent.value?.number) {
+      console.log(`AAAAPIG: ${minioURL}`)
       const newPhotoUrl = `${minioURL}/unigate/propics/${currentStudent.value.number}`;
       eventBus.updatePhoto(newPhotoUrl);
       previewUrl.value = newPhotoUrl;
@@ -307,6 +309,7 @@ onMounted(async () => {
 
   // Set initial preview URL
   if (currentStudent.value?.number) {
+    console.log(`AAAADOG: ${minioURL}`)
     const currentPhotoUrl = `${minioURL}/unigate/propics/${currentStudent.value.number}`;
     eventBus.updatePhoto(currentPhotoUrl);
   }
