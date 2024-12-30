@@ -7,6 +7,7 @@ from unigate.core.config import settings
 from unigate.models import Student
 from unigate.routes.deps import get_current_user
 from unigate.schemas.student import StudentRead, StudentReadOnlyGroups
+from unigate.enums import Mode
 
 router = APIRouter()
 
@@ -15,7 +16,7 @@ minio = Minio(
     settings.MINIO_ENDPOINT,
     access_key=settings.MINIO_ACCESS_KEY,
     secret_key=settings.MINIO_SECRET_KEY,
-    secure=False,
+    secure=settings.MODE == Mode.PROD,
 )
 
 
