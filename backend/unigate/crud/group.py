@@ -1,5 +1,4 @@
 import datetime
-from datetime import date
 
 from fastapi import Depends
 from sqlmodel import Session, and_, select
@@ -122,7 +121,7 @@ class CRUDGroup(CRUDBase[Group, GroupCreate, Group]):
                 query = query.where(Group.type == GroupType.PRIVATE)
 
         if exam_date:
-            query = query.where(Group.exam_date == date.fromisoformat(exam_date))
+            query = query.where(Group.exam_date == exam_date)
 
         if order == "Newest":
             query = query.order_by(Group.date.desc())
