@@ -115,6 +115,7 @@ services:
       - MINIO_ENDPOINT=${MINIO_ENDPOINT?Variable not set}
       - MINIO_ACCESS_KEY=${MINIO_ROOT_USER?Variable not set}
       - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD?Variable not set}
+      - MODE=prod
     labels:
       - traefik.enable=true
       - traefik.http.routers.unigate-backend.entrypoints=websecure
