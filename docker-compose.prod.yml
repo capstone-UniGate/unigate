@@ -101,7 +101,6 @@ services:
       context: ./backend
       dockerfile: Dockerfile.prod
     environment:
-      - BACKEND_PORT=${BACKEND_PORT?Variable not set}
       - POSTGRES_HOST=postgres-unigate
       - POSTGRES_PORT=${POSTGRES_PORT?Variable not set}
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
