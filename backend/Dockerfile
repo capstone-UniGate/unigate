@@ -33,6 +33,12 @@ COPY ./pyproject.toml ./uv.lock /app/
 
 COPY ./unigate /app/unigate
 
+COPY ./alembic_unigate /app/alembic_unigate
+
+COPY ./alembic_auth /app/alembic_auth
+
+COPY ./seeders /app/seeders
+
 # sync the project
 # ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
 RUN --mount=type=cache,target=/root/.cache/uv \

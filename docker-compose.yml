@@ -119,6 +119,9 @@ services:
       - MINIO_ENDPOINT=minio-unigate:9000
     volumes:
       - ./backend/unigate:/app/unigate
+      - ./backend/alembic_unigate:/app/alembic_unigate
+      - ./backend/alembic_auth:/app/alembic_auth
+      - ./backend/seeders:/app/seeders
     depends_on:
       postgres-unigate:
         condition: service_healthy
