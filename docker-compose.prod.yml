@@ -7,6 +7,8 @@ services:
       - POSTGRES_DB=${POSTGRES_DB?Variable not set}
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+      - UNIGATE_DB=${UNIGATE_DB?Variable not set}
+      - AUTH_DB=${AUTH_DB?Variable not set}
     volumes:
       - ./postgres/create-databases.sh:/docker-entrypoint-initdb.d/create-databases.sh
       - pgdata:/var/lib/postgresql/data/pgdata
@@ -106,6 +108,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
       - POSTGRES_DB=${POSTGRES_DB?Variable not set}
+      - UNIGATE_DB=${UNIGATE_DB?Variable not set}
       - AUTH_DB=${AUTH_DB?Variable not set}
       - SENDGRID_API_KEY=${SENDGRID_API_KEY?Variable not set}
       - JWT_SECRET=${JWT_SECRET?Variable not set}
