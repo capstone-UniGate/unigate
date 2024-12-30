@@ -12,6 +12,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       baseURL: process.env.BASE_URL || "http://localhost:8000/",
+      minioURL: process.env.MINIO_URL || "http://localhost:9000/",
     },
   },
   shadcn: {

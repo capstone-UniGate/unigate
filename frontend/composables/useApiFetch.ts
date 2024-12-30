@@ -17,6 +17,8 @@ export const useApiFetch = (
     options.headers.Authorization = `Bearer ${tokenCookie.value}`;
   }
 
+  console.log(config.public.baseURL);
+
   return $fetch(url, {
     baseURL: config.public.baseURL,
     ...options,

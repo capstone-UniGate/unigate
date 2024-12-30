@@ -175,6 +175,7 @@ import { useImageUploader } from "~/composables/useImageUploader";
 import { eventBus } from "~/utils/eventBus";
 
 const router = useRouter();
+const { minioURL } = useRuntimeConfig();
 const { currentStudent, getCurrentStudent } = useCurrentStudent();
 const { toast } = useToast();
 const isEditing = ref(false);
@@ -185,7 +186,7 @@ const isSubmitting = ref(false);
 // Remove usernameStore and create a computed photo URL
 const photoUrl = computed(() => {
   if (!currentStudent.value?.number) return null;
-  return `http://localhost:9000/unigate/propics/${currentStudent.value.number}`;
+  return `${minioURL}/unigate/propics/${currentStudent.value.number}`;
 });
 
 // Use the image uploader composable
@@ -256,7 +257,7 @@ const handleFileUpload = async (event: Event) => {
     await uploadImage(file);
     // After successful upload, update the previewUrl to the server URL
     if (currentStudent.value?.number) {
-      const newPhotoUrl = `http://localhost:9000/unigate/propics/${currentStudent.value.number}`;
+      const newPhotoUrl = `${minioURL}/unigate/propics/${currentStudent.value.number}`;
       eventBus.updatePhoto(newPhotoUrl);
       previewUrl.value = newPhotoUrl;
     }
@@ -306,7 +307,7 @@ onMounted(async () => {
 
   // Set initial preview URL
   if (currentStudent.value?.number) {
-    const currentPhotoUrl = `http://localhost:9000/unigate/propics/${currentStudent.value.number}`;
+    const currentPhotoUrl = `${minioURL}/unigate/propics/${currentStudent.value.number}`;
     eventBus.updatePhoto(currentPhotoUrl);
   }
 });
