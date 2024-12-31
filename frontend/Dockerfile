@@ -11,6 +11,8 @@ RUN corepack enable
 
 COPY ./ /app/
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile --shamefully-hoist
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
-CMD ["pnpm", "run", "dev"]
+RUN pnpm run build
+
+CMD ["pnpm", "run", "preview"]

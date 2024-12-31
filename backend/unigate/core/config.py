@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     JWT_EXPIRATION_SECONDS: int = 60 * 60 * 24  # 1 day
     JWT_ALGORITHM: str = "HS256"
     BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = (
-        "http://localhost,http://localhost:3000,https://localhost,https://localhost:3000"
+        "http://localhost,http://localhost:3000,https://localhost,https://localhost:3000,http://user-testing.unigate.tech,https://user-testing.unigate.tech"
     )
 
     @computed_field  # type: ignore

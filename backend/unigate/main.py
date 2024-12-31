@@ -1,3 +1,4 @@
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -25,6 +26,16 @@ async def hello() -> dict[str, str]:
 @app.get("/ping")
 async def ping() -> dict[str, str]:
     return {"message": "pong"}
+
+
+@app.get("/reset")
+def reset() -> dict[str, str]:
+    try:
+        with Path("/fifo").open("w") as f:
+            f.write("reset\n")
+        return {"message": "reset triggered"}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 app.include_router(auth.router, prefix="/auth")
