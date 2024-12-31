@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from unigate.core.config import settings
 from unigate.routes import auth, group, student
+from unigate import crud
+from unigate.core.database import get_session
 
 app = FastAPI()
 
@@ -33,9 +35,16 @@ def reset() -> dict[str, str]:
     try:
         with Path("/fifo").open("w") as f:
             f.write("reset\n")
-        return {"message": "reset triggered"}
-    except Exception as e:
-        return {"error": str(e)}
+        for _ in range(120):
+            try:
+                with next(get_session()) as session:
+                    crud.student.get_by_number(number=1234567, session=session)
+                return {"message": "reset finished"}
+            except Exception:
+                pass
+    except Exception:
+        pass
+    return {"error": "something went wrong"}
 
 
 app.include_router(auth.router, prefix="/auth")
