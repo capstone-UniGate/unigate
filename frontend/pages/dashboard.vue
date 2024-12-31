@@ -1,62 +1,85 @@
+<script setup lang="ts">
+import { ref, onMounted, watch } from "vue";
+import CourseSearchBox from "@/components/CourseSearchBox.vue";
+import ExamDateDropdown from "@/components/ExamDateDropdown.vue";
+import { useGroups } from "@/composables/useGroups";
+
+const { getCourses } = useGroups();
+
+const course = ref("");
+const examDate = ref("");
+
+const allCourses = ref<{ name: string; exams: { date: string; groupCount: number }[] }[]>([]);
+const selectedCourseExamDates = ref<string[]>([]);
+
+
+// Watcher to update exam dates and filtered courses when a course is selected
+watch(course, (newCourseName) => {
+  const matchedCourse = allCourses.value.find(
+    (c) => c.name.toLowerCase() === newCourseName.toLowerCase()
+  );
+  if (!matchedCourse) {
+    selectedCourseExamDates.value = [];
+    examDate.value = "";
+  } else {
+    selectedCourseExamDates.value = matchedCourse.exams.map((exam) => exam.date);
+    
+  }
+});
+
+
+// Fetch courses from the API
+const fetchCourses = async () => {
+  try {
+    const response = await getCourses();
+    allCourses.value = response.map(
+      (course: { name: string; exams: { date: string; groupCount: number }[] }) => ({
+        name: course.name,
+        exams: course.exams,
+      })
+    );
+
+  } catch (error) {
+    console.error("Error fetching courses:", error);
+    allCourses.value = [];
+  }
+};
+
+// Fetch courses when the component is mounted
+onMounted(fetchCourses);
+</script>
+
 <template>
-  <div class="dashboard mx-auto p-4 max-w-4xl">
+  <div class="p-4">
     <h1 class="text-2xl font-bold mb-4">Professor Dashboard</h1>
 
-    <!-- Autocomplete -->
+    <!-- Course SearchBox -->
     <div class="mb-6">
-      <Autocomplete
-        v-model="searchTerm"
-        :options="courses"
-        placeholder="Search for a course/exam"
-        @select="onCourseSelect"
+      <label for="course" class="block mb-2 text-sm font-medium text-gray-700">
+        Course
+      </label>
+      <CourseSearchBox
+        id="course"
+        :items="allCourses"
+        placeholder="Enter course name"
+        v-model="course"
+        @select="
+          (selectedCourse) => {
+            course = selectedCourse.name;
+            examDate = '';
+            selectedCourseExamDates = selectedCourse.exams.map((e) => e.date);
+          }
+        "
       />
     </div>
 
-    <!-- Course List -->
-    <ul class="grid gap-4 md:grid-cols-2">
-      <li
-        v-for="course in filteredCourses"
-        :key="course.id"
-        class="p-4 border rounded-md bg-gray-50 shadow-sm hover:shadow-md transition"
-      >
-        <div class="font-medium text-lg">{{ course.name }}</div>
-        <div class="text-gray-600">Groups: {{ course.groupCount }}</div>
-      </li>
-    </ul>
+    <!-- Exam Date Dropdown -->
+    <div class="mb-6">
+      <ExamDateDropdown
+        :examDates="selectedCourseExamDates"
+        v-model:selectedDate="examDate"
+        :disabled="selectedCourseExamDates.length === 0"
+      />
+    </div>
   </div>
 </template>
-
-<script lang="ts">
-import { ref, computed } from "vue";
-import Autocomplete, { Option } from "@/components/Autocomplete.vue";
-import useCourses from "@/composables/useCourses";
-
-export default {
-  components: {
-    Autocomplete,
-  },
-  setup() {
-    const { courses, filterCourses, isEligible } = useCourses();
-    const role = ref("professor"); // Mocked role constant
-    const searchTerm = ref("");
-
-    if (role.value !== "professor") {
-      console.error("Access Denied: User is not a professor.");
-    }
-
-    const filteredCourses = computed(() => filterCourses(searchTerm.value));
-
-    const onCourseSelect = (selectedCourse: Option) => {
-      console.log("Selected Course:", selectedCourse);
-    };
-
-    return {
-      searchTerm,
-      courses,
-      filteredCourses,
-      onCourseSelect,
-      isEligible,
-    };
-  },
-};
-</script>
