@@ -36,7 +36,7 @@ def reset() -> dict[str, str]:
     try:
         with Path("/fifo").open("w") as f:
             f.write("reset\n")
-        return {"message": "reset triggere"}
+        return {"message": "reset triggered"}
     except Exception:
         return {"error": "something went wrong"}
 
