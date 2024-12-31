@@ -73,5 +73,3 @@ networks:
 
 volumes:
   pgdata:
-  pgadmin_data:
-  minio_data:
