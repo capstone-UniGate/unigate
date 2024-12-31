@@ -41,7 +41,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.unigate-backend.entrypoints=websecure
-      - traefik.http.routers.unigate-backend.rule=Host(`api.user-testing.unigate.tech`)
+      - traefik.http.routers.unigate-backend.rule=Host(`api-user-testing.unigate.tech`)
       - traefik.http.routers.unigate-backend.tls.certresolver=dns-cloudflare
       - traefik.http.services.unigate-backend.loadbalancer.server.port=8000
     depends_on:
