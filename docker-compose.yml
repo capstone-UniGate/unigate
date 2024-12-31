@@ -24,7 +24,7 @@ services:
     container_name: backend-user-testing-unigate
     build:
       context: ./backend
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile
     environment:
       - POSTGRES_HOST=postgres-user-testing-unigate
       - POSTGRES_PORT=5432
@@ -55,7 +55,7 @@ services:
     container_name: frontend-user-testing-unigate
     build:
       context: ./frontend
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile
     environment:
       - NUXT_PUBLIC_BASE_URL=${NUXT_PUBLIC_BASE_URL?Variable not set}
     labels:
