@@ -1,6 +1,6 @@
 services:
-  postgres-unigate:
-    container_name: postgres-unigate
+  postgres-user-testing-unigate:
+    container_name: postgres-user-testing-unigate
     image: postgres:17-bookworm
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
@@ -20,13 +20,13 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  backend-unigate:
-    container_name: backend-unigate
+  backend-user-testing-unigate:
+    container_name: backend-user-testing-unigate
     build:
       context: ./backend
       dockerfile: Dockerfile.prod
     environment:
-      - POSTGRES_HOST=postgres-unigate
+      - POSTGRES_HOST=postgres-user-testing-unigate
       - POSTGRES_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
@@ -45,14 +45,14 @@ services:
       - traefik.http.routers.unigate-backend.tls.certresolver=dns-cloudflare
       - traefik.http.services.unigate-backend.loadbalancer.server.port=8000
     depends_on:
-      postgres-unigate:
+      postgres-user-testing-unigate:
         condition: service_healthy
         restart: true
         required: true
     restart: unless-stopped
 
-  frontend-unigate:
-    container_name: frontend-unigate
+  frontend-user-testing-unigate:
+    container_name: frontend-user-testing-unigate
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
