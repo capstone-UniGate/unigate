@@ -38,8 +38,9 @@ def reset() -> dict[str, str]:
         for _ in range(120):
             try:
                 with next(get_session()) as session:
-                    crud.student.get_by_number(number=1234567, session=session)
-                return {"message": "reset finished"}
+                    test_student = crud.student.get_by_number(number=1234567, session=session)
+                    if test_student:
+                        return {"message": "reset finished"}
             except Exception:
                 pass
     except Exception:
