@@ -87,9 +87,5 @@ const handleBlur = () => {
         {{ item.name }}
       </li>
     </ul>
-    <!-- No results found message -->
-    <p v-if="showDropdown && noResultsFound" class="mt-2 text-red-500">
-      No results found
-    </p>
   </div>
 </template>

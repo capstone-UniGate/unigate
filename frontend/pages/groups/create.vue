@@ -389,7 +389,7 @@ const onSubmit = handleSubmit(async (values) => {
       name: values.name,
       description: values.description,
       course_name: course.value,
-      category: values.course,
+      category: course.value,
       exam_date: examDate.value || null,
       type: values.isPublic,
       tags: tags.value,

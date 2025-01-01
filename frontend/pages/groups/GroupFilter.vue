@@ -3,10 +3,10 @@ import { ref, computed, defineEmits, onMounted, watch } from "vue";
 import { useGroups } from "@/composables/useGroups";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, Filter, Trash, X } from "lucide-vue-next";
-import CoursSearchBox from "@/components/CourseSearchBox.vue";
+import CourseSearchBox from "@/components/CourseSearchBox.vue";
 import ExamDateDropdown from "@/components/ExamDateDropdown.vue";
 
-const { getCourses } = useGroups();
+const { getCourses, searchGroups, getAllGroups } = useGroups();
 
 const isFilterVisible = ref(false);
 const course = ref("");
@@ -54,8 +54,15 @@ const areFiltersChanged = computed(() => {
     examDate.value !== defaultFilters.examDate ||
     participants.value !== defaultFilters.participants ||
     isPublic.value !== defaultFilters.isPublic ||
-    orderBy.value !== defaultFilters.orderBy
+    orderBy.value !== defaultFilters.orderBy ||
+    appliedFilters.value.length > 0
   );
+});
+
+
+// Computed property to enable/disable the Apply Filters button
+const isApplyEnabled = computed(() => {
+  return areFiltersChanged.value && course.value.trim().length > 0;
 });
 
 // Fetch courses from the API
@@ -82,49 +89,55 @@ const toggleFilter = () => {
 const groups = ref([]);
 
 const applyFilters = async () => {
-  if (areFiltersChanged.value) {
-    const filters = {
-      course: course.value || undefined,
-      exam_date: examDate.value || undefined,
-      participants: participants.value || undefined,
-      is_public: isPublic.value !== null ? isPublic.value : undefined,
-      order: orderBy.value || undefined,
-    };
+  try {
+    if (areFiltersChanged.value) {
+      const filters = {
+        course: course.value || undefined,
+        exam_date: examDate.value || undefined,
+        participants: participants.value || undefined,
+        is_public: isPublic.value !== null ? isPublic.value : undefined,
+        order: orderBy.value || undefined,
+      };
 
-    const queryParams = new URLSearchParams(
-      Object.entries(filters).reduce((acc, [key, value]) => {
-        if (value !== undefined) acc[key] = value.toString();
-        return acc;
-      }, {})
-    );
+      // Update applied filters with user-friendly labels
+      appliedFilters.value = Object.entries(filters)
+        .filter(([key, value]) => value !== undefined)
+        .map(([key, value]) => {
+          let label = "";
 
-    console.log("Query Parameters Sent:", queryParams.toString());
+          // Map key and value to user-friendly names
+          switch (key) {
+            case "course":
+              label = `Course: ${value}`;
+              break;
+            case "exam_date":
+              label = `Exam Date: ${value}`;
+              break;
+            case "participants":
+              label = `Participants: ${value}`;
+              break;
+            case "is_public":
+              label = `Type: ${value === true ? "Public" : "Private"}`;
+              break;
+            case "order":
+              label = `Order By: ${value === "Newest" ? "Newest" : "Oldest"}`;
+              break;
+            default:
+              label = `${key}: ${value}`;
+          }
 
-    try {
-      const response = await fetch(`http://127.0.0.1:8000/groups/search?${queryParams.toString()}`);
-      console.log("Response Status:", response.status);
+          return { key, label };
+        });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error Response:", errorText);
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
+      // Execute the search
+      searchGroups(filters);
 
-      const data = await response.json();
-      console.log("Filtered Groups from Backend:", data);
-
-      if (Array.isArray(data)) {
-        groups.value = data; // Update the state with filtered groups
-        console.log("Updated Groups:", groups.value);
-      } else {
-        console.error("Unexpected Data Format:", data);
-      }
-    } catch (error) {
-      console.error("Fetch Error:", error);
+      emit("apply-filters", filters);
     }
+  } catch (error) {
+    console.error("Error applying filters:", error);
   }
 };
-
 
 // Clear all filters
 const clearFilters = () => {
@@ -135,33 +148,9 @@ const clearFilters = () => {
   orderBy.value = null;
 
   appliedFilters.value = [];
+  getAllGroups();
 
   emit("apply-filters", defaultFilters);
-};
-
-// Remove a specific filter
-const removeFilter = (key) => {
-  if (key === "course") {
-    course.value = "";
-    examDate.value = "";
-  }
-  if (key === "exam_date") examDate.value = "";
-  if (key === "participants") participants.value = null;
-  if (key === "is_public") isPublic.value = null;
-  if (key === "order") orderBy.value = "";
-
-  appliedFilters.value = appliedFilters.value.filter(
-    (filter) =>
-      filter.key !== key && !(key === "course" && filter.key === "exam_date")
-  );
-
-  emit("apply-filters", {
-    course: course.value,
-    exam_date: examDate.value,
-    participants: participants.value,
-    is_public: isPublic.value,
-    order: orderBy.value,
-  });
 };
 
 // Fetch courses when the component is mounted
@@ -192,12 +181,6 @@ onMounted(fetchCourses);
           class="inline-flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
         >
           {{ filter.label }}
-          <button
-            @click="removeFilter(filter.key)"
-            class="ml-2 text-blue-800 hover:text-blue-500"
-          >
-            <X class="w-4 h-4" />
-          </button>
         </span>
       </div>
     </div>
@@ -219,7 +202,7 @@ onMounted(fetchCourses);
           <label
             for="course"
             class="block mb-2 text-sm font-medium text-gray-700"
-            >Course</label
+            >Course<span class="text-red-500 ml-1">*</span></label
           >
           <CourseSearchBox
             id="course"
@@ -305,12 +288,13 @@ onMounted(fetchCourses);
       <div class="flex justify-end gap-4 mt-6">
         <!-- Apply Filters Button -->
         <Button
-          :disabled="!areFiltersChanged"
+          :disabled="!isApplyEnabled"
           class="w-40 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold py-2 px-4 rounded-2xl shadow-lg hover:from-green-600 hover:to-green-700 hover:shadow-xl active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           @click="applyFilters"
         >
-          <Filter class="w-4 h-4 mr-2" /> Apply Filters
-        </Button>
+        <Filter class="w-4 h-4 mr-2" /> Apply Filters
+      </Button>
+
 
         <!-- Clear Filters Button -->
         <Button
