@@ -4,10 +4,10 @@ from fastapi import APIRouter, Depends
 from minio import Minio
 
 from unigate.core.config import settings
+from unigate.enums import Mode
 from unigate.models import Student
 from unigate.routes.deps import get_current_user
 from unigate.schemas.student import StudentRead, StudentReadOnlyGroups
-from unigate.enums import Mode
 
 router = APIRouter()
 

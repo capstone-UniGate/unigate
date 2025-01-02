@@ -1,7 +1,7 @@
 import { ref } from "vue";
 
 export function useGroups() {
-  const groups = ref();
+  const groups = useState("groups", () => ref([]));
   const isLoading = ref(false);
   const isError = ref(false);
   const { currentStudent, getCurrentStudent } = useCurrentStudent();
@@ -29,18 +29,48 @@ export function useGroups() {
     }
   };
 
-  async function getAllGroups(filters = {}) {
+  async function getAllGroups() {
     try {
       await ensureAuthenticated();
       isError.value = false;
       isLoading.value = true;
       const response = await useApiFetch("/groups", {
         method: "GET",
-        params: filters,
       });
+      groups.value = response;
+      console.log(groups.value);
+    } catch (error) {
+      isError.value = true;
+      throw error;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function searchGroups(queryParams: Record<string, any> = {}) {
+    try {
+      await ensureAuthenticated();
+      isError.value = false;
+      isLoading.value = false;
+
+      const queryString = new URLSearchParams(
+        Object.entries(queryParams).reduce(
+          (acc, [key, value]) => {
+            if (value !== undefined) acc[key] = value.toString();
+            return acc;
+          },
+          {} as Record<string, string>,
+        ),
+      ).toString();
+
+      const response = await useApiFetch(`/groups/search?${queryString}`, {
+        method: "GET",
+      });
+
       groups.value = response;
     } catch (error) {
       isError.value = true;
+      console.error("Error during group search:", error);
       throw error;
     } finally {
       isLoading.value = false;
@@ -234,5 +264,6 @@ export function useGroups() {
     handleUserBlock,
     checkAuthStatus,
     getCourses,
+    searchGroups,
   };
 }
