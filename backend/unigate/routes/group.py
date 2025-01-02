@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, HTTPException, status
 
 from unigate import crud
@@ -38,6 +40,15 @@ def search(
     participants: int = None,
     order: str = None,
 ) -> list[Group]:
+    if exam_date is not None:
+        try:
+            exam_date = datetime.strptime(exam_date, "%Y-%m-%d").date()
+        except ValueError:
+            raise HTTPException(
+                status_code=422,
+                detail="Invalid date format. Please use YYYY-MM-DD for the 'exam_date'.",
+            )
+
     return crud.group.search(
         session=session,
         course=course,

@@ -28,8 +28,6 @@ services:
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL?Variable not set}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD?Variable not set}
-      - PGADMIN_CONFIG_SERVER_MODE=False
-      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
       - PGADMIN_SERVER_JSON_FILE=/tmp/servers.json
       - POSTGRES_DB=${POSTGRES_DB?Variable not set}
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
@@ -64,11 +62,13 @@ services:
       - traefik.http.routers.unigate-minio.entrypoints=websecure
       - traefik.http.routers.unigate-minio.rule=Host(`minio.unigate.tech`)
       - traefik.http.routers.unigate-minio.tls.certresolver=dns-cloudflare
+      - traefik.http.routers.unigate-minio.service=unigate-minio
       - traefik.http.services.unigate-minio.loadbalancer.server.port=9000
-      - traefik.http.routers.unigate-minio-dashboard.entrypoints=websecure
-      - traefik.http.routers.unigate-minio-dashboard.rule=Host(`minio-dashboard.unigate.tech`)
-      - traefik.http.routers.unigate-minio-dashboard.tls.certresolver=dns-cloudflare
-      - traefik.http.services.unigate-minio-dashboard.loadbalancer.server.port=9001
+      - traefik.http.routers.unigate-minioadmin.entrypoints=websecure
+      - traefik.http.routers.unigate-minioadmin.rule=Host(`minioadmin.unigate.tech`)
+      - traefik.http.routers.unigate-minioadmin.tls.certresolver=dns-cloudflare
+      - traefik.http.routers.unigate-minioadmin.service=unigate-minioadmin
+      - traefik.http.services.unigate-minioadmin.loadbalancer.server.port=9001
     healthcheck:
       test: ["CMD", "curl", "-I", "http://localhost:9000/minio/health/live"]
       interval: 10s
@@ -112,16 +112,14 @@ services:
       - AUTH_DB=${AUTH_DB?Variable not set}
       - SENDGRID_API_KEY=${SENDGRID_API_KEY?Variable not set}
       - JWT_SECRET=${JWT_SECRET?Variable not set}
-      - MINIO_ENDPOINT=minio-unigate:9000
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT?Variable not set}
       - MINIO_ACCESS_KEY=${MINIO_ROOT_USER?Variable not set}
       - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD?Variable not set}
+      - MODE=prod
     labels:
       - traefik.enable=true
       - traefik.http.routers.unigate-backend.entrypoints=websecure
-      - traefik.http.routers.unigate-backend.rule=Host(`unigate.tech`) && PathPrefix(`/v1`)
-      - traefik.http.middlewares.unigate-backend-stripper.stripprefix.prefixes=/v1
-      - traefik.http.middlewares.unigate-backend-stripper.stripprefix.forceslash=true
-      - traefik.http.routers.unigate-backend.middlewares=unigate-backend-stripper
+      - traefik.http.routers.unigate-backend.rule=Host(`api.unigate.tech`)
       - traefik.http.routers.unigate-backend.tls.certresolver=dns-cloudflare
       - traefik.http.services.unigate-backend.loadbalancer.server.port=8000
     depends_on:

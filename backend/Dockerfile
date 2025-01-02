@@ -44,4 +44,4 @@ COPY ./seeders /app/seeders
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
 
-CMD ["fastapi", "dev", "unigate/main.py"]
+CMD ["fastapi", "run", "--reload", "unigate/main.py"]

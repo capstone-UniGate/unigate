@@ -10,7 +10,7 @@ export function useImageUploader() {
     try {
       // Fetch the presigned URL
       const { url: presignedURL } = await useApiFetch(
-        `students/propic-presigned-url/`,
+        `students/propic-presigned-url`,
         {
           method: "GET",
         },
@@ -39,7 +39,7 @@ export function useImageUploader() {
   // Get the photo from db and set it to previewUrl
   const getPhoto = async () => {
     try {
-      const response = await useApiFetch(`students/propic-presigned-url/`, {
+      const response = await useApiFetch(`students/propic-presigned-url`, {
         method: "GET",
       });
 
