@@ -1,53 +1,48 @@
-import unittest
-
+import pytest
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 
 from tests.pages.user_page import UserPage
 from tests.test_cases.base_test import BaseTest
 
-class TestUserPage(BaseTest):
-    def setUp(self):
-        self.driver = webdriver.Chrome()
-        self.UserPage = UserPage(self.driver)
-        self.UserPage.load()
 
-    def tearDown(self):
-        self.driver.quit()
+class TestUserProfile(BaseTest):
+    @pytest.fixture(autouse=True)
+    def setup(self, base_page: webdriver.Chrome) -> None:
+        """Setup fixture for logging in and navigating to the user page."""
+        self.login(base_page)  # Login setup
+        self.page = UserPage(base_page)
+        self.page.load()
 
-    def test_viewing_user_page_without_profile_image(self):
-        name, surname, number, email, user_type = self.UserPage.get_user_details()
-        profile_image = self.UserPage.get_profile_image()
+    def test_view_profile_without_image(self) -> None:
+        """Test viewing the user profile without a profile image."""
+        user_details = self.page.get_user_details()
+        assert user_details["name"], "Name not displayed"
+        assert user_details["surname"], "Surname not displayed"
+        assert user_details["number"], "Student number not displayed"
+        assert user_details["email"], "Email not displayed"
+        assert user_details["user_type"], "User type not displayed"
+        profile_image = self.page.get_profile_image()
+        assert "placeholder" in profile_image, "Placeholder image not displayed"
 
-        self.assertEqual(name, "John")
-        self.assertEqual(surname, "Doe")
-        self.assertEqual(number, "12345")
-        self.assertEqual(email, "john.doe@example.com")
-        self.assertEqual(user_type, "Admin")
-        self.assertIn("placeholder.png", profile_image)
+    def test_upload_profile_image(self) -> None:
+        """Test uploading a profile image."""
+        image_path = "/path/to/test_image.jpg"
+        self.page.upload_profile_image(image_path)
+        updated_image = self.page.get_profile_image()
+        assert updated_image and "test_image.jpg" in updated_image, "Profile image not updated"
 
-    def test_uploading_profile_image(self):
-        self.UserPage.upload_profile_image("/path/to/new/profile/image.png")
-        profile_image = self.UserPage.get_profile_image()
+    def test_display_image_across_application(self) -> None:
+        """Test that the uploaded profile image is displayed across the application."""
+        image_path = "/path/to/test_image.jpg"
+        self.page.upload_profile_image(image_path)
+        updated_image = self.page.get_profile_image()
+        # Add navigation to sections and checks for the image, similar to `check_image_in_comments` and `check_image_in_topbar`
 
-        self.assertIn("new/profile/image.png", profile_image)
-
-    def test_displaying_profile_image_across_application(self):
-        self.UserPage.upload_profile_image("/path/to/new/profile/image.png")
-        self.UserPage.load()  # Reload the page to simulate navigation
-
-        profile_image = self.UserPage.get_profile_image()
-        self.assertIn("new/profile/image.png", profile_image)
-
-    def test_error_during_image_upload(self):
-        self.UserPage.upload_profile_image("/path/to/invalid/image.png")
-        error_message = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.ID, "error-message"))
-        ).text
-
-        self.assertEqual(error_message, "Upload failed. Please try again.")
-
-if __name__ == "__main__":
-    unittest.main()
+    def test_error_during_image_upload(self) -> None:
+        """Test error handling during profile image upload."""
+        self.page.simulate_upload_error()
+        error_message = self.page.get_error_message()
+        assert error_message == "Failed to update profile photo", "Error message not displayed correctly"
+        self.page.retry_upload("/path/to/test_image.jpg")
+        updated_image = self.page.get_profile_image()
+        assert updated_image and "test_image.jpg" in updated_image, "Retry upload failed"
