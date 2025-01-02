@@ -1,7 +1,7 @@
 import { ref } from "vue";
 
 export function useGroups() {
-  const groups = useState("groups", () => ref([])); 
+  const groups = useState("groups", () => ref([]));
   const isLoading = ref(false);
   const isError = ref(false);
   const { currentStudent, getCurrentStudent } = useCurrentStudent();
@@ -29,7 +29,6 @@ export function useGroups() {
     }
   };
 
-
   async function getAllGroups() {
     try {
       await ensureAuthenticated();
@@ -48,26 +47,27 @@ export function useGroups() {
     }
   }
 
-
   async function searchGroups(queryParams: Record<string, any> = {}) {
     try {
       await ensureAuthenticated();
       isError.value = false;
       isLoading.value = false;
-  
+
       const queryString = new URLSearchParams(
-        Object.entries(queryParams).reduce((acc, [key, value]) => {
-          if (value !== undefined) acc[key] = value.toString();
-          return acc;
-        }, {} as Record<string, string>)
+        Object.entries(queryParams).reduce(
+          (acc, [key, value]) => {
+            if (value !== undefined) acc[key] = value.toString();
+            return acc;
+          },
+          {} as Record<string, string>,
+        ),
       ).toString();
-  
+
       const response = await useApiFetch(`/groups/search?${queryString}`, {
         method: "GET",
       });
 
       groups.value = response;
-
     } catch (error) {
       isError.value = true;
       console.error("Error during group search:", error);
@@ -76,8 +76,7 @@ export function useGroups() {
       isLoading.value = false;
     }
   }
-  
-  
+
   async function getGroupById(groupId: string) {
     try {
       await ensureAuthenticated();
@@ -265,6 +264,6 @@ export function useGroups() {
     handleUserBlock,
     checkAuthStatus,
     getCourses,
-    searchGroups
+    searchGroups,
   };
 }

@@ -20,6 +20,6 @@ import GroupList from "@/components/GroupList.vue";
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import { useGroups } from "@/composables/useGroups";
 
-const { groups, isLoading, isError, errorMessage, getAllGroups, getCourses } = useGroups();
-
+const { groups, isLoading, isError, errorMessage, getAllGroups, getCourses } =
+  useGroups();
 </script>

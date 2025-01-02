@@ -26,9 +26,8 @@ onMounted(() => {
       See Your Groups
     </Button>
 
-      <!-- Loading Indicator Component -->
-      <LoadingIndicator v-if="isLoading" />
-
+    <!-- Loading Indicator Component -->
+    <LoadingIndicator v-if="isLoading" />
 
     <!-- Group Cards List -->
     <div

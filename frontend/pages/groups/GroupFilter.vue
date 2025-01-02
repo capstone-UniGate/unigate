@@ -37,13 +37,15 @@ const noResultsFound = computed(() => {
 // Watcher to update exam dates when a course is selected
 watch(course, (newCourseName) => {
   const matchedCourse = allCourses.value.find(
-    (c) => c.name.toLowerCase() === newCourseName.toLowerCase()
+    (c) => c.name.toLowerCase() === newCourseName.toLowerCase(),
   );
   if (!matchedCourse) {
     selectedCourseExamDates.value = [];
     examDate.value = "";
   } else {
-    selectedCourseExamDates.value = matchedCourse.exams.map((exam) => exam.date);
+    selectedCourseExamDates.value = matchedCourse.exams.map(
+      (exam) => exam.date,
+    );
   }
 });
 
@@ -58,7 +60,6 @@ const areFiltersChanged = computed(() => {
     appliedFilters.value.length > 0
   );
 });
-
 
 // Computed property to enable/disable the Apply Filters button
 const isApplyEnabled = computed(() => {
@@ -292,9 +293,8 @@ onMounted(fetchCourses);
           class="w-40 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold py-2 px-4 rounded-2xl shadow-lg hover:from-green-600 hover:to-green-700 hover:shadow-xl active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           @click="applyFilters"
         >
-        <Filter class="w-4 h-4 mr-2" /> Apply Filters
-      </Button>
-
+          <Filter class="w-4 h-4 mr-2" /> Apply Filters
+        </Button>
 
         <!-- Clear Filters Button -->
         <Button

@@ -17,9 +17,7 @@ const router = useRouter();
 const { getGroupById, checkAuthStatus } = useGroups();
 
 const goToGroupPage = async () => {
-  
   try {
-    
     // First verify authentication status
     const isAuthenticated = await checkAuthStatus();
     if (!isAuthenticated) {
