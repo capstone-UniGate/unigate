@@ -3,45 +3,49 @@ import { ref, onMounted, watch } from "vue";
 import CourseSearchBox from "@/components/CourseSearchBox.vue";
 import ExamDateDropdown from "@/components/ExamDateDropdown.vue";
 import { useGroups } from "@/composables/useGroups";
+import CourseCard from "@/components/CourseCard.vue";
 
 const { getCourses } = useGroups();
 
 const course = ref("");
 const examDate = ref("");
 
-const allCourses = ref<{ name: string; exams: { date: string; groupCount: number }[] }[]>([]);
+const courses = ref<
+  { name: string; exams: { date: string; groupCount: number }[] }[]
+>([]);
 const selectedCourseExamDates = ref<string[]>([]);
-
 
 // Watcher to update exam dates and filtered courses when a course is selected
 watch(course, (newCourseName) => {
-  const matchedCourse = allCourses.value.find(
-    (c) => c.name.toLowerCase() === newCourseName.toLowerCase()
+  const matchedCourse = courses.value.find(
+    (c) => c.name.toLowerCase() === newCourseName.toLowerCase(),
   );
   if (!matchedCourse) {
     selectedCourseExamDates.value = [];
     examDate.value = "";
   } else {
-    selectedCourseExamDates.value = matchedCourse.exams.map((exam) => exam.date);
-    
+    selectedCourseExamDates.value = matchedCourse.exams.map(
+      (exam) => exam.date,
+    );
   }
 });
-
 
 // Fetch courses from the API
 const fetchCourses = async () => {
   try {
     const response = await getCourses();
-    allCourses.value = response.map(
-      (course: { name: string; exams: { date: string; groupCount: number }[] }) => ({
+    courses.value = response.map(
+      (course: {
+        name: string;
+        exams: { date: string; groupCount: number }[];
+      }) => ({
         name: course.name,
         exams: course.exams,
-      })
+      }),
     );
-
   } catch (error) {
     console.error("Error fetching courses:", error);
-    allCourses.value = [];
+    courses.value = [];
   }
 };
 
@@ -60,7 +64,7 @@ onMounted(fetchCourses);
       </label>
       <CourseSearchBox
         id="course"
-        :items="allCourses"
+        :items="courses"
         placeholder="Enter course name"
         v-model="course"
         @select="
@@ -80,6 +84,12 @@ onMounted(fetchCourses);
         v-model:selectedDate="examDate"
         :disabled="selectedCourseExamDates.length === 0"
       />
+    </div>
+
+    <div
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+    >
+      <CourseCard v-for="course in courses" :key="course.id" :course="course" />
     </div>
   </div>
 </template>

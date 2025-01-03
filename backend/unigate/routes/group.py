@@ -1,10 +1,18 @@
+from datetime import datetime
+
 from fastapi import APIRouter, HTTPException, status
 
 from unigate import crud
 from unigate.core.database import SessionDep
 from unigate.enums import GroupType, RequestStatus
 from unigate.models import Block, Group, Request
-from unigate.routes.deps import CurrStudentDep, GroupDep, RequestDep, StudentDep
+from unigate.routes.deps import (
+    AuthSessionDep,
+    CurrStudentDep,
+    GroupDep,
+    RequestDep,
+    StudentDep,
+)
 from unigate.schemas.group import (
     GroupCreate,
     GroupReadOnlyStudents,
@@ -23,6 +31,38 @@ def get_groups(session: SessionDep) -> list[Group]:
     return crud.group.get_all(session=session)
 
 
+@router.get("/search")
+def search(
+    session: SessionDep,
+    course: str,
+    is_public: bool = None,
+    exam_date: str = None,
+    participants: int = None,
+    order: str = None,
+) -> list[Group]:
+    if exam_date is not None:
+        try:
+            exam_date = datetime.strptime(exam_date, "%Y-%m-%d").date()
+        except ValueError:
+            raise HTTPException(
+                status_code=422,
+                detail="Invalid date format. Please use YYYY-MM-DD for the 'exam_date'.",
+            )
+
+    return crud.group.search(
+        session=session,
+        course=course,
+        is_public=is_public,
+        exam_date=exam_date,
+        participants=participants,
+        order=order,
+    )
+
+
+@router.get(
+    "/by_name",
+    response_model=GroupReadWithStudents,
+)
 @router.get(
     "/{group_id}",
     response_model=GroupReadWithStudents,
@@ -37,9 +77,21 @@ def get_group(group: GroupDep) -> Group:
 )
 def create_group(
     session: SessionDep,
+    auth_session: AuthSessionDep,
     group: GroupCreate,
     current_user: CurrStudentDep,
 ) -> Group:
+    if (
+        crud.course.get_by_name_and_exam(
+            name=group.course_name, exam_date=group.exam_date, auth_session=auth_session
+        )
+        is None
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Course not found or exam date is not valid",
+        )
+
     return crud.group.create(
         session=session,
         obj_in=group,

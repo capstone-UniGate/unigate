@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from typing import TYPE_CHECKING
 
@@ -30,3 +31,4 @@ class Group(DBUnigateBase, UUIDBase, GroupBase, table=True):
     blocked_students: list["Student"] = Relationship(
         back_populates="blocked_groups", link_model=Block
     )
+    date: datetime.date | None = Field(default_factory=datetime.date.today)

@@ -18,11 +18,8 @@ onMounted(() => {
     <ErrorMessage
       v-if="isError"
       @retry="getMyGroups"
-      data-testid="error-mesMsage"
+      data-testid="error-message"
     />
-
-    <!-- Loading Indicator Component -->
-    <LoadingIndicator v-if="isLoading" data-testid="loading-indicator" />
 
     <div class="flex justify-end items-center py-2">
       <div>
@@ -47,6 +44,11 @@ onMounted(() => {
       >
         Create a new group
       </Button>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div v-if="isLoading" class="py-4" data-testid="loading-indicator">
+      <LoadingIndicator />
     </div>
 
     <!-- Group Cards List -->

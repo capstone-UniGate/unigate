@@ -1,0 +1,156 @@
+services:
+  postgres-unigate:
+    container_name: postgres-unigate
+    image: postgres:17-bookworm
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
+      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+      - UNIGATE_DB=${UNIGATE_DB?Variable not set}
+      - AUTH_DB=${AUTH_DB?Variable not set}
+    volumes:
+      - ./postgres/create-databases.sh:/docker-entrypoint-initdb.d/create-databases.sh
+      - pgdata:/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  pgadmin-unigate:
+    container_name: pgadmin-unigate
+    image: dpage/pgadmin4:8.13
+    entrypoint:
+      - /custom-entrypoint.sh
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL?Variable not set}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD?Variable not set}
+      - PGADMIN_SERVER_JSON_FILE=/tmp/servers.json
+      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
+      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+    volumes:
+      - ./pgadmin/entrypoint.sh:/custom-entrypoint.sh
+      - pgadmin_data:/var/lib/pgadmin
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.unigate-pgadmin.entrypoints=websecure
+      - traefik.http.routers.unigate-pgadmin.rule=Host(`pgadmin.unigate.tech`)
+      - traefik.http.routers.unigate-pgadmin.tls.certresolver=dns-cloudflare
+      - traefik.http.services.unigate-pgadmin.loadbalancer.server.port=80
+    depends_on:
+      postgres-unigate:
+        condition: service_healthy
+        restart: true
+        required: true
+    restart: unless-stopped
+
+  minio-unigate:
+    container_name: minio-unigate
+    image: minio/minio:RELEASE.2024-12-18T13-15-44Z
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER?Variable not set}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD?Variable not set}
+    volumes:
+      - minio_data:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.unigate-minio.entrypoints=websecure
+      - traefik.http.routers.unigate-minio.rule=Host(`minio.unigate.tech`)
+      - traefik.http.routers.unigate-minio.tls.certresolver=dns-cloudflare
+      - traefik.http.routers.unigate-minio.service=unigate-minio
+      - traefik.http.services.unigate-minio.loadbalancer.server.port=9000
+      - traefik.http.routers.unigate-minioadmin.entrypoints=websecure
+      - traefik.http.routers.unigate-minioadmin.rule=Host(`minioadmin.unigate.tech`)
+      - traefik.http.routers.unigate-minioadmin.tls.certresolver=dns-cloudflare
+      - traefik.http.routers.unigate-minioadmin.service=unigate-minioadmin
+      - traefik.http.services.unigate-minioadmin.loadbalancer.server.port=9001
+    healthcheck:
+      test: ["CMD", "curl", "-I", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  mc-unigate:
+    container_name: mc-unigate
+    image: minio/mc:RELEASE.2024-11-21T17-21-54Z
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set minio http://minio-unigate:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      mc mb minio/${MINIO_BUCKET} || true;
+      mc anonymous set download minio/${MINIO_BUCKET} || true;
+      tail -f /dev/null;"
+    environment:
+      - MINIO_BUCKET=${MINIO_BUCKET?Variable not set}
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER?Variable not set}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD?Variable not set}
+    depends_on:
+      minio-unigate:
+        condition: service_healthy
+        restart: true
+        required: true
+    restart: unless-stopped
+
+  backend-unigate:
+    container_name: backend-unigate
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    environment:
+      - POSTGRES_HOST=postgres-unigate
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
+      - UNIGATE_DB=${UNIGATE_DB?Variable not set}
+      - AUTH_DB=${AUTH_DB?Variable not set}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY?Variable not set}
+      - JWT_SECRET=${JWT_SECRET?Variable not set}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT?Variable not set}
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER?Variable not set}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD?Variable not set}
+      - MODE=prod
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.unigate-backend.entrypoints=websecure
+      - traefik.http.routers.unigate-backend.rule=Host(`api.unigate.tech`)
+      - traefik.http.routers.unigate-backend.tls.certresolver=dns-cloudflare
+      - traefik.http.services.unigate-backend.loadbalancer.server.port=8000
+    depends_on:
+      postgres-unigate:
+        condition: service_healthy
+        restart: true
+        required: true
+    restart: unless-stopped
+
+  frontend-unigate:
+    container_name: frontend-unigate
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    environment:
+      - NUXT_PUBLIC_BASE_URL=${NUXT_PUBLIC_BASE_URL?Variable not set}
+      - NUXT_PUBLIC_MINIO_URL=${NUXT_PUBLIC_MINIO_URL?Variable not set}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.unigate-frontend.entrypoints=websecure
+      - traefik.http.routers.unigate-frontend.rule=Host(`unigate.tech`)
+      - traefik.http.routers.unigate-frontend.tls.certresolver=dns-cloudflare
+      - traefik.http.services.unigate-frontend.loadbalancer.server.port=3000
+    restart: unless-stopped
+
+networks:
+  default:
+    name: infrastructure
+    external: true
+
+volumes:
+  pgdata:
+  pgadmin_data:
+  minio_data:

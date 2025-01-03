@@ -31,8 +31,11 @@ class Settings(BaseSettings):
     JWT_EXPIRATION_SECONDS: int = 60 * 60 * 24  # 1 day
     JWT_ALGORITHM: str = "HS256"
     BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = (
-        "http://localhost,http://localhost:3000,https://localhost,https://localhost:3000"
+        "http://localhost,http://localhost:3000,https://localhost,https://localhost:3000,http://frontend-unigate,https://frontend-unigate,http://frontend-unigate:3000,https://frontend-unigate:3000,http://unigate.tech,https://unigate.tech"
     )
+    MINIO_ENDPOINT: str
+    MINIO_ACCESS_KEY: str
+    MINIO_SECRET_KEY: str
 
     @computed_field  # type: ignore
     @property

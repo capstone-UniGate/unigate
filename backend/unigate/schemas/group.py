@@ -1,3 +1,4 @@
+import datetime
 import uuid
 
 from pydantic import BaseModel
@@ -8,6 +9,7 @@ from unigate.schemas.student import StudentReadWithoutGroups
 
 class GroupRead(GroupBase):
     id: uuid.UUID
+    date: datetime.date
 
 
 class GroupReadWithStudents(GroupRead):

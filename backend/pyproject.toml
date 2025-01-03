@@ -8,6 +8,7 @@ dependencies = [
     "faker>=33.1.0",
     "fastapi[all,standard]>=0.115.4",
     "loguru>=0.7.2",
+    "minio>=7.2.13",
     "psycopg[binary]>=3.2.3",
     "pyjwt>=2.10.1",
     "python-dotenv>=1.0.1",

@@ -1,68 +1,98 @@
 <template>
   <Toaster />
-  <div class="w-2/3 mx-auto margin-top-custom">
+  <div
+    class="container mx-auto my-8 max-w-3xl p-6 bg-white shadow-md rounded-lg"
+  >
     <form class="space-y-6" @submit.prevent="onSubmit">
       <!-- Name Field -->
       <FormField v-slot="{ componentField }" name="name">
         <FormItem>
-          <FormLabel>Name</FormLabel>
+          <FormLabel> Name<span class="text-red-500 ml-1">*</span> </FormLabel>
           <FormControl>
-            <Input
+            <input
               type="text"
-              placeholder="Group Name"
+              placeholder="Enter Group Name"
               v-bind="componentField"
-              id="group-name-input"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-500"
             />
           </FormControl>
           <FormMessage />
         </FormItem>
       </FormField>
 
-      <!-- Course Field -->
+      <!-- Course SearchBox -->
       <FormField v-slot="{ componentField }" name="course">
         <FormItem>
-          <FormLabel>Course</FormLabel>
+          <FormLabel>
+            Course<span class="text-red-500 ml-1">*</span>
+          </FormLabel>
           <FormControl>
-            <select
-              v-bind="componentField"
-              class="form-select"
-              id="course-select"
-            >
-              <option value="">Select from student's courses</option>
-              <option value="course1">Course 1</option>
-              <option value="course2">Course 2</option>
-              <!-- Add other courses as needed -->
-            </select>
+            <div class="relative">
+              <input
+                type="text"
+                placeholder="Enter Course Name"
+                v-bind="componentField"
+                @input="(e) => handleCourseInput(e, componentField)"
+                @focus="showCourseDropdown = true"
+                @blur="handleCourseBlur"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-500"
+              />
+              <!-- Dropdown for filtered items -->
+              <ul
+                v-if="showCourseDropdown && filteredCourses.length"
+                class="absolute w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-2 z-10"
+              >
+                <li
+                  v-for="course in filteredCourses"
+                  :key="course.name"
+                  class="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  @click="selectCourse(course, componentField)"
+                >
+                  {{ course.name }}
+                </li>
+              </ul>
+            </div>
           </FormControl>
           <FormMessage />
         </FormItem>
       </FormField>
 
-      <!-- Privacy Type (Public or Private) -->
+      <!-- Exam Date Dropdown -->
+      <div>
+        <ExamDateDropdown
+          :examDates="selectedCourseExamDates"
+          v-model:selectedDate="examDate"
+          :disabled="selectedCourseExamDates.length === 0"
+        />
+      </div>
+
+      <!-- Privacy Type -->
       <div>
         <FormField v-slot="{ componentField, errorMessage }" name="isPublic">
           <FormItem>
-            <div class="flex items-center space-x-4">
-              <label class="inline-flex items-center">
+            <FormLabel>
+              Privacy<span class="text-red-500 ml-1">*</span>
+            </FormLabel>
+            <div class="flex items-center space-x-6">
+              <label class="flex items-center space-x-2">
                 <input
                   type="radio"
                   value="Public"
                   v-bind="componentField"
-                  id="privacy-public"
+                  class="form-radio h-4 w-4 text-blue-600 focus:ring focus:ring-blue-500"
                 />
-                <span class="ml-2">Public</span>
+                <span>Public</span>
               </label>
-              <label class="inline-flex items-center">
+              <label class="flex items-center space-x-2">
                 <input
                   type="radio"
                   value="Private"
                   v-bind="componentField"
-                  id="privacy-private"
+                  class="form-radio h-4 w-4 text-blue-600 focus:ring focus:ring-blue-500"
                 />
-                <span class="ml-2">Private</span>
+                <span>Private</span>
               </label>
             </div>
-            <!-- Display "Required" message only if there's an error -->
             <FormMessage v-if="errorMessage">{{ errorMessage }}</FormMessage>
           </FormItem>
         </FormField>
@@ -71,53 +101,73 @@
       <!-- Description Field -->
       <FormField v-slot="{ componentField }" name="description">
         <FormItem>
-          <FormLabel>Description</FormLabel>
+          <FormLabel>
+            Description<span class="text-red-500 ml-1">*</span>
+          </FormLabel>
           <FormControl>
             <textarea
               v-bind="componentField"
               placeholder="Describe your group"
-              class="form-textarea"
-              id="group-description"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-500"
+              style="min-height: 100px"
             ></textarea>
           </FormControl>
           <FormMessage />
         </FormItem>
       </FormField>
 
-      <!-- Updated Tags Field -->
+      <!-- Tags Field -->
       <FormField v-slot="{ componentField }" name="tags">
         <FormItem>
-          <FormLabel>Tags</FormLabel>
+          <FormLabel> Tags<span class="text-red-500 ml-1">*</span> </FormLabel>
           <FormControl>
-            <div class="tags-input-container">
-              <div class="tags">
-                <span v-for="(tag, index) in tags" :key="index" class="tag">
+            <div class="space-y-2">
+              <div class="flex flex-wrap gap-2">
+                <span
+                  v-for="(tag, index) in tags"
+                  :key="index"
+                  class="inline-flex items-center bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
+                >
                   {{ tag }}
                   <button
                     type="button"
                     @click="removeTag(index)"
-                    class="remove-tag-button"
+                    class="ml-2 text-blue-600 hover:text-blue-500"
                   >
-                    &times;
+                    ×
                   </button>
                 </span>
               </div>
-              <input
-                type="text"
-                v-model="tagInput"
-                @keydown.enter.prevent="addTag"
-                @keydown.delete="removeLastTag"
-                @input="filterSuggestions"
-                placeholder="Add tags..."
-                class="tags-input"
-                id="tags-input"
-              />
-              <ul v-if="filteredSuggestions.length" class="suggestions-list">
+              <div class="flex items-center space-x-2">
+                <input
+                  type="text"
+                  v-model="tagInput"
+                  @keydown.enter.prevent="addTag"
+                  @keydown.delete="removeLastTag"
+                  @input="filterSuggestions"
+                  placeholder="Add tags..."
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-500"
+                />
+                <button
+                  type="button"
+                  @click="addTag"
+                  class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:ring focus:ring-green-500"
+                >
+                  +
+                </button>
+              </div>
+              <p class="text-sm text-gray-500">
+                Press Enter or click "+" to add tags
+              </p>
+              <ul
+                v-if="filteredSuggestions.length"
+                class="bsolute w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-2 z-10 scrollbar overflow-y-auto max-h-40"
+              >
                 <li
                   v-for="(suggestion, index) in filteredSuggestions"
                   :key="index"
                   @click="selectSuggestion(suggestion)"
-                  class="suggestion-item"
+                  class="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                 >
                   {{ suggestion }}
                 </li>
@@ -128,74 +178,72 @@
         </FormItem>
       </FormField>
 
-      <!-- Error Message Placeholder -->
-      <div v-if="errorMessage" class="text-red-600">{{ errorMessage }}</div>
-
       <!-- Buttons -->
-      <div class="flex justify-start space-x-4 margin-bottom-custom">
-        <Button
+      <div class="flex justify-start space-x-4">
+        <button
           type="submit"
           :disabled="formHasErrors || isLoading"
-          id="create-group-button"
+          class="w-40 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold py-2 px-4 rounded-md shadow-lg hover:from-green-600 hover:to-green-700 hover:shadow-xl active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {{ isLoading ? "Creating..." : "Create" }}
-        </Button>
-        <Button
+        </button>
+        <button
           type="button"
           @click="onCancel"
-          variant="destructive"
-          id="cancel-button"
-          :disabled="isLoading"
+          class="w-40 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold py-2 px-4 rounded-md shadow-lg hover:from-red-600 hover:to-red-700 hover:shadow-xl active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cancel
-        </Button>
+        </button>
       </div>
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Button } from "@/components/ui/button";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Toaster } from "@/components/ui/toast";
-import { useToast } from "@/components/ui/toast/use-toast";
-import { computed, ref, watch } from "vue";
+import { ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
-import {} from "@/composables/useGroups";
 import * as z from "zod";
+import { useToast } from "@/components/ui/toast/use-toast";
+import { useGroups } from "@/composables/useGroups";
 
 const { toast } = useToast();
 const router = useRouter();
-const { createGroup, isLoading, isError } = useGroups();
-const { currentStudent } = useCurrentStudent();
+const { createGroup, isLoading } = useGroups();
+const { getCourses } = useGroups();
 
 const formSchema = toTypedSchema(
   z.object({
     name: z.string().min(2, "Name must be at least 2 characters long").max(50),
-    course: z.string().nonempty("Course is required"),
+    course: z.string().nonempty("Please enter a valid course name"),
     isPublic: z.enum(["Public", "Private"]),
     description: z.string().min(10, "The description is too short").max(300),
     tags: z.array(z.string()).min(1, "Please add at least one tag"),
   }),
 );
 
-const { handleSubmit, errors, setFieldValue } = useForm({
-  validationSchema: formSchema,
-});
+const course = ref("");
+const showCourseDropdown = ref(false);
+let isDropdownItemClicked = false;
+const selectedCourseExamDates = ref<string[]>([]);
+const allCourses = ref<{ name: string; exams: { date: string }[] }[]>([]);
+const filteredCourses = computed(() =>
+  course.value
+    ? allCourses.value.filter((c) =>
+        c.name.toLowerCase().includes(course.value.toLowerCase()),
+      )
+    : [],
+);
+const noCourseResultsFound = computed(
+  () => course.value && filteredCourses.value.length === 0,
+);
 
-const errorMessage = ref("");
+const examDate = ref("");
 const tags = ref<string[]>([]);
 const tagInput = ref("");
 const filteredSuggestions = ref<string[]>([]);
+const errorMessage = ref("");
 
 const allSuggestions = [
   "JavaScript",
@@ -209,6 +257,85 @@ const allSuggestions = [
   "Webpack",
   "Rollup",
 ];
+
+const { handleSubmit, errors, setFieldValue } = useForm({
+  validationSchema: formSchema,
+});
+
+const fetchCourses = async () => {
+  try {
+    const response = await getCourses();
+    allCourses.value = response.map(
+      (course: { name: string; exams: { date: string }[] }) => ({
+        name: course.name,
+        exams: course.exams,
+      }),
+    );
+  } catch (error) {
+    console.error("Error fetching courses:", error);
+    allCourses.value = [];
+  }
+};
+
+const updateCourseValue = () => {
+  showCourseDropdown.value = true;
+};
+
+watch(course, (newCourseName) => {
+  const matchedCourse = allCourses.value.find(
+    (c) => c.name.toLowerCase() === newCourseName.toLowerCase(),
+  );
+
+  if (!matchedCourse) {
+    // If no matching course is found, reset exam dates
+    selectedCourseExamDates.value = [];
+    examDate.value = "";
+  } else {
+    // Update exam dates based on the selected course
+    selectedCourseExamDates.value = matchedCourse.exams.map((e) => e.date);
+    if (!selectedCourseExamDates.value.includes(examDate.value)) {
+      examDate.value = ""; // Reset if current exam date is not valid
+    }
+  }
+});
+
+const handleCourseInput = (event: Event, componentField: any) => {
+  const inputValue = (event.target as HTMLInputElement).value;
+  componentField.value = inputValue; // Update vee-validate's internal value
+  course.value = inputValue; // Update local state
+  showCourseDropdown.value = true; // Show dropdown
+  examDate.value = ""; // Reset exam date on input change
+};
+
+const selectCourse = (selectedCourse, componentField) => {
+  isDropdownItemClicked = true; // Set flag to prevent blur handling
+  componentField.value = selectedCourse.name;
+  course.value = selectedCourse.name;
+  selectedCourseExamDates.value = selectedCourse.exams.map((e) => e.date);
+  showCourseDropdown.value = false;
+};
+
+const handleCourseBlur = () => {
+  setTimeout(() => {
+    if (!isDropdownItemClicked) {
+      // Validate the course name only if no dropdown item was clicked
+      const matchedCourse = allCourses.value.find(
+        (c) => c.name.toLowerCase() === course.value.toLowerCase(),
+      );
+
+      if (course.value.length > 0 && !matchedCourse) {
+        errorMessage.value = "Please enter a valid course name";
+        course.value = "";
+        setFieldValue("course", course.value);
+      } else {
+        errorMessage.value = "";
+      }
+
+      showCourseDropdown.value = false; // Hide dropdown
+    }
+    isDropdownItemClicked = false; // Reset flag
+  }, 200);
+};
 
 const addTag = () => {
   const newTag = tagInput.value.trim();
@@ -256,30 +383,36 @@ const selectSuggestion = (suggestion: string) => {
 
 const formHasErrors = computed(() => Object.keys(errors.value).length > 0);
 
-// Handle form submission
 const onSubmit = handleSubmit(async (values) => {
   try {
-    let result = await createGroup({
+    const payload = {
       name: values.name,
       description: values.description,
-      category: values.course,
+      course_name: course.value,
+      category: course.value,
+      exam_date: examDate.value || null,
       type: values.isPublic,
       tags: tags.value,
-    });
+    };
+
+    console.log("Payload for submission:", payload);
+
+    await createGroup(payload);
+
     toast({
       variant: "success",
       description: "Group created successfully!",
-      duration: 1500,
     });
 
     setTimeout(() => {
       router.push({ name: "groups" });
     }, 1500);
   } catch (error) {
+    console.error("Error creating group:", error);
+
     toast({
       variant: "destructive",
       description: "Failed to create group. Please try again.",
-      duration: 1500,
     });
   }
 });
@@ -287,85 +420,7 @@ const onSubmit = handleSubmit(async (values) => {
 const onCancel = () => {
   router.push({ name: "groups" });
 };
+
+// Fetch courses when the component is mounted
+onMounted(fetchCourses);
 </script>
-
-<style scoped>
-.form-select,
-.form-textarea {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 0.25rem;
-}
-
-.text-red-600 {
-  color: #e3342f;
-}
-
-.margin-bottom-custom {
-  padding-bottom: 3px;
-}
-
-.margin-top-custom {
-  padding-top: 6px;
-}
-
-.tags-input-container {
-  position: relative;
-  border: 1px solid #ddd;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-}
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.tag {
-  background-color: #e2e8f0;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  display: flex;
-  align-items: center;
-}
-
-.remove-tag-button {
-  background: none;
-  border: none;
-  margin-left: 0.25rem;
-  cursor: pointer;
-}
-
-.tags-input {
-  border: none;
-  outline: none;
-  width: 100%;
-  margin-top: 0.5rem;
-}
-
-.suggestions-list {
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #ddd;
-  max-height: 150px;
-  overflow-y: auto;
-  z-index: 1000;
-  border-radius: 0.25rem;
-  padding: 0;
-  list-style: none;
-}
-
-.suggestion-item {
-  padding: 0.5rem;
-  cursor: pointer;
-}
-
-.suggestion-item:hover {
-  background-color: #f1f5f9;
-}
-</style>
