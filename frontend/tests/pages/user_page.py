@@ -1,46 +1,67 @@
+import time
+
 from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+
+from tests.constants import Urls
+
+from .base_page import BasePage
 
 
-class UserPage:
-    def __init__(self, driver: WebDriver):
-        self.driver = driver
-        self.url = "http://localhost:3000/user"
+class UserPage(BasePage):
+    URL = Urls.USER_PAGE
+    image_path = "..."
+    EDIT_BUTTON = (By.ID, "edit-button")
 
-    def load(self):
-        self.driver.get(self.url)
-
-    def get_user_name(self):
-        return self.driver.find_element(By.ID, "user-name").text
-
-    def get_user_surname(self):
-        return self.driver.find_element(By.ID, "user-surname").text
-
-    def get_user_number(self):
-        return self.driver.find_element(By.ID, "user-number").text
-
-    def get_user_email(self):
-        return self.driver.find_element(By.ID, "user-email").text
-
-    def get_user_type(self):
-        return self.driver.find_element(By.ID, "user-type").text
-
-    def get_placeholder_image(self):
-        return self.driver.find_element(By.ID, "placeholder-image").is_displayed()
-
-    def click_edit_button(self):
-        self.driver.find_element(By.ID, "edit-button").click()
-
-    def upload_profile_image(self, image_path):
-        upload_button = self.driver.find_element(By.ID, "upload-photo")
-        upload_button.send_keys(image_path)
-
-    def wait_for_image_upload(self):
+    def navigate(self) -> None:
+        self.driver.get(Urls.USER_PAGE)
+        time.sleep(1)
         WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.ID, "profile-image"))
+            EC.presence_of_element_located(self.EDIT_BUTTON)
         )
 
-    def get_uploaded_image_url(self):
-        return self.driver.find_element(By.ID, "profile-image").get_attribute("src")
+    def get_user_name_and_surname(self) -> str:
+        try:
+            element = WebDriverWait(self.driver, 10).until(
+                EC.visibility_of_element_located((By.ID, "user-name-surname"))
+            )
+            return element.text
+        except Exception as e:
+            print(f"Error while fetching name and surname: {e}")
+            return ""
+
+    def get_user_number(self) -> str:
+        return self.driver.find_element(By.ID, "user-number").text
+
+    def get_user_email(self) -> str:
+        email = self.driver.find_element(By.ID, "Email").text
+        return email.split("Email: ")[1].strip()
+
+    def get_user_role(self) -> str:
+        role = self.driver.find_element(By.ID, "Role").text
+        return role.split("Role: ")[1].strip()
+
+    # def get_image(self) -> None:
+    # return #self.driver.find_element(By.ID, "placeholder-image").is_displayed()
+
+    def click_edit_button(self) -> None:
+        self.driver.find_element(By.ID, "edit-button").click()
+
+    def change_profile_image(self, image_path: str) -> None:
+        self.driver.find_element(By.ID, "change-photo-click").click()
+        file_input = self.driver.find_element(By.CSS_SELECTOR, "input[type='file']")
+        time.sleep(1)
+        file_input.send_keys(image_path)
+
+    def get_toast_message(self) -> str:
+        return (self.get_toast()).text
+
+    def get_toast(self) -> WebElement:
+        return self.driver.find_element(
+            By.CSS_SELECTOR, '[data-state="open"][data-swipe-direction="right"]'
+        )
+
+    # def get_uploaded_image_url(self):
+    #    return self.driver.find_element(By.ID, "profile-image").get_attribute("src")

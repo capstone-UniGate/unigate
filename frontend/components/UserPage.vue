@@ -37,7 +37,9 @@
             <div
               class="absolute inset-0 bg-black bg-opacity-40 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
             >
-              <span class="text-white text-sm">Change Photo</span>
+              <span class="text-white text-sm" id="change-photo-click"
+                >Change Photo</span
+              >
             </div>
           </div>
 
@@ -57,10 +59,10 @@
             @change="handleFileUpload"
           />
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">
+            <h1 class="text-2xl font-bold text-gray-900" id="user-name-surname">
               {{ currentStudent?.name }} {{ currentStudent?.surname }}
             </h1>
-            <p class="text-gray-500">
+            <p class="text-gray-500" id="user-number">
               Student Number: {{ currentStudent?.number }}
             </p>
             <span
@@ -78,6 +80,7 @@
 
         <!-- Edit Button -->
         <Button
+          id="edit-button"
           @click="isEditing = true"
           class="bg-blue-500 hover:bg-blue-600 text-white"
           v-if="!isEditing"
@@ -92,8 +95,10 @@
           <h2 class="text-lg font-semibold text-gray-900 mb-2">
             Contact Information
           </h2>
-          <p class="text-gray-600">Email: {{ currentStudent?.email }}</p>
-          <p class="text-gray-600">Role: {{ userRole }}</p>
+          <p class="text-gray-600" id="Email">
+            Email: {{ currentStudent?.email }}
+          </p>
+          <p class="text-gray-600" id="Role">Role: {{ userRole }}</p>
         </div>
       </div>
 
@@ -105,6 +110,7 @@
             <div class="space-y-2">
               <label class="text-sm font-medium text-gray-700">Name</label>
               <input
+                id="name-input"
                 v-model="editForm.name"
                 type="text"
                 class="w-full p-2 border rounded-md"
@@ -115,6 +121,7 @@
             <div class="space-y-2">
               <label class="text-sm font-medium text-gray-700">Surname</label>
               <input
+                id="surname-input"
                 v-model="editForm.surname"
                 type="text"
                 class="w-full p-2 border rounded-md"
@@ -146,6 +153,7 @@
 
             <div class="flex space-x-4 pt-4">
               <Button
+                id="save-button"
                 type="submit"
                 class="bg-green-500 hover:bg-green-600 text-white"
                 :disabled="isSubmitting"
@@ -263,6 +271,7 @@ const handleFileUpload = async (event: Event) => {
     }
 
     toast({
+      variant: "success",
       title: "Success",
       description: "Profile photo updated successfully",
     });
@@ -283,15 +292,16 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
   try {
     toast({
+      variant: "success",
       title: "Success",
       description: "Profile updated successfully",
     });
     isEditing.value = false;
   } catch (error) {
     toast({
+      variant: "destructive",
       title: "Error",
       description: "Failed to update profile",
-      variant: "destructive",
     });
     console.error("Error updating profile:", error);
   } finally {

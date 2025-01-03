@@ -21,6 +21,8 @@ class TestData:
     INVALID_USERNAME: ClassVar[str] = "S7654321"
     INVALID_PASSWORD: ClassVar[str] = "wrongpassword"
 
+    IMAGE_PROFILE_TO_CHANGE_PATH = "https://github.com/capstone-UniGate/unigate/blob/issue-267/User-Page-e2e-tests/frontend/tests/test_cases/cat.jpg"
+
 
 class Urls:
     BASE_URL = "http://localhost:3000"
@@ -29,5 +31,4 @@ class Urls:
     CREATE_GROUP_PAGE = f"{GROUP_PAGE}/create"
     LOGIN_PAGE = f"{BASE_URL}/login"
     LOGOUT_PAGE = f"{BASE_URL}/login?message=You have successfully logged out."
-    USER_PAGE = f"{BASE_URL}/user"  # Add this line for the user profile page
-
+    USER_PAGE = f"{BASE_URL}/user"
