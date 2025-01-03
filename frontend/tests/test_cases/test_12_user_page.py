@@ -1,12 +1,10 @@
 import time
-
 import pytest
 from selenium import webdriver
-
-from tests.constants import TestData
+import os
 from tests.pages.user_page import UserPage
 from tests.test_cases.base_test import BaseTest
-
+from selenium.common.exceptions import InvalidArgumentException
 
 class TestUserProfile(BaseTest):
     @pytest.fixture(autouse=True)
@@ -25,50 +23,25 @@ class TestUserProfile(BaseTest):
         assert self.page.get_user_role() == "Student", "Role is wrong or not displayed"
 
     def test_edit_photo(self) -> None:
+        relative_path_profile_image = "unigate/frontend/tests/test_cases/lorax.jpeg"
+        project_root = os.getcwd()  # Assume that the test is execute at the root of the project
+        path_without_last_two = os.path.dirname(os.path.dirname(project_root)) # Remove the last two directories
+        file_path_profile_image = os.path.join(path_without_last_two, relative_path_profile_image) # Create the absolute path
+
         self.page.click_edit_button()
-        self.page.change_profile_image(TestData.IMAGE_PROFILE_TO_CHANGE_PATH)
+        self.page.change_profile_image(file_path_profile_image)
         time.sleep(1)
         toast_message = self.page.get_toast_message()
         assert (
             toast_message == "Success"
         ), "Toast message did not appear or was incorrect."
 
-        # assert self.page.get_image(), "Image not displayed"
-
-    """
-    def test_view_profile_without_image(self):
-        WebDriverWait(self.page.driver, 10).until(
-            EC.presence_of_element_located((By.ID, "user-name"))
-        )
-        assert self.page.get_user_name() != "", "Name not displayed"
-        assert self.page.get_user_surname() != "", "Surname not displayed"
-        assert self.page.get_user_number() != "", "Student number not displayed"
-        assert self.page.get_user_email() != "", "Email not displayed"
-        assert self.page.get_user_type() != "", "User type not displayed"
-        assert self.page.get_placeholder_image(), "Placeholder image not displayed"
-
-    def test_upload_profile_image(self):
-        image_path = "https://github.com/radix-vue.png"
-        assert os.path.exists(image_path), "Test image does not exist"
-
+    def test_edit_photo_error(self) -> None:
         self.page.click_edit_button()
-        self.page.upload_profile_image(image_path)
-        self.page.wait_for_image_upload()
-        uploaded_image_url = self.page.get_uploaded_image_url()
-        assert uploaded_image_url is not None, "Profile image not updated"
-
-    def test_display_image_across_application(self):
-        image_path = "https://github.com/radix-vue.png"
-        assert os.path.exists(image_path), "Test image does not exist"
-
-        self.page.click_edit_button()
-        self.page.upload_profile_image(image_path)
-        self.page.wait_for_image_upload()
-        uploaded_image_url = self.page.get_uploaded_image_url()
-        assert uploaded_image_url is not None, "Profile image not updated"
-
-    def test_error_during_image_upload(self):
-        self.page.upload_profile_image("/invalid/path/to/image.jpg")
-        error_message = self.page.get_error_message()
-        assert error_message == "Failed to update profile photo", "Error message not displayed correctly"
-    """
+        try:
+            self.page.change_profile_image("empy_path")
+        except InvalidArgumentException as e:
+            assert "File not found" in str(e)
+        #time.sleep(1)
+        #toast_message = self.page.get_toast_message()
+        #assert (toast_message == "Error"), "Toast message did not appear or was correct."

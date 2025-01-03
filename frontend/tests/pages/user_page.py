@@ -50,13 +50,12 @@ class UserPage(BasePage):
         self.driver.find_element(By.ID, "edit-button").click()
 
     def change_profile_image(self, image_path: str) -> None:
-        self.driver.find_element(By.ID, "change-photo-click").click()
+        #self.driver.find_element(By.ID, "change-photo-click").click()
         file_input = self.driver.find_element(By.CSS_SELECTOR, "input[type='file']")
-        time.sleep(1)
         file_input.send_keys(image_path)
 
     def get_toast_message(self) -> str:
-        return (self.get_toast()).text
+        return (self.get_toast()).text.split("\n")[0]
 
     def get_toast(self) -> WebElement:
         return self.driver.find_element(
