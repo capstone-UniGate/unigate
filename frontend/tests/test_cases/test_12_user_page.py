@@ -1,10 +1,13 @@
+import os
 import time
+
 import pytest
 from selenium import webdriver
-import os
+from selenium.common.exceptions import InvalidArgumentException
+
 from tests.pages.user_page import UserPage
 from tests.test_cases.base_test import BaseTest
-from selenium.common.exceptions import InvalidArgumentException
+
 
 class TestUserProfile(BaseTest):
     @pytest.fixture(autouse=True)
@@ -24,9 +27,15 @@ class TestUserProfile(BaseTest):
 
     def test_edit_photo(self) -> None:
         relative_path_profile_image = "unigate/frontend/tests/test_cases/lorax.jpeg"
-        project_root = os.getcwd()  # Assume that the test is execute at the root of the project
-        path_without_last_two = os.path.dirname(os.path.dirname(project_root)) # Remove the last two directories
-        file_path_profile_image = os.path.join(path_without_last_two, relative_path_profile_image) # Create the absolute path
+        project_root = (
+            os.getcwd()
+        )  # Assume that the test is execute at the root of the project
+        path_without_last_two = os.path.dirname(
+            os.path.dirname(project_root)
+        )  # Remove the last two directories
+        file_path_profile_image = os.path.join(
+            path_without_last_two, relative_path_profile_image
+        )  # Create the absolute path
 
         self.page.click_edit_button()
         self.page.change_profile_image(file_path_profile_image)
@@ -42,6 +51,6 @@ class TestUserProfile(BaseTest):
             self.page.change_profile_image("empy_path")
         except InvalidArgumentException as e:
             assert "File not found" in str(e)
-        #time.sleep(1)
-        #toast_message = self.page.get_toast_message()
-        #assert (toast_message == "Error"), "Toast message did not appear or was correct."
+        # time.sleep(1)
+        # toast_message = self.page.get_toast_message()
+        # assert (toast_message == "Error"), "Toast message did not appear or was correct."

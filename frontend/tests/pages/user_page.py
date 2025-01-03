@@ -50,7 +50,7 @@ class UserPage(BasePage):
         self.driver.find_element(By.ID, "edit-button").click()
 
     def change_profile_image(self, image_path: str) -> None:
-        #self.driver.find_element(By.ID, "change-photo-click").click()
+        # self.driver.find_element(By.ID, "change-photo-click").click()
         file_input = self.driver.find_element(By.CSS_SELECTOR, "input[type='file']")
         file_input.send_keys(image_path)
 
