@@ -210,8 +210,7 @@ import { useGroups } from "@/composables/useGroups";
 
 const { toast } = useToast();
 const router = useRouter();
-const { createGroup, isLoading } = useGroups();
-const { getCourses } = useGroups();
+const { createGroup, isLoading, getCourses } = useGroups();
 
 const formSchema = toTypedSchema(
   z.object({
