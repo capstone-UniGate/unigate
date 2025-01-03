@@ -25,7 +25,9 @@ watch(course, (newCourseName) => {
     selectedCourseExamDates.value = [];
     examDate.value = "";
   } else {
-    selectedCourseExamDates.value = matchedCourse.exams.map((exam) => exam.date);
+    selectedCourseExamDates.value = matchedCourse.exams.map(
+      (exam) => exam.date,
+    );
   }
 });
 
@@ -61,7 +63,9 @@ const fetchCourses = async () => {
 // Computed property to filter displayed courses
 const filteredCourses = computed(() => {
   // if (!course.value) return courses.value; // Show all courses if no course is selected
-  return courses.value.filter((c) => c.name.toLowerCase() === course.value.toLowerCase());
+  return courses.value.filter(
+    (c) => c.name.toLowerCase() === course.value.toLowerCase(),
+  );
 });
 
 onMounted(fetchCourses);
@@ -69,7 +73,9 @@ onMounted(fetchCourses);
 
 <template>
   <div class="flex justify-center items-center min-h-[80vh] bg-gray-100 py-6">
-    <div class="container mx-auto max-w-5xl h-[90vh] bg-white shadow-lg rounded-lg p-8 overflow-y-auto">
+    <div
+      class="container mx-auto max-w-5xl h-[90vh] bg-white shadow-lg rounded-lg p-8 overflow-y-auto"
+    >
       <h1 class="text-3xl font-semibold mb-6 text-center">
         Professor Dashboard
       </h1>
@@ -104,7 +110,10 @@ onMounted(fetchCourses);
       </div>
 
       <!-- Course Cards Grid -->
-      <div v-if="filteredCourses.length" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div
+        v-if="filteredCourses.length"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+      >
         <CourseCard
           v-for="course in filteredCourses"
           :key="course.id"

@@ -1,12 +1,15 @@
 <template>
-  <div class="rounded-lg border bg-card text-card-foreground shadow-sm transition-shadow hover:shadow-md p-4">
+  <div
+    class="rounded-lg border bg-card text-card-foreground shadow-sm transition-shadow hover:shadow-md p-4"
+  >
     <!-- Course Name and Group Tag -->
     <h2 class="text-base font-semibold flex items-center justify-between">
       {{ course.name }}
-      <span class="rounded-full bg-emerald-500 text-white px-2 py-1 text-xs font-medium">
+      <span
+        class="rounded-full bg-emerald-500 text-white px-2 py-1 text-xs font-medium"
+      >
         Groups: {{ groupCount }}
       </span>
-
     </h2>
 
     <!-- Exam List -->

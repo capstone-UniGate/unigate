@@ -212,7 +212,6 @@ const { toast } = useToast();
 const router = useRouter();
 const { createGroup, isLoading, getCourses } = useGroups();
 
-
 const formSchema = toTypedSchema(
   z.object({
     name: z.string().min(2, "Name must be at least 2 characters long").max(50),

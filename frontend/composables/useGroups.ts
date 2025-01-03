@@ -51,9 +51,12 @@ export function useGroups() {
       await ensureAuthenticated();
       isError.value = false;
       isLoading.value = true;
-      const response = await useApiFetch(`/courses/get_group_number?course_name=${encodeURIComponent(courseName)}`, {
-        method: "GET",
-      });
+      const response = await useApiFetch(
+        `/courses/get_group_number?course_name=${encodeURIComponent(courseName)}`,
+        {
+          method: "GET",
+        },
+      );
       return response;
     } catch (error) {
       isError.value = true;
@@ -62,7 +65,6 @@ export function useGroups() {
       isLoading.value = false;
     }
   }
-  
 
   async function searchGroups(queryParams: Record<string, any> = {}) {
     try {
