@@ -38,7 +38,6 @@ export function useGroups() {
         method: "GET",
       });
       groups.value = response;
-      console.log(groups.value);
     } catch (error) {
       isError.value = true;
       throw error;
@@ -47,11 +46,29 @@ export function useGroups() {
     }
   }
 
+  async function getGroupCount(courseName: string) {
+    try {
+      await ensureAuthenticated();
+      isError.value = false;
+      isLoading.value = true;
+      const response = await useApiFetch(`/courses/get_group_number?course_name=${encodeURIComponent(courseName)}`, {
+        method: "GET",
+      });
+      return response;
+    } catch (error) {
+      isError.value = true;
+      throw error;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  
+
   async function searchGroups(queryParams: Record<string, any> = {}) {
     try {
       await ensureAuthenticated();
       isError.value = false;
-      isLoading.value = false;
+      isLoading.value = true;
 
       const queryString = new URLSearchParams(
         Object.entries(queryParams).reduce(
@@ -265,5 +282,6 @@ export function useGroups() {
     checkAuthStatus,
     getCourses,
     searchGroups,
+    getGroupCount,
   };
 }
