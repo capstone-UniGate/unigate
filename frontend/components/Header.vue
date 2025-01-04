@@ -59,7 +59,7 @@
 
           <!-- Updated Avatar with click handler -->
           <div class="cursor-pointer" @click="router.push('/user')">
-            <Avatar>
+            <Avatar id="avatar">
               <AvatarImage
                 :src="photoUrl || 'https://github.com/radix-vue.png'"
                 alt="@radix-vue"
