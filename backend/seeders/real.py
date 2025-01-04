@@ -65,6 +65,7 @@ groups = [
         category="Test",
         type=GroupType.PUBLIC,
         course_name="Test Course",
+        date=datetime(2024, 1, 1, tzinfo=pytz.utc),
         exam_date=datetime(2025, 1, 1, tzinfo=pytz.utc),
     ),
     GroupCreate(
@@ -73,7 +74,8 @@ groups = [
         category="Test",
         type=GroupType.PRIVATE,
         course_name="Test Course",
-        exam_date=datetime(2025, 1, 1, tzinfo=pytz.utc),
+        date=datetime(2025, 1, 10, tzinfo=pytz.utc),
+        exam_date=datetime(2025, 1, 10, tzinfo=pytz.utc),
     ),
 ]
 

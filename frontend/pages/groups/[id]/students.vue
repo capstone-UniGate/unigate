@@ -21,6 +21,7 @@ const blockedStudents = ref([]);
 const sameStudent = ref([]);
 const isLoading = ref(true);
 const activeTab = ref("members");
+const config = useRuntimeConfig();
 
 // Function to check if current user is a super student
 const isSuperStudent = () => {
@@ -104,6 +105,14 @@ onMounted(async () => {
   await getCurrentStudent();
   await loadMembers();
 });
+
+// Replace photoUrl computed with reactive eventBus
+const photoUrl = computed(() => eventBus.photoUrl || null);
+
+function retrieveUrl(member) {
+  const photoUrl = `${config.public.minioURL}/unigate/propics/${member.number}`;
+  return photoUrl;
+}
 </script>
 
 <template>
@@ -172,7 +181,7 @@ onMounted(async () => {
           <!-- Avatar with Default Image -->
           <Avatar class="mr-4">
             <AvatarImage
-              src="https://via.placeholder.com/50"
+              :src="retrieveUrl(member) || 'https://github.com/radix-vue.png'"
               alt="Default Avatar"
               id="avatar"
             />
