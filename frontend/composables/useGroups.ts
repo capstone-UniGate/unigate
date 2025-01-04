@@ -48,7 +48,7 @@ export function useGroups() {
 
   async function getGroupCount(courseName: string) {
     try {
-      await ensureAuthenticated();
+      // await ensureAuthenticated();
       isError.value = false;
       isLoading.value = true;
       const response = await useApiFetch(
@@ -267,6 +267,24 @@ export function useGroups() {
     }
   }
 
+    //Function to fetch professors courses
+    async function getProfessorsCourses() {
+      try {
+        // await ensureAuthenticated();
+        isError.value = false;
+        isLoading.value = true;
+        const response = await useApiFetch("/professors/courses", {
+          method: "GET",
+        });
+        return response;
+      } catch (error) {
+        isError.value = true;
+        throw error;
+      } finally {
+        isLoading.value = false;
+      }
+    }
+
   return {
     groups,
     isLoading,
@@ -285,5 +303,6 @@ export function useGroups() {
     getCourses,
     searchGroups,
     getGroupCount,
+    getProfessorsCourses
   };
 }
