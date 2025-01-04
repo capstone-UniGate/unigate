@@ -263,7 +263,6 @@ const handleFileUpload = async (event: Event) => {
       eventBus.updatePhoto(newPhotoUrl);
     }
 
-
     toast({
       title: "Success",
       description: "Profile photo updated successfully",

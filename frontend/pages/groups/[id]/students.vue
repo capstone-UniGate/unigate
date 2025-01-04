@@ -113,7 +113,6 @@ function retrieveUrl(member) {
   const photoUrl = `${config.public.minioURL}/unigate/propics/${member.number}`;
   return photoUrl;
 }
-
 </script>
 
 <template>
@@ -182,7 +181,7 @@ function retrieveUrl(member) {
           <!-- Avatar with Default Image -->
           <Avatar class="mr-4">
             <AvatarImage
-              :src="retrieveUrl(member) || 'https://github.com/radix-vue.png'" 
+              :src="retrieveUrl(member) || 'https://github.com/radix-vue.png'"
               alt="Default Avatar"
               id="avatar"
             />
