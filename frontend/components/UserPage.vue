@@ -28,7 +28,7 @@
             <Avatar class="w-20 h-20">
               <AvatarImage
                 :src="
-                  photoUrl || previewUrl || 'https://github.com/radix-vue.png'
+                  previewUrl || photoUrl || 'https://github.com/radix-vue.png'
                 "
                 alt="@radix-vue"
               />
@@ -256,11 +256,13 @@ const handleFileUpload = async (event: Event) => {
 
     await uploadImage(file);
     // After successful upload, update the previewUrl to the server URL
+    // Inside handleFileUpload, after uploading:
     if (currentStudent.value?.number) {
-      const newPhotoUrl = `${config.public.minioURL}/unigate/propics/${currentStudent.value.number}`;
-      eventBus.updatePhoto(newPhotoUrl);
+      const newPhotoUrl = `${config.public.minioURL}/unigate/propics/${currentStudent.value.number}?t=${Date.now()}`;
       previewUrl.value = newPhotoUrl;
+      eventBus.updatePhoto(newPhotoUrl);
     }
+
 
     toast({
       title: "Success",
