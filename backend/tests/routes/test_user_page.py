@@ -6,7 +6,6 @@ from fastapi.testclient import TestClient
 from unigate.main import app
 from minio import Minio
 import os
-import logging as logger
 
 client = TestClient(app)
 
@@ -62,23 +61,31 @@ def test_verify_user_profile() -> None:
 
 def test_minio_connection():
     try:
-        # Testa la connessione elencando i bucket
         buckets = minio.list_buckets()
         assert buckets, "No buckets found. MinIO potrebbe non essere configurato correttamente."
         print(f"Connesso a MinIO. Buckets disponibili: {[bucket.name for bucket in buckets]}")
     except Exception as e:
         raise AssertionError(f"Errore nella connessione a MinIO: {e}")
 
-def test_upload_to_minio_direct() -> None:
-    # Configurazione
-    image_path = "/home/michy/Scrivania/Capstone/unigate/backend/tests/routes/test.jpeg"
-    bucket_name = "unigate"
-    object_name = "propics/1234567/test.jpeg"
 
-    # Assicurati che il file esista
+def test_upload_to_minio_direct() -> None:
+
+    relative_path_profile_image = "unigate/backend/tests/routes/test.jpeg"
+    project_root = (
+        os.getcwd()
+    )
+    path_without_last_two = os.path.dirname(
+        os.path.dirname(project_root)
+    )
+    image_path = os.path.join(
+        path_without_last_two, relative_path_profile_image
+    )
+
+    bucket_name = "unigate"
+    object_name = "propics/1234567"
+
     assert os.path.exists(image_path), f"File not found: {image_path}"
 
-    # Carica il file su MinIO
     try:
         with open(image_path, "rb") as file_data:
             minio.put_object(
@@ -89,12 +96,10 @@ def test_upload_to_minio_direct() -> None:
                 content_type="image/jpeg",
             )
     except Exception as e:
-        assert False, f"Errore durante l'upload su MinIO: {e}"
+        assert False, f"Error uploading to MinIO: {e}"
 
-    # Verifica che il file sia stato caricato
     try:
         found = minio.stat_object(bucket_name, object_name)
-        assert found, f"File non trovato su MinIO: {bucket_name}/{object_name}"
-        logger.info(f"File caricato correttamente: {bucket_name}/{object_name}")
+        assert found, f"File not found on MinIO: {bucket_name}/{object_name}"
     except Exception as e:
-        assert False, f"Errore durante la verifica del file su MinIO: {e}"
+        assert False, f"Error checking file on MinIO: {e}"
