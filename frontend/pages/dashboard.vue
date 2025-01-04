@@ -27,7 +27,9 @@ watch(course, (newCourseName) => {
     selectedCourseExamDates.value = [];
     examDate.value = "";
   } else {
-    selectedCourseExamDates.value = matchedCourse.exams.map((exam) => exam.date);
+    selectedCourseExamDates.value = matchedCourse.exams.map(
+      (exam) => exam.date,
+    );
   }
 });
 
@@ -57,7 +59,8 @@ const fetchProfessorsCourses = async () => {
   } catch (error: any) {
     console.error("Error fetching courses:", error);
     if (error.response?.status === 403) {
-      errorMessage.value = "Access to this page is blocked. You must be authenticated.";
+      errorMessage.value =
+        "Access to this page is blocked. You must be authenticated.";
     } else {
       errorMessage.value = "Error fetching courses. Please try again later.";
     }
@@ -68,7 +71,9 @@ const fetchProfessorsCourses = async () => {
 
 // Computed property to filter displayed courses
 const filteredCourses = computed(() => {
-  return courses.value.filter((c) => c.name.toLowerCase() === course.value.toLowerCase());
+  return courses.value.filter(
+    (c) => c.name.toLowerCase() === course.value.toLowerCase(),
+  );
 });
 
 onMounted(fetchProfessorsCourses);
@@ -90,25 +95,36 @@ onMounted(fetchProfessorsCourses);
     </div>
 
     <!-- Main dashboard content -->
-    <div v-else class="flex justify-center items-center min-h-[80vh] bg-gray-100 py-6">
-      <div class="container mx-auto max-w-5xl h-[90vh] bg-white shadow-lg rounded-lg p-8 overflow-y-auto">
+    <div
+      v-else
+      class="flex justify-center items-center min-h-[80vh] bg-gray-100 py-6"
+    >
+      <div
+        class="container mx-auto max-w-5xl h-[90vh] bg-white shadow-lg rounded-lg p-8 overflow-y-auto"
+      >
         <h1 class="text-3xl font-semibold mb-6 text-center">
           Professor Dashboard
         </h1>
         <div>
           <!-- Course SearchBox -->
           <div class="mb-6">
-            <label for="course" class="block mb-2 text-sm font-medium">Course</label>
+            <label for="course" class="block mb-2 text-sm font-medium"
+              >Course</label
+            >
             <CourseSearchBox
               id="course"
               :items="courses"
               placeholder="Enter course name"
               v-model="course"
-              @select="(selectedCourse) => {
-                course = selectedCourse.name;
-                examDate = '';
-                selectedCourseExamDates = selectedCourse.exams.map((e) => e.date);
-              }"
+              @select="
+                (selectedCourse) => {
+                  course = selectedCourse.name;
+                  examDate = '';
+                  selectedCourseExamDates = selectedCourse.exams.map(
+                    (e) => e.date,
+                  );
+                }
+              "
             />
           </div>
 
@@ -122,7 +138,10 @@ onMounted(fetchProfessorsCourses);
           </div>
 
           <!-- Course Cards Grid -->
-          <div v-if="filteredCourses.length" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div
+            v-if="filteredCourses.length"
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+          >
             <CourseCard
               v-for="course in filteredCourses"
               :key="course.id"
