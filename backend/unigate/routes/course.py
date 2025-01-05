@@ -11,6 +11,8 @@ from unigate.schemas.course import (
 )
 from unigate.schemas.group import (
     GroupReadWithStudents,
+    NumberMembersOfGroups,
+    NumberOfGroupsResponse,
 )
 
 router = APIRouter()
@@ -78,7 +80,6 @@ def get_groups_exams(
         session=session, course_name=course_name, date=date
     )
 
-
 @router.get("/{course_name}/active", response_model=ActiveCourseResponse)
 def check_active_course(
     session: SessionDep, course_name: str, exam_date: str
@@ -125,3 +126,34 @@ def get_group_distribution(
     return CourseGroupDistributionResponse(
         course_name=course_name, total_groups=len(groups_info), groups_info=groups_info
     )
+
+@router.get(
+    "/{course_name}/number_of_groups",
+    response_model=NumberOfGroupsResponse,
+)
+def number_of_groups(
+    session: SessionDep, auth_session: AuthSessionDep, course_name: str
+) -> NumberOfGroupsResponse:
+    course = crud.course.get_by_name(auth_session=auth_session, name=course_name)
+    if not course:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Course not found",
+        )
+    return crud.group.number_of_groups(session=session, course_name=course_name)
+
+
+@router.get(
+    "/{course_name}/average_members",
+    response_model=NumberMembersOfGroups,
+)
+def average_members(
+    session: SessionDep, auth_session: AuthSessionDep, course_name: str
+) -> NumberMembersOfGroups:
+    course = crud.course.get_by_name(auth_session=auth_session, name=course_name)
+    if not course:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Course not found",
+        )
+    return crud.group.average_members(session=session, course_name=course_name)
