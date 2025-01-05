@@ -25,5 +25,17 @@ class GroupReadOnlyStudents(BaseModel):
     blocked_students: list[StudentReadWithoutGroups]
 
 
+class NumberOfGroupsResponse(BaseModel):
+    count: int
+    groups: list[str]
+
+
+class NumberMembersOfGroups(BaseModel):
+    avg: float
+    min: int
+    max: int
+    members: dict[str, int]
+
+
 class GroupCreate(GroupBase):
     pass
