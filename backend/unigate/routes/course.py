@@ -80,6 +80,7 @@ def get_groups_exams(
         session=session, course_name=course_name, date=date
     )
 
+
 @router.get("/{course_name}/active", response_model=ActiveCourseResponse)
 def check_active_course(
     session: SessionDep, course_name: str, exam_date: str
@@ -126,6 +127,7 @@ def get_group_distribution(
     return CourseGroupDistributionResponse(
         course_name=course_name, total_groups=len(groups_info), groups_info=groups_info
     )
+
 
 @router.get(
     "/{course_name}/number_of_groups",
