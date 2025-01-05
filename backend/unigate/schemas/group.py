@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from unigate.models.base import GroupBase
 from unigate.schemas.student import StudentReadWithoutGroups
-
+from typing import List
 
 class GroupRead(GroupBase):
     id: uuid.UUID
@@ -24,6 +24,15 @@ class GroupReadOnlyStudents(BaseModel):
     super_students: list[StudentReadWithoutGroups]
     blocked_students: list[StudentReadWithoutGroups]
 
+class NumberOfGroupsResponse(BaseModel):
+    count: int
+    groups: List[str]
+
+class NumberMembersOfGroups(BaseModel):
+    avg: float
+    min: int
+    max: int
+    members: dict[str, int]
 
 class GroupCreate(GroupBase):
     pass
