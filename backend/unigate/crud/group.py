@@ -9,7 +9,11 @@ from unigate.enums import GroupType, RequestStatus
 from unigate.models import Group
 from unigate.models.request import Request
 from unigate.models.student import Student
-from unigate.schemas.group import GroupCreate, NumberOfGroupsResponse, NumberMembersOfGroups
+from unigate.schemas.group import (
+    GroupCreate,
+    NumberMembersOfGroups,
+    NumberOfGroupsResponse,
+)
 
 
 class CRUDGroup(CRUDBase[Group, GroupCreate, Group]):
@@ -153,13 +157,17 @@ class CRUDGroup(CRUDBase[Group, GroupCreate, Group]):
         result = session.exec(statement)
         return result.all()  # type: ignore
 
-    def number_of_groups(self, *, course_name: str, session: Session) -> NumberOfGroupsResponse:
+    def number_of_groups(
+        self, *, course_name: str, session: Session
+    ) -> NumberOfGroupsResponse:
         groups = self.get_groups_course(course_name=course_name, session=session)
         count = len(groups)
         group_names = [str(group.name) for group in groups]
         return {"count": count, "groups": group_names}
 
-    def average_members(self, *, course_name: str, session: Session) -> NumberMembersOfGroups:
+    def average_members(
+        self, *, course_name: str, session: Session
+    ) -> NumberMembersOfGroups:
         groups = self.get_groups_course(course_name=course_name, session=session)
         members = [len(group.students) for group in groups]
         return {
@@ -168,5 +176,6 @@ class CRUDGroup(CRUDBase[Group, GroupCreate, Group]):
             "max": max(members),
             "members": {str(group.name): len(group.students) for group in groups},
         }
+
 
 group = CRUDGroup(Group)

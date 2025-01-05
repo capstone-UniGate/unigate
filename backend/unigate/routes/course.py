@@ -5,7 +5,9 @@ from unigate.core.database import AuthSessionDep, SessionDep
 from unigate.models import Course, Group
 from unigate.schemas.course import CourseReadWithUsersAndExams
 from unigate.schemas.group import (
-    GroupReadWithStudents, NumberOfGroupsResponse, NumberMembersOfGroups
+    GroupReadWithStudents,
+    NumberMembersOfGroups,
+    NumberOfGroupsResponse,
 )
 
 router = APIRouter()
@@ -73,12 +75,14 @@ def get_groups_exams(
         session=session, course_name=course_name, date=date
     )
 
+
 @router.get(
     "/{course_name}/number_of_groups",
-    response_model= NumberOfGroupsResponse,
+    response_model=NumberOfGroupsResponse,
 )
 def number_of_groups(
-    session: SessionDep, auth_session: AuthSessionDep, course_name: str) -> NumberOfGroupsResponse:
+    session: SessionDep, auth_session: AuthSessionDep, course_name: str
+) -> NumberOfGroupsResponse:
     course = crud.course.get_by_name(auth_session=auth_session, name=course_name)
     if not course:
         raise HTTPException(
@@ -87,12 +91,14 @@ def number_of_groups(
         )
     return crud.group.number_of_groups(session=session, course_name=course_name)
 
+
 @router.get(
     "/{course_name}/average_members",
-    response_model= NumberMembersOfGroups,
+    response_model=NumberMembersOfGroups,
 )
 def average_members(
-    session: SessionDep, auth_session: AuthSessionDep, course_name: str) -> NumberMembersOfGroups:
+    session: SessionDep, auth_session: AuthSessionDep, course_name: str
+) -> NumberMembersOfGroups:
     course = crud.course.get_by_name(auth_session=auth_session, name=course_name)
     if not course:
         raise HTTPException(
