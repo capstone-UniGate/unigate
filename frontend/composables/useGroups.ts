@@ -67,6 +67,25 @@ export function useGroups() {
     }
   }
 
+  async function getAverageMembers(courseName: string) {
+    try {
+      isError.value = false;
+      isLoading.value = true;
+      const response = await useApiFetch(
+        `/courses/${encodeURIComponent(courseName)}/average_members`, 
+        { method: "GET" }
+      );
+      return response;
+    } catch (error) {
+      isError.value = true;
+      console.error(`Error fetching average members for ${courseName}:`, error);
+      throw error;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  
+
   async function searchGroups(queryParams: Record<string, any> = {}) {
     try {
       await ensureAuthenticated();
@@ -306,5 +325,6 @@ export function useGroups() {
     searchGroups,
     getGroupCount,
     getProfessorsCourses,
+    getAverageMembers
   };
 }

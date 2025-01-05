@@ -6,17 +6,19 @@ import CourseCard from "@/components/CourseCard.vue";
 import LoadingIndicator from "@/components/LoadingIndicator.vue";
 import { useGroups } from "@/composables/useGroups";
 
-const { getProfessorsCourses, getGroupCount } = useGroups();
+const { getProfessorsCourses, getGroupCount, getAverageMembers } = useGroups();
 
 const course = ref("");
 const examDate = ref("");
 const isLoading = ref(true); // Track loading state
 const courses = ref<
-  { id: number; name: string; exams: { date: string; groupCount: number }[] }[]
+  { id: number; name: string; exams: { date: string; groupCount: number ; avgMembers: number}[] }[]
 >([]);
 const selectedCourseExamDates = ref<string[]>([]);
 const groupCounts = ref<Record<string, number>>({});
 const errorMessage = ref("");
+const averageMembers = ref<Record<string, number>>({});
+
 
 // Watcher to update exam dates when a course is selected
 watch(course, (newCourseName) => {
@@ -46,6 +48,19 @@ const fetchGroupCounts = async () => {
   }
 };
 
+//Fetch group average members for each course
+const fetchAverageMembers = async () => {
+  for (const course of courses.value) {
+    try {
+      const response = await getAverageMembers(course.name);
+      averageMembers.value[course.name] = (response as { avg: number }).avg;
+    } catch (error) {
+        console.error(`Error fetching average members for ${course.name}:`, error);
+        averageMembers.value[course.name] = 0;
+    }
+  }
+};
+
 // Fetch professor's courses from the API
 const fetchProfessorsCourses = async () => {
   try {
@@ -56,6 +71,7 @@ const fetchProfessorsCourses = async () => {
       exams: course.exams,
     }));
     await fetchGroupCounts();
+    await fetchAverageMembers();
   } catch (error: any) {
     console.error("Error fetching courses:", error);
     if (error.response?.status === 403) {
@@ -147,6 +163,7 @@ onMounted(fetchProfessorsCourses);
               :key="course.id"
               :course="course"
               :groupCount="groupCounts[course.name] || 0"
+              :avgMembers="averageMembers[course.name] || 0"
             />
           </div>
           <div v-else class="text-center text-gray-500 mt-8">
