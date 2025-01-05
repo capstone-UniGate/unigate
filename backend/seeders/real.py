@@ -83,6 +83,12 @@ courses = {
     CourseCreate(
         name="Test Course",
     ): [datetime(2025, 1, 1, tzinfo=pytz.utc), datetime(2025, 1, 10, tzinfo=pytz.utc)],
+    CourseCreate(
+        name="Capstone Project",
+    ): [datetime(2023, 12, 1, tzinfo=pytz.utc), datetime(2024, 4, 14, tzinfo=pytz.utc)],
+    CourseCreate(
+        name="Decentralized Systems",
+    ): [datetime(2024, 7, 3, tzinfo=pytz.utc), datetime(2023, 9, 14, tzinfo=pytz.utc)],
 }
 
 users: list[AuthUserCreate] = []
