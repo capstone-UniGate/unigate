@@ -1,6 +1,4 @@
 from fastapi.testclient import TestClient
-from unigate.core.config import settings
-from unigate.enums import Mode
 from unigate.main import app
 
 client = TestClient(app)
@@ -32,6 +30,7 @@ def fetch_professor_statistic_number_of_groups(course_name: str) -> dict:
     assert response.status_code == 200, f"Failed to fetch user data: {response.json()}"
     return response.json()
 
+
 def fetch_professor_statistic_average_members(course_name: str) -> dict:
     token_data = authenticate_user()
     token = token_data["access_token"]
@@ -40,6 +39,7 @@ def fetch_professor_statistic_average_members(course_name: str) -> dict:
     response = client.get(f"/courses/{course_name}/average_members", headers=headers)
     assert response.status_code == 200, f"Failed to fetch user data: {response.json()}"
     return response.json()
+
 
 def fetch_professor_statistic_distribution(course_name: str) -> dict:
     token_data = authenticate_user()
@@ -50,32 +50,36 @@ def fetch_professor_statistic_distribution(course_name: str) -> dict:
     assert response.status_code == 200, f"Failed to fetch user data: {response.json()}"
     return response.json()
 
+
 def fetch_professor_statistic_active(course_name: str, exam_date: str) -> dict:
     token_data = authenticate_user()
     token = token_data["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
 
-    response = client.get(f"/courses/{course_name}/active?exam_date={exam_date}", headers=headers)
+    response = client.get(
+        f"/courses/{course_name}/active?exam_date={exam_date}", headers=headers
+    )
     assert response.status_code == 200, f"Failed to fetch user data: {response.json()}"
     return response.json()
-
 
 
 def test_verify_professor_statistic() -> None:
     professor_statistic = fetch_professor_statistic_number_of_groups("Capstone")
     assert professor_statistic["count"] == 2
-    assert professor_statistic["groups"] == ["Test Private Group 4891185", "Test Public Group 5475593"]
+    assert professor_statistic["groups"] == [
+        "Test Private Group 4891185",
+        "Test Public Group 5475593",
+    ]
+
 
 def test_verify_professor_statistic_average_members() -> None:
     professor_statistic = fetch_professor_statistic_average_members("Capstone")
     assert professor_statistic["avg"] == 1
     assert professor_statistic["min"] == 1
     assert professor_statistic["max"] == 1
-    expected_members = {
-        "Test Private Group 4891185": 1,
-        "Test Public Group 5475593": 1
-    }
+    expected_members = {"Test Private Group 4891185": 1, "Test Public Group 5475593": 1}
     assert professor_statistic["members"] == expected_members
+
 
 def test_verify_professor_statistic_distribution() -> None:
     professor_statistic = fetch_professor_statistic_distribution("Capstone")
