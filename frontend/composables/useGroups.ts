@@ -38,6 +38,7 @@ export function useGroups() {
         method: "GET",
       });
       groups.value = response;
+      return response;
     } catch (error) {
       isError.value = true;
       throw error;
@@ -87,9 +88,10 @@ export function useGroups() {
       });
 
       groups.value = response;
+
+      return response; // Added return statement
     } catch (error) {
       isError.value = true;
-      console.error("Error during group search:", error);
       throw error;
     } finally {
       isLoading.value = false;
