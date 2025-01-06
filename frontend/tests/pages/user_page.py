@@ -11,8 +11,6 @@ from .base_page import BasePage
 
 
 class UserPage(BasePage):
-    URL = Urls.USER_PAGE
-    image_path = "..."
     EDIT_BUTTON = (By.ID, "edit-button")
 
     def navigate(self) -> None:

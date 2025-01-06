@@ -1,4 +1,5 @@
 from datetime import datetime
+from itertools import cycle
 
 import pytz
 from unigate import crud
@@ -56,6 +57,12 @@ students = [
         name="Forough",
         surname="Majidi",
     ),
+    StudentCreate(
+        number=4878744,
+        email="s4878744@studenti.unige.it",
+        name="Michele",
+        surname="Frattini",
+    ),
 ]
 
 groups = [
@@ -65,7 +72,7 @@ groups = [
         category="Test",
         type=GroupType.PUBLIC,
         course_name="Test Course",
-        date=datetime(2024, 1, 1, tzinfo=pytz.utc),
+        date=datetime(2025, 1, 1, tzinfo=pytz.utc),
         exam_date=datetime(2025, 1, 1, tzinfo=pytz.utc),
     ),
     GroupCreate(
@@ -81,14 +88,32 @@ groups = [
 
 courses = {
     CourseCreate(
-        name="Test Course",
-    ): [datetime(2025, 1, 1, tzinfo=pytz.utc), datetime(2025, 1, 10, tzinfo=pytz.utc)],
+        name="Binary Analysis and secure coding",
+    ): [datetime(2025, 1, 8, tzinfo=pytz.utc), datetime(2025, 2, 10, tzinfo=pytz.utc)],
     CourseCreate(
-        name="Capstone Project",
-    ): [datetime(2023, 12, 1, tzinfo=pytz.utc), datetime(2024, 4, 14, tzinfo=pytz.utc)],
+        name="Capstone",
+    ): [datetime(2025, 2, 3, tzinfo=pytz.utc), datetime(2025, 2, 17, tzinfo=pytz.utc)],
     CourseCreate(
         name="Decentralized Systems",
-    ): [datetime(2024, 7, 3, tzinfo=pytz.utc), datetime(2023, 9, 14, tzinfo=pytz.utc)],
+    ): [datetime(2025, 1, 14, tzinfo=pytz.utc), datetime(2025, 2, 13, tzinfo=pytz.utc)],
+    CourseCreate(
+        name="High Performance Computing",
+    ): [datetime(2025, 1, 21, tzinfo=pytz.utc), datetime(2025, 2, 18, tzinfo=pytz.utc)],
+    CourseCreate(
+        name="Machine Learning",
+    ): [datetime(2025, 1, 20, tzinfo=pytz.utc), datetime(2025, 2, 19, tzinfo=pytz.utc)],
+    CourseCreate(
+        name="Network Security",
+    ): [datetime(2025, 1, 27, tzinfo=pytz.utc), datetime(2025, 2, 20, tzinfo=pytz.utc)],
+    CourseCreate(
+        name="Digital Forensics",
+    ): [datetime(2025, 1, 28, tzinfo=pytz.utc), datetime(2025, 2, 21, tzinfo=pytz.utc)],
+    CourseCreate(
+        name="Virtualization and Cloud Computing",
+    ): [datetime(2025, 2, 4, tzinfo=pytz.utc), datetime(2025, 2, 26, tzinfo=pytz.utc)],
+    CourseCreate(
+        name="Data Protection and Privacy",
+    ): [datetime(2025, 2, 11, tzinfo=pytz.utc), datetime(2025, 2, 27, tzinfo=pytz.utc)],
 }
 
 users: list[AuthUserCreate] = []
@@ -126,15 +151,20 @@ def seed_auth() -> None:
 
 def seed_unigate() -> None:
     session = next(get_session())
+    course_cycle = cycle(courses.items())
+
     for student in students:
         current_student = crud.student.create(obj_in=student, session=session)
         if student.number != 4820312:
             for group in groups:
+                current_course, exam_dates = next(course_cycle)
                 group = crud.group.create(
                     obj_in=group,
                     update={
                         "creator_id": current_student.id,
                         "name": f"{group.name} {current_student.number}",
+                        "course_name": current_course.name,
+                        "exam_date": exam_dates[0],
                     },
                     session=session,
                 )
