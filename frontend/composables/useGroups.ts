@@ -38,6 +38,7 @@ export function useGroups() {
         method: "GET",
       });
       groups.value = response;
+      return response; 
     } catch (error) {
       isError.value = true;
       throw error;
@@ -71,7 +72,7 @@ export function useGroups() {
       await ensureAuthenticated();
       isError.value = false;
       isLoading.value = true;
-
+  
       const queryString = new URLSearchParams(
         Object.entries(queryParams).reduce(
           (acc, [key, value]) => {
@@ -81,20 +82,22 @@ export function useGroups() {
           {} as Record<string, string>,
         ),
       ).toString();
-
+  
       const response = await useApiFetch(`/groups/search?${queryString}`, {
         method: "GET",
       });
-
+  
       groups.value = response;
+  
+      return response;  // Added return statement
     } catch (error) {
       isError.value = true;
-      console.error("Error during group search:", error);
       throw error;
     } finally {
       isLoading.value = false;
     }
   }
+  
 
   async function getGroupById(groupId: string) {
     try {

@@ -14,6 +14,7 @@ const examDate = ref("");
 const participants = ref<number | null>(null);
 const isPublic = ref<boolean | null>(null);
 const orderBy = ref(null);
+const noResults = ref(false);
 
 const emit = defineEmits(["apply-filters"]);
 
@@ -28,11 +29,6 @@ const defaultFilters = {
 const appliedFilters = ref([]);
 const allCourses = ref<{ name: string; exams: { date: string }[] }[]>([]);
 const selectedCourseExamDates = ref<string[]>([]);
-
-// Computed property to check if no results are found
-const noResultsFound = computed(() => {
-  return course.value && selectedCourseExamDates.value.length === 0;
-});
 
 // Watcher to update exam dates when a course is selected
 watch(course, (newCourseName) => {
@@ -87,7 +83,6 @@ const toggleFilter = () => {
   isFilterVisible.value = !isFilterVisible.value;
 };
 
-const groups = ref([]);
 
 const applyFilters = async () => {
   try {
@@ -131,8 +126,13 @@ const applyFilters = async () => {
         });
 
       // Execute the search
-      searchGroups(filters);
+      const results = await searchGroups(filters);
 
+      if (results.length === 0) {
+        noResults.value = true;
+      } else {
+        noResults.value = false;
+      }
       emit("apply-filters", filters);
     }
   } catch (error) {
@@ -149,6 +149,7 @@ const clearFilters = () => {
   orderBy.value = null;
 
   appliedFilters.value = [];
+  noResults.value = false; 
   getAllGroups();
 
   emit("apply-filters", defaultFilters);
@@ -306,5 +307,10 @@ onMounted(fetchCourses);
         </Button>
       </div>
     </div>
+    <!-- No Results Message -->
+    <div v-if="noResults" class="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
+      No groups found matching your criteria. Please try adjusting the filters.
+    </div>
+
   </div>
 </template>
