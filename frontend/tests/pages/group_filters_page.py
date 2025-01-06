@@ -67,6 +67,7 @@ class GroupFiltersPage:
         self.select_option(self.SELECTORS["order_by_dropdown"], order)
 
     def is_no_results_message_displayed(self) -> bool:
-
-        elements = self.driver.find_elements(By.XPATH, self.SELECTORS["no_results_message"])
-        return len(elements) > 0 
+        elements = self.driver.find_elements(
+            By.XPATH, self.SELECTORS["no_results_message"]
+        )
+        return len(elements) > 0

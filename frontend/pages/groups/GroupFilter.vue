@@ -83,7 +83,6 @@ const toggleFilter = () => {
   isFilterVisible.value = !isFilterVisible.value;
 };
 
-
 const applyFilters = async () => {
   try {
     if (areFiltersChanged.value) {
@@ -149,7 +148,7 @@ const clearFilters = () => {
   orderBy.value = null;
 
   appliedFilters.value = [];
-  noResults.value = false; 
+  noResults.value = false;
   getAllGroups();
 
   emit("apply-filters", defaultFilters);
@@ -311,6 +310,5 @@ onMounted(fetchCourses);
     <div v-if="noResults" class="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
       No groups found matching your criteria. Please try adjusting the filters.
     </div>
-
   </div>
 </template>
