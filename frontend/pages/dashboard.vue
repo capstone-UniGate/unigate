@@ -12,7 +12,8 @@ const course = ref("");
 const examDate = ref("");
 const isLoading = ref(true); // Track loading state
 const courses = ref<
-  { id: number; name: string; exams: { date: string; groupCount: number ; avgMembers: number}[] }[]
+  { id: number; name: string; exams: { date: string; groupCount: number ; 
+    avgMembers: number, activeGroupCount: number}[] }[]
 >([]);
 const selectedCourseExamDates = ref<string[]>([]);
 const groupCounts = ref<Record<string, number>>({});
