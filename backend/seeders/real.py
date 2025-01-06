@@ -1,6 +1,6 @@
 from datetime import datetime
-
 from itertools import cycle
+
 import pytz
 from unigate import crud
 from unigate.core.database import get_auth_session, get_session

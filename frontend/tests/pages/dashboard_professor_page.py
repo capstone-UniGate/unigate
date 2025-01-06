@@ -1,9 +1,11 @@
 import time
+
 from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
+
 from tests.constants import Urls
+
 from .base_page import BasePage
 
 
@@ -28,7 +30,7 @@ class DashboardProfessorPage(BasePage):
 
     def get_course_name_card(self) -> str:
         course_name = self.driver.find_element(By.ID, "course_name_card").text
-        return course_name.split('\n')[0]
+        return course_name.split("\n")[0]
 
     def get_course_number_groups(self) -> str:
         role = self.driver.find_element(By.ID, "course_number_groups").text
