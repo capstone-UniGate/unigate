@@ -47,8 +47,9 @@ watch(localSelectedDate, (newVal) => {
       :disabled="disabled"
     >
       <!-- Allow the user to reset the selection -->
-      <option value="">Select Exam Date</option>
-      <option v-for="date in examDates" :key="date" :value="date">
+      <option id="data_0" value="">Select Exam Date</option>
+      <option :id="'data_' + (index + 1)"  
+      v-for="(date, index) in examDates" :key="date" :value="date">
         {{ date }}
       </option>
     </select>

@@ -66,6 +66,7 @@ const handleBlur = () => {
 <template>
   <div class="relative">
     <input
+      :id="'course_input'"
       :placeholder="placeholder"
       v-model="inputValue"
       @input="updateValue"
@@ -79,7 +80,8 @@ const handleBlur = () => {
       class="absolute w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-2 z-10"
     >
       <li
-        v-for="item in filteredItems"
+        :id="'filter_' + (index + 1)"
+        v-for="(item, index) in filteredItems"
         :key="item.name"
         class="px-4 py-2 hover:bg-gray-100 cursor-pointer"
         @click="selectItem(item)"
