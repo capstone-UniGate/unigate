@@ -18,6 +18,7 @@ const selectedCourseExamDates = ref<string[]>([]);
 const groupCounts = ref<Record<string, number>>({});
 const errorMessage = ref("");
 const averageMembers = ref<Record<string, number>>({});
+const activeGroupsCounts = ref<Record<string, number>>({});
 
 
 // Watcher to update exam dates when a course is selected
@@ -61,6 +62,19 @@ const fetchAverageMembers = async () => {
   }
 };
 
+//Fetch group average members for each course
+const fetchNumberOfActiveGroups = async () => {
+  for (const course of courses.value) {
+    try {
+      const response = await getAverageMembers(course.name);
+      averageMembers.value[course.name] = (response as { avg: number }).avg;
+    } catch (error) {
+        console.error(`Error fetching active group count for ${course.name}:`, error);
+        averageMembers.value[course.name] = 0;
+    }
+  }
+};
+
 // Fetch professor's courses from the API
 const fetchProfessorsCourses = async () => {
   try {
@@ -72,6 +86,7 @@ const fetchProfessorsCourses = async () => {
     }));
     await fetchGroupCounts();
     await fetchAverageMembers();
+    await fetchNumberOfActiveGroups();
   } catch (error: any) {
     console.error("Error fetching courses:", error);
     if (error.response?.status === 403) {
@@ -164,6 +179,7 @@ onMounted(fetchProfessorsCourses);
               :course="course"
               :groupCount="groupCounts[course.name] || 0"
               :avgMembers="averageMembers[course.name] || 0"
+              :activeGroupCount="activeGroupsCounts[course.name] || 0"
             />
           </div>
           <div v-else class="text-center text-gray-500 mt-8">
