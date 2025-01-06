@@ -25,7 +25,6 @@ const yAccessor = (d: { count: number }) => d.count;
 
 <template>
   <div>
-    <h2 class="text-lg font-bold mb-4">Group Creation Over Time</h2>
     <!-- Chart Container -->
     <VisXYContainer style="width: 100%; height: 300px;">
       <VisLine :data="chartData" :x="xAccessor" :y="yAccessor" :style="{ stroke: '#0000FF' }" />

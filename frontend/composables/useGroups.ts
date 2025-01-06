@@ -90,7 +90,7 @@ export function useGroups() {
       isError.value = false;
       isLoading.value = true;
       const response = await useApiFetch(
-        `/courses/${encodeURIComponent(courseName)}/active_groups_count`, 
+        `/courses/${encodeURIComponent(courseName)}/active`, 
         { method: "GET" }
       );
       return response;
