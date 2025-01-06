@@ -102,6 +102,22 @@ export function useGroups() {
     }
   }
 
+  async function getGroupCreationDistribution(courseName: string) {
+    try {
+      isError.value = false;
+      isLoading.value = true;
+      const response = await useApiFetch(`/courses/${encodeURIComponent(courseName)}/distribution`, {
+        method: 'GET',
+      });
+      return response;
+    } catch (error) {
+      isError.value = true;
+      throw error;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  
   async function searchGroups(queryParams: Record<string, any> = {}) {
     try {
       await ensureAuthenticated();
@@ -344,5 +360,6 @@ export function useGroups() {
     getProfessorsCourses,
     getAverageMembers,
     getActiveGroupCount,
+    getGroupCreationDistribution,
   };
 }
