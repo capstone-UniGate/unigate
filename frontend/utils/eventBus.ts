@@ -5,4 +5,7 @@ export const eventBus = reactive({
   updatePhoto(url: string) {
     this.photoUrl = url;
   },
+  clearPhoto() {
+    this.photoUrl = "";
+  },
 });

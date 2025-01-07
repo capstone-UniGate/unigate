@@ -58,7 +58,11 @@
           </button>
 
           <!-- Updated Avatar with click handler -->
-          <div class="cursor-pointer" @click="router.push('/user')">
+          <div
+            v-if="isLoggedIn"
+            class="cursor-pointer"
+            @click="router.push('/user')"
+          >
             <Avatar id="avatar">
               <AvatarImage
                 :src="photoUrl || 'https://github.com/radix-vue.png'"
@@ -170,6 +174,7 @@ const handleLogout = async () => {
   try {
     await logout();
     currentStudent.value = null;
+    eventBus.clearPhoto(); // Add this line to clear the photo
     await router.push("/login?message=You have successfully logged out.");
   } catch (error) {
     console.error("Logout error:", error);
