@@ -38,7 +38,7 @@
               >
                 <path
                   fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 00-1.414-1.414L10 8.586 8.707 7.293z"
                   clip-rule="evenodd"
                 />
               </svg>
@@ -72,7 +72,7 @@
               >
                 <path
                   fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 101.414 1.414L10 11.414l1.293 1.293a1 1 001.414-1.414L11.414 10l1.293-1.293a1 1 00-1.414-1.414L10 8.586 8.707 7.293z"
                   clip-rule="evenodd"
                 />
               </svg>
@@ -204,7 +204,12 @@ export default {
           username: form.value.username,
           password: form.value.password,
         });
-        router.push("/groups");
+        // Check if user is professor (PXXXXXXX) or student (SXXXXXXX)
+        if (form.value.username.startsWith("P")) {
+          router.push("/dashboard");
+        } else {
+          router.push("/groups");
+        }
       } catch (error: any) {
         passwordError.value = error?.data?.message || "Login failed.";
         clearInput("username");
