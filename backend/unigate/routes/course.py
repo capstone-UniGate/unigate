@@ -159,3 +159,54 @@ def average_members(
             detail="Course not found",
         )
     return crud.group.average_members(session=session, course_name=course_name)
+
+@router.get(
+    "/all_stats",
+    response_model=dict[str, list[dict]],
+)
+def all_stats(session: SessionDep, auth_session: AuthSessionDep) -> dict[str, list[dict]]:
+    courses = crud.course.get_all_name_courses(session=auth_session)
+    if not courses:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No courses found",
+        )
+    stats_by_course = {}
+
+    for course in courses:
+        groups = crud.group.get_groups_course(session=session, course_name=course)
+
+        groups_by_exam_date = {}
+        for group in groups:
+            if group.exam_date not in groups_by_exam_date:
+                groups_by_exam_date[group.exam_date] = []
+            groups_by_exam_date[group.exam_date].append(group)
+
+        course_stats = []
+        for exam_date, groups in groups_by_exam_date.items():
+            member_counts = [len(group.students) for group in groups]
+            course_stats.append({
+                "exam_date": exam_date,
+                "average_members": sum(member_counts) / len(member_counts) if member_counts else 0,
+                "min_members": min(member_counts) if member_counts else 0,
+                "max_members": max(member_counts) if member_counts else 0,
+                "total_members": sum(member_counts),
+                "total_groups": len(groups),
+            })
+
+        stats_by_course[course] = course_stats
+    return stats_by_course
+
+@router.get(
+    "/names_courses",
+    response_model=list[str],
+)
+def get_all_course_names(session: SessionDep, auth_session: AuthSessionDep) -> list[str]:
+    courses = crud.course.get_all_name_courses(session=auth_session)
+    if not courses:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No courses found",
+        )
+    return courses
+
