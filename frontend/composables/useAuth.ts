@@ -34,6 +34,12 @@ export function useAuth() {
 
     if (!response) throw new Error("Login failed");
     tokenCookie.value = (response as LoginResponse).access_token;
+
+    // Set auth state
+    isLoggedIn.value = true;
+
+    // Return user data for photo URL update
+    return response;
   }
 
   function logout() {
