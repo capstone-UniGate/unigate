@@ -31,5 +31,8 @@ class CRUDCourse(CRUDBase[Course, CourseCreate, Course]):
                 return course
         return None
 
+    def get_all_name_courses(self, *, session: Session) -> list[str]:
+        return session.exec(select(self.model.name))
+
 
 course = CRUDCourse(Course)
