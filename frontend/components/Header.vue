@@ -151,22 +151,36 @@ const getInitials = computed(() => {
 // Replace photoUrl computed with reactive eventBus
 const photoUrl = computed(() => eventBus.photoUrl || null);
 
-// Watch for login state changes
-watch(isLoggedIn, async (newValue) => {
-  if (newValue) {
-    await getCurrentStudent();
-  } else {
-    currentStudent.value = null;
-  }
-});
+// Create immediate watcher for currentStudent
+watch(
+  () => currentStudent.value,
+  async (newStudent) => {
+    if (newStudent?.number) {
+      const currentPhotoUrl = `${config.public.minioURL}/unigate/propics/${newStudent.number}`;
+      eventBus.updatePhoto(currentPhotoUrl);
+    }
+  },
+  { immediate: true }, // This ensures it runs right away when component mounts
+);
 
+// Watch for login state changes
+watch(
+  isLoggedIn,
+  async (newValue) => {
+    if (newValue) {
+      await getCurrentStudent();
+    } else {
+      currentStudent.value = null;
+      eventBus.clearPhoto();
+    }
+  },
+  { immediate: true },
+); // This ensures it runs on component mount
+
+// Remove the photo URL logic from onMounted since we handle it in the watchers
 onMounted(async () => {
   if (isLoggedIn.value) {
     await getCurrentStudent();
-    if (currentStudent.value?.number) {
-      const currentPhotoUrl = `${config.public.minioURL}/unigate/propics/${currentStudent.value.number}`;
-      eventBus.updatePhoto(currentPhotoUrl);
-    }
   }
 });
 

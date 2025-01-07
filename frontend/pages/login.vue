@@ -38,7 +38,7 @@
               >
                 <path
                   fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 101.414 1.414L10 11.414l1.293 1.293a1 1 001.414-1.414L11.414 10l1.293-1.293a1 1 00-1.414-1.414L10 8.586 8.707 7.293z"
                   clip-rule="evenodd"
                 />
               </svg>
@@ -185,25 +185,20 @@ export default {
     });
 
     const handleLogin = async () => {
-      const password = form.value.password;
-      // if (
-      //   passwordStrength.value < 100 ||
-      //   !/[A-Z]/.test(password) ||
-      //   !/[a-z]/.test(password) ||
-      //   !/\d/.test(password) ||
-      //   !/[^a-zA-Z0-9]/.test(password)
-      // ) {
-      //   passwordError.value =
-      //     'Password must contain at least 8 characters, including uppercase, lowercase, a number, and a special character.'
-      //   return
-      // }
       passwordError.value = "";
 
       try {
-        await login({
+        const response = await login({
           username: form.value.username,
           password: form.value.password,
         });
+
+        // Update photo URL after successful login
+        if (response?.number) {
+          const photoUrl = `${config.public.minioURL}/unigate/propics/${response.number}`;
+          eventBus.updatePhoto(photoUrl);
+        }
+
         // Check if user is professor (PXXXXXXX) or student (SXXXXXXX)
         if (form.value.username.startsWith("P")) {
           router.push("/dashboard");
