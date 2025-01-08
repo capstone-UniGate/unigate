@@ -51,12 +51,12 @@ onMounted(getStats);
     </div>
 
     <!-- Main dashboard content -->
-    <div class="bg-white p-8">
+    <div class="bg-white p-15">
       <h1 class="text-3xl font-semibold mb-6 text-center">
         Courses Comparison
       </h1>
       <!-- Course Cards Grid -->
-      <div v-if="courses.length">
+      <div>
         <CourseTable
           v-for="course in courses"
           :key="courses_stats[course].id"
