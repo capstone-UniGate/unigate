@@ -11,34 +11,36 @@
     <!-- Exam List -->
     <div
       v-if="course_data"
-      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3"
     >
       <div
         v-for="(exam, index) in course_data"
         :key="index"
         class="rounded-lg border bg-muted/50 p-3"
       >
-        <h3 class="text-sm font-medium mb-2">Exam Date: {{ exam.exam_date }}</h3>
+        <h3 class="text-sm font-medium mb-2 p-1 text-blue">
+          Exam Date: {{ exam.exam_date }}
+        </h3>
         <table class="w-full text-sm border-collapse">
           <tbody>
             <tr>
-              <td class="font-medium pr-2">Avg members/group:</td>
+              <td class="font-medium pr-2 p-1">Avg members/group:</td>
               <td>{{ exam.average_members }}</td>
             </tr>
             <tr>
-              <td class="font-medium pr-2">Min members:</td>
+              <td class="font-medium pr-2 p-1">Min members:</td>
               <td>{{ exam.min_members }}</td>
             </tr>
             <tr>
-              <td class="font-medium pr-2">Max members:</td>
+              <td class="font-medium pr-2 p-1">Max members:</td>
               <td>{{ exam.max_members }}</td>
             </tr>
             <tr>
-              <td class="font-medium pr-2">Total members:</td>
+              <td class="font-medium pr-2 p-1">Total members:</td>
               <td>{{ exam.total_members }}</td>
             </tr>
             <tr>
-              <td class="font-medium pr-2">Total groups:</td>
+              <td class="font-medium pr-2 p-1">Total groups:</td>
               <td>{{ exam.total_groups }}</td>
             </tr>
           </tbody>
@@ -61,19 +63,3 @@ const props = defineProps<{
   }[];
 }>();
 </script>
-
-<style scoped>
-.text-primary {
-  color: #1d4ed8;
-}
-.bg-muted\50 {
-  background-color: rgba(229, 231, 235, 0.5);
-}
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
-td {
-  padding: 0.25rem 0;
-}
-</style>
