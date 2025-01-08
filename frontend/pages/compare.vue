@@ -51,28 +51,18 @@ onMounted(getStats);
     </div>
 
     <!-- Main dashboard content -->
-    <div
-      v-else
-      class="flex justify-center items-center min-h-[80vh] bg-gray-100 py-6"
-    >
-      <div
-        class="container mx-auto max-w-5xl h-[90vh] bg-white shadow-lg rounded-lg p-8 overflow-y-auto"
-      >
-        <h1 class="text-3xl font-semibold mb-6 text-center">
-          Courses Comparison
-        </h1>
-        <!-- Course Cards Grid -->
-        <div
-          v-if="courses.length"
-          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-        >
-          <CourseTable
-            v-for="course in courses"
-            :key="courses_stats[course].id"
-            :course="course"
-            :course_data="courses_stats[course]"
-          />
-        </div>
+    <div class="bg-white p-8">
+      <h1 class="text-3xl font-semibold mb-6 text-center">
+        Courses Comparison
+      </h1>
+      <!-- Course Cards Grid -->
+      <div v-if="courses.length">
+        <CourseTable
+          v-for="course in courses"
+          :key="courses_stats[course].id"
+          :course="course"
+          :course_data="courses_stats[course]"
+        />
       </div>
     </div>
   </div>
