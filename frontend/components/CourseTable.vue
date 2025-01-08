@@ -18,7 +18,9 @@
         :key="index"
         class="rounded-lg border bg-muted/50 p-3"
       >
-        <h3 class="text-sm font-medium mb-2 p-1 text-blue">
+        <h3
+          class="text-sm font-medium mb-2 p-1 text-blue-600 border-b border-dlue-500/30"
+        >
           Exam Date: {{ exam.exam_date }}
         </h3>
         <table class="w-full text-sm border-collapse">
