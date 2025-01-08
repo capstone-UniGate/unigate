@@ -51,8 +51,8 @@ onMounted(getStats);
     </div>
 
     <!-- Main dashboard content -->
-    <div class="bg-white p-15">
-      <h1 class="text-3xl font-semibold mb-6 text-center">
+    <div class="bg-white">
+      <h1 class="text-3xl font-semibold mb-6 mt-6 text-center">
         Courses Comparison
       </h1>
       <!-- Course Cards Grid -->

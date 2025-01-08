@@ -1,85 +1,54 @@
 <template>
-  <div
-    class="rounded-lg m-8 border bg-card text-card-foreground shadow-sm transition-shadow hover:shadow-md p-4"
-  >
-    <!-- Course Name and Group Tag -->
+  <div class="rounded-lg m-6 border bg-card text-card-foreground shadow-sm p-4">
+    <!-- Course Name -->
     <h2
       id="course_name_card"
-      class="text-base font-semibold flex items-center justify-between"
+      class="text-lg font-semibold flex items-center justify-between border-b pb-2 mb-4"
     >
       {{ course }}
     </h2>
 
     <!-- Exam List -->
-    <div class="mt-3 space-y-2">
+    <div
+      v-if="course_data"
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
+    >
       <div
-        v-if="course_data"
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+        v-for="(exam, index) in course_data"
+        :key="index"
+        class="rounded-lg border bg-muted/50 p-3"
       >
-        <div
-          :id="'course_data_' + 1"
-          v-for="exam in course_data"
-          :key="exam.exam_date"
-          class="flex justify-between items-center rounded-md border bg-muted/50 p-2"
-        >
-          <div class="mt-3 space-y-2">
-            <h3>{{ exam.exam_date }}</h3>
-            <div
-              :id="'course_stats_' + 2"
-              class="justify-between items-center rounded-md border bg-muted/50 p-2"
-            >
-              <div
-                class="flex justify-between items-center rounded-md bg-muted/50 p-2"
-              >
-                <span class="text-sm"
-                  >Average members per group: {{ exam.average_members }}</span
-                >
-              </div>
-              <div
-                class="flex justify-between items-center rounded-md bg-muted/50 p-2"
-              >
-                <span class="text-sm"
-                  >Minimum members per group: {{ exam.min_members }}</span
-                >
-              </div>
-              <div
-                class="flex justify-between items-center rounded-md bg-muted/50 p-2"
-              >
-                <span class="text-sm"
-                  >Maximum members per group: {{ exam.max_members }}</span
-                >
-              </div>
-              <div
-                class="flex justify-between items-center rounded-md bg-muted/50 p-2"
-              >
-                <span class="text-sm"
-                  >Total numbers of members: {{ exam.total_members }}</span
-                >
-              </div>
-              <div
-                class="flex justify-between items-center rounded-md bg-muted/50 p-2"
-              >
-                <span class="text-sm"
-                  >Total numbers of groups: {{ exam.total_groups }}</span
-                >
-              </div>
-            </div>
-          </div>
-        </div>
+        <h3 class="text-sm font-medium mb-2">Exam Date: {{ exam.exam_date }}</h3>
+        <table class="w-full text-sm border-collapse">
+          <tbody>
+            <tr>
+              <td class="font-medium pr-2">Avg members/group:</td>
+              <td>{{ exam.average_members }}</td>
+            </tr>
+            <tr>
+              <td class="font-medium pr-2">Min members:</td>
+              <td>{{ exam.min_members }}</td>
+            </tr>
+            <tr>
+              <td class="font-medium pr-2">Max members:</td>
+              <td>{{ exam.max_members }}</td>
+            </tr>
+            <tr>
+              <td class="font-medium pr-2">Total members:</td>
+              <td>{{ exam.total_members }}</td>
+            </tr>
+            <tr>
+              <td class="font-medium pr-2">Total groups:</td>
+              <td>{{ exam.total_groups }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { PropType } from "vue";
-
-interface Course {
-  id: number;
-  name: string;
-  exams: { date: string; groupCount: number }[];
-}
-
 const props = defineProps<{
   course: string;
   course_data: {
@@ -92,3 +61,19 @@ const props = defineProps<{
   }[];
 }>();
 </script>
+
+<style scoped>
+.text-primary {
+  color: #1d4ed8;
+}
+.bg-muted\50 {
+  background-color: rgba(229, 231, 235, 0.5);
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+td {
+  padding: 0.25rem 0;
+}
+</style>
