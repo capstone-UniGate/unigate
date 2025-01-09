@@ -15,7 +15,7 @@ from unigate.core.config import settings
 # make sure all SQLModel models are imported (unigate.models) before initializing DB
 # otherwise, SQLModel might fail to initialize relationships properly
 
-engine = create_engine(str(settings.UNIGATE_DB_URI), echo=True)
+engine = create_engine(str(settings.UNIGATE_DB_URI))
 auth_engine = create_engine(str(settings.AUTH_DB_URI))
 
 

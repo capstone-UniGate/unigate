@@ -62,12 +62,15 @@ def test_create_group_success() -> None:
     token = token_data["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
 
+    course = client.get("/courses").json()[0]
     valid_group_payload = {
         "name": f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}",
         "description": "A test group description",
         "category": "Test Category",
         "type": "Public",
         "creator_id": test_student_id,
+        "course_name": course["name"],
+        "exam_date": course["exams"][0]["date"],
     }
 
     response = client.post("/groups", json=valid_group_payload, headers=headers)
@@ -111,12 +114,15 @@ def test_get_group_info() -> None:
     token = token_data["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
 
+    course = client.get("/courses").json()[0]
     valid_group_payload = {
         "name": f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}",
         "description": "A test group description",
         "category": "Test Category",
         "type": "Public",
         "creator_id": test_student_id,
+        "course_name": course["name"],
+        "exam_date": course["exams"][0]["date"],
     }
     create_group_response = client.post(
         "/groups", json=valid_group_payload, headers=headers

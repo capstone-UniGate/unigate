@@ -57,6 +57,7 @@ def create_group(student_id: uuid.UUID, group_id: uuid.UUID) -> dict:
     # Authorization headers
     headers = {"Authorization": f"Bearer {token}"}
 
+    course = client.get("/courses").json()[0]
     # Group payload
     group_payload = {
         "id": str(group_id),
@@ -64,6 +65,8 @@ def create_group(student_id: uuid.UUID, group_id: uuid.UUID) -> dict:
         "description": "A test group description",
         "category": "Test Category",
         "type": "Public",  # Adjust as needed
+        "course_name": course["name"],
+        "exam_date": course["exams"][0]["date"],
     }
 
     # Call the API to create the group

@@ -68,6 +68,7 @@ def test_get_group_info() -> str:
     token = authenticate_user()
     headers = {"Authorization": f"Bearer {token}"}
 
+    course = client.get("/courses").json()[0]
     # Create a group first
     valid_group_payload = {
         "name": f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}",
@@ -75,6 +76,8 @@ def test_get_group_info() -> str:
         "category": "Test Category",
         "type": "Public",
         "creator_id": STUDENT_ID,
+        "course_name": course["name"],
+        "exam_date": course["exams"][0]["date"],
     }
     create_group_response = client.post(
         "/groups", json=valid_group_payload, headers=headers

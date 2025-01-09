@@ -55,11 +55,14 @@ def create_private_group(group_id: uuid.UUID, student_id: uuid.UUID) -> dict:
     token = token_data["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
 
+    course = client.get("/courses").json()[0]
     group_payload = {
         "name": f"TestGroup-{''.join(secrets.choice(string.ascii_letters) for _ in range(6))}",
         "description": "A test group description",
         "category": "Test Category",
         "type": "Private",
+        "course_name": course["name"],
+        "exam_date": course["exams"][0]["date"],
     }
 
     response = client.post("/groups", json=group_payload, headers=headers)
@@ -69,8 +72,8 @@ def create_private_group(group_id: uuid.UUID, student_id: uuid.UUID) -> dict:
 
 
 def test_create_request_success() -> None:
-    create_student(student_id=student_id, email_par="ciao@example.com")
-    create_student(student_id=student_id2, email_par="ciao2@example.com")
+    create_student(student_id=student_id, email_par="ciao5@example.com")
+    create_student(student_id=student_id2, email_par="ciao6@example.com")
     group_data = create_private_group(group_id, student_id)
 
     # Use the returned group id
@@ -104,8 +107,8 @@ def test_create_request_group_not_found() -> None:
 
 
 def test_create_request_already_exists() -> None:
-    create_student(student_id=student_id, email_par="ciao@example.com")
-    create_student(student_id=student_id2, email_par="ciao2@example.com")
+    create_student(student_id=student_id, email_par="ciao3@example.com")
+    create_student(student_id=student_id2, email_par="ciao4@example.com")
     group_data = create_private_group(group_id, student_id)
     created_group_id = group_data["id"]
 

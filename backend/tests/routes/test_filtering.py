@@ -29,6 +29,7 @@ def create_group() -> dict:
     token = token_data["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
 
+    course = client.get("/courses").json()[0]
     group_payload = {
         "id": uuid.uuid4(),
         "name": f"TestGroup-{uuid.uuid4().hex[:6]}",
@@ -38,6 +39,8 @@ def create_group() -> dict:
         "course_name": "Test Course",
         "exam_date": "2025-01-01",
         "date": "2024-01-01",
+        "course_name": course["name"],
+        "exam_date": course["exams"][0]["date"],
     }
 
     response = client.post("/groups", json=group_payload, headers=headers)

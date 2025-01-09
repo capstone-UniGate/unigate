@@ -88,6 +88,9 @@ groups = [
 
 courses = {
     CourseCreate(
+        name="Test Course",
+    ): [datetime(2025, 1, 1, tzinfo=pytz.utc), datetime(2025, 1, 25, tzinfo=pytz.utc)],
+    CourseCreate(
         name="Binary Analysis and secure coding",
     ): [datetime(2025, 1, 8, tzinfo=pytz.utc), datetime(2025, 2, 10, tzinfo=pytz.utc)],
     CourseCreate(

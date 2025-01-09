@@ -32,12 +32,16 @@ def create_group(token: str) -> dict:
     """
     Creates a public group and returns the group data.
     """
+
+    course = client.get("/courses").json()[0]
     group_payload = {
         "id": str(uuid.uuid4()),
         "name": f"TestGroup-{uuid.uuid4().hex[:6]}",
         "description": "A test group description",
         "category": "Test Category",
         "type": "Public",
+        "course_name": course["name"],
+        "exam_date": course["exams"][0]["date"],
     }
 
     headers = {"Authorization": f"Bearer {token}"}

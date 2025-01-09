@@ -31,12 +31,15 @@ def create_group() -> dict:
     token_data = authenticate_user()
     token = token_data["access_token"]
 
+    course = client.get("/courses").json()[0]
     group_payload = {
         "id": str(uuid.uuid4()),
         "name": f"TestGroup-{uuid.uuid4().hex[:6]}",
         "description": "A test group description",
         "category": "Test Category",
         "type": "Private",
+        "course_name": course["name"],
+        "exam_date": course["exams"][0]["date"],
     }
 
     headers = {"Authorization": f"Bearer {token}"}

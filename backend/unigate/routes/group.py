@@ -157,9 +157,7 @@ def undo_join_request(
             detail="Request is not pending",
         )
 
-    crud.group.delete_request(
-        session=session, group=group, student=current_user, request=request
-    )
+    crud.group.delete_request(session=session, group=group, request=request)
 
     return {"message": "Join request undo successfully."}
 
