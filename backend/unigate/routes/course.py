@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException, status
 from unigate import crud
 from unigate.core.database import AuthSessionDep, SessionDep
 from unigate.models import Course, Group
+from unigate.routes.deps import CurrProfessorDep
 from unigate.schemas.course import (
     ActiveCourseResponse,
     CourseGroupDistributionResponse,
@@ -166,8 +167,16 @@ def average_members(
     response_model=dict[str, list[dict]],
 )
 def all_stats(
-    session: SessionDep, auth_session: AuthSessionDep
+    session: SessionDep,
+    auth_session: AuthSessionDep,
+    current_professor: CurrProfessorDep,
 ) -> dict[str, list[dict]]:
+    if not current_professor:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No courses found",
+        )
+
     courses = crud.course.get_all_name_courses(session=auth_session)
     if not courses:
         raise HTTPException(

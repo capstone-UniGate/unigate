@@ -14,9 +14,12 @@ const courses = ref<Course[]>([
   { id: 5, name: "English 505", groupCount: 4 },
 ]);
 
+const isLoading = ref(false);
+const isError = ref(false);
+
 const professorCourses = ref<number[]>([1, 2, 3]); // IDs of courses the professor has access to.
 
-export default function useCourses() {
+export function useCourses() {
   const filterCourses = (search: string) => {
     if (!search) return courses.value.filter(isEligible);
     return courses.value.filter(
@@ -26,6 +29,23 @@ export default function useCourses() {
     );
   };
 
+  async function getAllStats() {
+    try {
+      // await ensureAuthenticated();
+      isError.value = false;
+      isLoading.value = true;
+      const response = await useApiFetch("/courses/all_stats", {
+        method: "GET",
+      });
+      return response;
+    } catch (error) {
+      isError.value = true;
+      throw error;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   const isEligible = (course: Course) =>
     professorCourses.value.includes(course.id);
 
@@ -33,5 +53,6 @@ export default function useCourses() {
     courses: computed(() => courses.value.filter(isEligible)),
     filterCourses,
     isEligible,
+    getAllStats,
   };
 }
