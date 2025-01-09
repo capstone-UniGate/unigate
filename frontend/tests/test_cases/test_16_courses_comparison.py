@@ -12,7 +12,6 @@ class TestUserProfile(BaseTest):
         self.page = DashboardProfessorComparePage(base_page)
         self.page.navigate()
 
-
     def test_course_name(self) -> None:
         course_name = "Binary Analysis and secure coding"
         assert self.page.get_course_name_card() == course_name
