@@ -14,5 +14,5 @@ class TestUserProfile(BaseTest):
 
 
     def test_course_name(self) -> None:
-        course_name = "Capstone"
+        course_name = "Binary Analysis and secure coding"
         assert self.page.get_course_name_card() == course_name
