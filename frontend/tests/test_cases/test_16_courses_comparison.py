@@ -27,3 +27,9 @@ class TestUserProfile(BaseTest):
         actual_data = self.page.get_table_data()
         print(f"Actual data retrieved from the webpage: {actual_data}")
         assert actual_data == expected_data, f"Expected {expected_data} but got {actual_data}"
+
+    def test_fail_contains(self) -> None:
+        self.login_lorenzo()
+        self.page.navigate()
+        assert self.page.
+

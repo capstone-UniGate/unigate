@@ -23,3 +23,10 @@ class DashboardProfessorComparePage(BasePage):
             value = row.find_elements(By.CSS_SELECTOR, "td")[1].text
             table_data[key] = int(value) if value.isdigit() else value
         return table_data
+    
+    def is_access_denied_image_present(self) -> bool:
+        try:
+            self.driver.find_element(By.CSS_SELECTOR, "img[src='/_nuxt/static/images/access-denied.png'][alt='Access Denied']")
+            return True
+        except NoSuchElementException:
+            return False
