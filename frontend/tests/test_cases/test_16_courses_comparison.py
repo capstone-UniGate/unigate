@@ -8,6 +8,7 @@ from tests.test_cases.base_test import BaseTest
 class TestUserProfile(BaseTest):
     @pytest.fixture(autouse=True)
     def setup(self, base_page: webdriver.Chrome) -> None:
+        self.base_page = base_page
         self.login_professor(base_page)
         self.page = DashboardProfessorComparePage(base_page)
         self.page.navigate()
@@ -29,7 +30,7 @@ class TestUserProfile(BaseTest):
         assert actual_data == expected_data, f"Expected {expected_data} but got {actual_data}"
 
     def test_fail_contains(self) -> None:
-        self.login_lorenzo()
+        self.login_lorenzo(self.base_page)
         self.page.navigate()
-        assert self.page.
+        assert self.page.is_access_denied_image_present(), "The 'Access Denied' image is not present on the page."
 
