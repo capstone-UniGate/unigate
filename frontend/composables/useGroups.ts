@@ -67,6 +67,60 @@ export function useGroups() {
     }
   }
 
+  async function getAverageMembers(courseName: string) {
+    try {
+      isError.value = false;
+      isLoading.value = true;
+      const response = await useApiFetch(
+        `/courses/${encodeURIComponent(courseName)}/average_members`,
+        { method: "GET" },
+      );
+      return response;
+    } catch (error) {
+      isError.value = true;
+      throw error;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function getActiveGroupCount(courseName: string) {
+    try {
+      // await ensureAuthenticated();
+      isError.value = false;
+      isLoading.value = true;
+      const response = await useApiFetch(
+        `/courses/${encodeURIComponent(courseName)}/active`,
+        { method: "GET" },
+      );
+      return response;
+    } catch (error) {
+      isError.value = true;
+      throw error;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function getGroupCreationDistribution(courseName: string) {
+    try {
+      isError.value = false;
+      isLoading.value = true;
+      const response = await useApiFetch(
+        `/courses/${encodeURIComponent(courseName)}/distribution`,
+        {
+          method: "GET",
+        },
+      );
+      return response;
+    } catch (error) {
+      isError.value = true;
+      throw error;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   async function searchGroups(queryParams: Record<string, any> = {}) {
     try {
       await ensureAuthenticated();
@@ -306,5 +360,8 @@ export function useGroups() {
     searchGroups,
     getGroupCount,
     getProfessorsCourses,
+    getAverageMembers,
+    getActiveGroupCount,
+    getGroupCreationDistribution,
   };
 }

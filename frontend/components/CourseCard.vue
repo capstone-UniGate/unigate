@@ -16,6 +16,12 @@
       </span>
     </h2>
 
+    <!-- Average People per Group -->
+    <p class="text-sm mt-2">Average members per group: {{ avgMembers }}</p>
+
+    <!-- Number of Active Groups -->
+    <p class="text-sm mt-2">Number of Active Groups: {{ activeGroupCount }}</p>
+
     <!-- Exam List -->
     <div class="mt-3 space-y-2">
       <div
@@ -36,11 +42,18 @@ import { PropType } from "vue";
 interface Course {
   id: number;
   name: string;
-  exams: { date: string; groupCount: number }[];
+  exams: {
+    date: string;
+    groupCount: number;
+    avgMembers: number;
+    activeGroupCount: number;
+  }[];
 }
 
 const props = defineProps<{
   course: Course;
   groupCount: number;
+  avgMembers: number;
+  activeGroupCount: number;
 }>();
 </script>
