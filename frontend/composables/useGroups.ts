@@ -72,8 +72,8 @@ export function useGroups() {
       isError.value = false;
       isLoading.value = true;
       const response = await useApiFetch(
-        `/courses/${encodeURIComponent(courseName)}/average_members`, 
-        { method: "GET" }
+        `/courses/${encodeURIComponent(courseName)}/average_members`,
+        { method: "GET" },
       );
       return response;
     } catch (error) {
@@ -83,15 +83,15 @@ export function useGroups() {
       isLoading.value = false;
     }
   }
-  
+
   async function getActiveGroupCount(courseName: string) {
     try {
       // await ensureAuthenticated();
       isError.value = false;
       isLoading.value = true;
       const response = await useApiFetch(
-        `/courses/${encodeURIComponent(courseName)}/active`, 
-        { method: "GET" }
+        `/courses/${encodeURIComponent(courseName)}/active`,
+        { method: "GET" },
       );
       return response;
     } catch (error) {
@@ -106,9 +106,12 @@ export function useGroups() {
     try {
       isError.value = false;
       isLoading.value = true;
-      const response = await useApiFetch(`/courses/${encodeURIComponent(courseName)}/distribution`, {
-        method: 'GET',
-      });
+      const response = await useApiFetch(
+        `/courses/${encodeURIComponent(courseName)}/distribution`,
+        {
+          method: "GET",
+        },
+      );
       return response;
     } catch (error) {
       isError.value = true;
@@ -117,7 +120,7 @@ export function useGroups() {
       isLoading.value = false;
     }
   }
-  
+
   async function searchGroups(queryParams: Record<string, any> = {}) {
     try {
       await ensureAuthenticated();
@@ -337,7 +340,6 @@ export function useGroups() {
       isLoading.value = false;
     }
   }
-
 
   return {
     groups,

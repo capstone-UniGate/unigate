@@ -5,16 +5,30 @@ import ExamDateDropdown from "@/components/ExamDateDropdown.vue";
 import CourseCard from "@/components/CourseCard.vue";
 import LoadingIndicator from "@/components/LoadingIndicator.vue";
 import { useGroups } from "@/composables/useGroups";
-import GroupCreationChart from '@/components/GroupCreationChart.vue';
+import GroupCreationChart from "@/components/GroupCreationChart.vue";
 
-const { getProfessorsCourses, getGroupCount, getAverageMembers, getActiveGroupCount, getGroupCreationDistribution } = useGroups();
+const {
+  getProfessorsCourses,
+  getGroupCount,
+  getAverageMembers,
+  getActiveGroupCount,
+  getGroupCreationDistribution,
+} = useGroups();
 
 const course = ref("");
 const examDate = ref("");
 const isLoading = ref(true); // Track loading state
 const courses = ref<
-  { id: number; name: string; exams: { date: string; groupCount: number ; 
-    avgMembers: number, activeGroupCount: number}[] }[]
+  {
+    id: number;
+    name: string;
+    exams: {
+      date: string;
+      groupCount: number;
+      avgMembers: number;
+      activeGroupCount: number;
+    }[];
+  }[]
 >([]);
 const selectedCourseExamDates = ref<string[]>([]);
 const groupCounts = ref<Record<string, number>>({});
@@ -23,7 +37,6 @@ const averageMembers = ref<Record<string, number>>({});
 const activeGroupsCounts = ref<Record<string, number>>({});
 const groupCreationData = ref<{ date: string; count: number }[]>([]);
 const isLoadingChart = ref(true);
-
 
 // Watcher to update exam dates when a course is selected
 watch(course, (newCourseName) => {
@@ -60,8 +73,11 @@ const fetchAverageMembers = async () => {
       const response = await getAverageMembers(course.name);
       averageMembers.value[course.name] = (response as { avg: number }).avg;
     } catch (error) {
-        console.error(`Error fetching average members for ${course.name}:`, error);
-        averageMembers.value[course.name] = 0;
+      console.error(
+        `Error fetching average members for ${course.name}:`,
+        error,
+      );
+      averageMembers.value[course.name] = 0;
     }
   }
 };
@@ -73,8 +89,11 @@ const fetchNumberOfActiveGroups = async () => {
       const response = await getActiveGroupCount(course.name);
       activeGroupsCounts.value[course.name] = response.count;
     } catch (error) {
-        console.error(`Error fetching active group count for ${course.name}:`, error);
-        activeGroupsCounts.value[course.name] = 0;
+      console.error(
+        `Error fetching active group count for ${course.name}:`,
+        error,
+      );
+      activeGroupsCounts.value[course.name] = 0;
     }
   }
 };
@@ -84,7 +103,7 @@ const processGroupCreationData = (groupsInfo: any[]) => {
   const creationCounts: Record<string, number> = {};
 
   groupsInfo.forEach((group) => {
-    const creationDate = group.creation_date.split('T')[0]; // Extract YYYY-MM-DD
+    const creationDate = group.creation_date.split("T")[0]; // Extract YYYY-MM-DD
     if (!creationCounts[creationDate]) {
       creationCounts[creationDate] = 0;
     }
@@ -142,7 +161,6 @@ const filteredCourses = computed(() => {
 });
 
 onMounted(fetchProfessorsCourses);
-
 </script>
 
 <template>
@@ -174,7 +192,9 @@ onMounted(fetchProfessorsCourses);
 
         <!-- Course SearchBox -->
         <div class="mb-6">
-          <label for="course" class="block mb-2 text-sm font-medium">Course</label>
+          <label for="course" class="block mb-2 text-sm font-medium"
+            >Course</label
+          >
           <CourseSearchBox
             id="course"
             :items="courses"
@@ -182,20 +202,29 @@ onMounted(fetchProfessorsCourses);
             v-model="course"
             @select="
               async (selectedCourse) => {
-              course = selectedCourse.name;
-              examDate = '';
-              selectedCourseExamDates = selectedCourse.exams.map((e) => e.date);
+                course = selectedCourse.name;
+                examDate = '';
+                selectedCourseExamDates = selectedCourse.exams.map(
+                  (e) => e.date,
+                );
 
-              // Fetch group creation data for the selected course
-              if (course) {
-                //isLoading.value = true; 
-                try {
-                  console.log('Fetching group creation data for course:', course);
-                  await fetchGroupCreationData(course);
-                } catch (error) {
-                  console.error('Error fetching group creation data for course:', course, error);
-                } finally {
-                // isLoading.value = false;
+                // Fetch group creation data for the selected course
+                if (course) {
+                  //isLoading.value = true;
+                  try {
+                    console.log(
+                      'Fetching group creation data for course:',
+                      course,
+                    );
+                    await fetchGroupCreationData(course);
+                  } catch (error) {
+                    console.error(
+                      'Error fetching group creation data for course:',
+                      course,
+                      error,
+                    );
+                  } finally {
+                    // isLoading.value = false;
                   }
                 }
               }
@@ -213,10 +242,10 @@ onMounted(fetchProfessorsCourses);
         </div>
 
         <!-- Course Cards Grid -->
-          <div
-            v-if="filteredCourses.length"
-            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-          >
+        <div
+          v-if="filteredCourses.length"
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+        >
           <CourseCard
             v-for="course in filteredCourses"
             :key="course.id"
@@ -231,7 +260,10 @@ onMounted(fetchProfessorsCourses);
         </div>
 
         <!-- Group Creation Chart -->
-        <div v-if="filteredCourses.length && groupCreationData.length > 0" class="mt-8">
+        <div
+          v-if="filteredCourses.length && groupCreationData.length > 0"
+          class="mt-8"
+        >
           <h2 class="text-2xl font-bold mb-6">Group Creation Over Time</h2>
           <GroupCreationChart :data="groupCreationData" />
         </div>

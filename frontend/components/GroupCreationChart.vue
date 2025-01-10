@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { VisXYContainer, VisLine, VisAxis } from '@unovis/vue';
+import { VisXYContainer, VisLine, VisAxis } from "@unovis/vue";
 
 // Define props to accept `data` from the parent
 const props = defineProps<{
@@ -26,15 +26,19 @@ const yAccessor = (d: { count: number }) => d.count;
 <template>
   <div>
     <!-- Chart Container -->
-    <VisXYContainer style="width: 100%; height: 300px;">
-      <VisLine :data="chartData" :x="xAccessor" :y="yAccessor" :style="{ stroke: '#0000FF' }" />
-      <VisAxis 
-        type="x" 
-        scale="time" 
-        :tickFormat="(d) => new Date(d).toLocaleDateString()" 
-        />
+    <VisXYContainer style="width: 100%; height: 300px">
+      <VisLine
+        :data="chartData"
+        :x="xAccessor"
+        :y="yAccessor"
+        :style="{ stroke: '#0000FF' }"
+      />
+      <VisAxis
+        type="x"
+        scale="time"
+        :tickFormat="(d) => new Date(d).toLocaleDateString()"
+      />
       <VisAxis type="y" />
     </VisXYContainer>
   </div>
-  
 </template>
