@@ -31,3 +31,4 @@ class Urls:
     LOGOUT_PAGE = f"{BASE_URL}/login?message=You have successfully logged out."
     USER_PAGE = f"{BASE_URL}/user"
     DASHBOARD_PAGE = f"{BASE_URL}/dashboard"
+    COMPARE_PAGE = f"{BASE_URL}/compare"

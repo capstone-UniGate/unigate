@@ -41,4 +41,4 @@ class BaseTest:
         self.login_page = LoginPage(driver)
         self.login_page.navigate()
         self.login_page.login("P1234567", "testpassword")
-        self.wait.until(EC.url_to_be(url=Urls.GROUP_PAGE))
+        self.wait.until(EC.url_to_be(url=Urls.DASHBOARD_PAGE))
