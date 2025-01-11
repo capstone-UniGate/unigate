@@ -34,7 +34,7 @@ const selectedCourseExamDates = ref<string[]>([]);
 const groupCounts = ref<Record<string, number>>({});
 const errorMessage = ref("");
 const averageMembers = ref<Record<string, number>>({});
-const activeGroupsCounts = ref<Record<string, number>>({});
+const activeGroupsCounts = ref<Record<string, Record<string, number>>>({});
 const groupCreationData = ref<{ date: string; count: number }[]>([]);
 const isLoadingChart = ref(true);
 
@@ -84,18 +84,38 @@ const fetchAverageMembers = async () => {
 
 //Fetch number of active groups for each course
 const fetchNumberOfActiveGroups = async () => {
+  console.log("Starting fetchNumberOfActiveGroups");
   for (const course of courses.value) {
-    try {
-      const response = await getActiveGroupCount(course.name);
-      activeGroupsCounts.value[course.name] = response.count;
-    } catch (error) {
-      console.error(
-        `Error fetching active group count for ${course.name}:`,
-        error,
-      );
-      activeGroupsCounts.value[course.name] = 0;
+    if (!activeGroupsCounts.value[course.name]) {
+      activeGroupsCounts.value[course.name] = {};
+    }
+
+    for (const exam of course.exams) {
+      try {
+        const response = await getActiveGroupCount(course.name, exam.date);
+        console.log("Response for", course.name, exam.date, ":", response);
+
+        // Count groups that have more than one student
+        const activeGroupCount = response.groups.filter(
+          (group: { students: string[] }) => group.students.length > 1,
+        ).length;
+
+        activeGroupsCounts.value[course.name][exam.date] = activeGroupCount;
+
+        console.log(
+          `Active groups for ${course.name} on ${exam.date}: ${activeGroupCount}`,
+          `(Total groups with >1 student: ${activeGroupCount} out of ${response.groups.length} total groups)`,
+        );
+      } catch (error) {
+        console.error(
+          `Error fetching active group count for ${course.name} on ${exam.date}:`,
+          error,
+        );
+        activeGroupsCounts.value[course.name][exam.date] = 0;
+      }
     }
   }
+  console.log("Final activeGroupsCounts:", activeGroupsCounts.value);
 };
 
 // Process group creation data
@@ -158,6 +178,12 @@ const filteredCourses = computed(() => {
   return courses.value.filter(
     (c) => c.name.toLowerCase() === course.value.toLowerCase(),
   );
+});
+
+// Add a new computed property to get active group count for current selection
+const currentActiveGroupCount = computed(() => {
+  if (!course.value || !examDate.value) return 0;
+  return activeGroupsCounts.value[course.value]?.[examDate.value] || 0;
 });
 
 onMounted(fetchProfessorsCourses);
@@ -252,7 +278,7 @@ onMounted(fetchProfessorsCourses);
             :course="course"
             :groupCount="groupCounts[course.name] || 0"
             :avgMembers="averageMembers[course.name] || 0"
-            :activeGroupCount="activeGroupsCounts[course.name] || 0"
+            :activeGroupCount="currentActiveGroupCount"
           />
         </div>
         <div v-else class="text-center text-gray-500 mt-8">

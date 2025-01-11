@@ -22,10 +22,17 @@ class CourseReadWithUsersAndExams(CourseRead):
     exams: list[ExamRead]
 
 
+# Add new schema for group info
+class GroupInfo(BaseModel):
+    group_name: str
+    students: list[str]
+
+
 class ActiveCourseResponse(BaseModel):
     course_name: str
     total_students: int
     student_names: list[str]
+    groups: list[GroupInfo]  # Add this field
 
 
 class GroupDistributionInfo(BaseModel):
