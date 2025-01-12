@@ -84,15 +84,17 @@ export function useGroups() {
     }
   }
 
-  async function getActiveGroupCount(courseName: string) {
+  async function getActiveGroupCount(courseName: string, examDate: string) {
     try {
-      // await ensureAuthenticated();
       isError.value = false;
       isLoading.value = true;
-      const response = await useApiFetch(
-        `/courses/${encodeURIComponent(courseName)}/active`,
-        { method: "GET" },
-      );
+      const queryParams = new URLSearchParams({
+        exam_date: examDate,
+      }).toString();
+      const url = `/courses/${encodeURIComponent(courseName)}/active?${queryParams}`;
+      const response = await useApiFetch(url, {
+        method: "GET",
+      });
       return response;
     } catch (error) {
       isError.value = true;
