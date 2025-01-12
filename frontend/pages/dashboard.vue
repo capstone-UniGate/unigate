@@ -34,7 +34,7 @@ const selectedCourseExamDates = ref<string[]>([]);
 const groupCounts = ref<Record<string, number>>({});
 const errorMessage = ref("");
 const averageMembers = ref<Record<string, number>>({});
-const activeGroupsCounts = ref<Record<string, number>>({});
+const activeGroupsCounts = ref<Record<string, Record<string, number>>>({});
 const groupCreationData = ref<{ date: string; count: number }[]>([]);
 const isLoadingChart = ref(true);
 
@@ -85,15 +85,32 @@ const fetchAverageMembers = async () => {
 //Fetch number of active groups for each course
 const fetchNumberOfActiveGroups = async () => {
   for (const course of courses.value) {
-    try {
-      const response = await getActiveGroupCount(course.name);
-      activeGroupsCounts.value[course.name] = response.count;
-    } catch (error) {
-      console.error(
-        `Error fetching active group count for ${course.name}:`,
-        error,
-      );
-      activeGroupsCounts.value[course.name] = 0;
+    if (!activeGroupsCounts.value[course.name]) {
+      activeGroupsCounts.value[course.name] = {};
+    }
+
+    for (const exam of course.exams) {
+      try {
+        const response = await getActiveGroupCount(course.name, exam.date);
+        // Count groups with more than 1 student as active
+        const activeCount = response.groups_info.filter(
+          (group: { super_students: string[] }) =>
+            group.super_students.length > 1,
+        ).length;
+
+        activeGroupsCounts.value[course.name][exam.date] = activeCount;
+
+        console.log(
+          `Active groups for ${course.name} on ${exam.date}: ${activeCount}`,
+          `(Total groups: ${response.total_groups})`,
+        );
+      } catch (error) {
+        console.error(
+          `Error fetching active group count for ${course.name} on ${exam.date}:`,
+          error,
+        );
+        activeGroupsCounts.value[course.name][exam.date] = 0;
+      }
     }
   }
 };
@@ -158,6 +175,12 @@ const filteredCourses = computed(() => {
   return courses.value.filter(
     (c) => c.name.toLowerCase() === course.value.toLowerCase(),
   );
+});
+
+// Add a new computed property to get active group count for current selection
+const currentActiveGroupCount = computed(() => {
+  if (!course.value || !examDate.value) return 0;
+  return activeGroupsCounts.value[course.value]?.[examDate.value] || 0;
 });
 
 onMounted(fetchProfessorsCourses);
@@ -252,7 +275,7 @@ onMounted(fetchProfessorsCourses);
             :course="course"
             :groupCount="groupCounts[course.name] || 0"
             :avgMembers="averageMembers[course.name] || 0"
-            :activeGroupCount="activeGroupsCounts[course.name] || 0"
+            :activeGroupCount="currentActiveGroupCount"
           />
         </div>
         <div v-else class="text-center text-gray-500 mt-8">
