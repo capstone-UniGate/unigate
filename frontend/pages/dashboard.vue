@@ -34,9 +34,10 @@ const selectedCourseExamDates = ref<string[]>([]);
 const groupCounts = ref<Record<string, number>>({});
 const errorMessage = ref("");
 const averageMembers = ref<Record<string, number>>({});
-const activeGroupsCounts = ref<Record<string, number>>({});
+const activeGroupsCounts = ref<Record<string, Record<string, number>>>({});
 const groupCreationData = ref<{ date: string; count: number }[]>([]);
 const isLoadingChart = ref(true);
+const studentNames = ref<string[]>([]);
 
 // Watcher to update exam dates when a course is selected
 watch(course, (newCourseName) => {
@@ -84,19 +85,59 @@ const fetchAverageMembers = async () => {
 
 //Fetch number of active groups for each course
 const fetchNumberOfActiveGroups = async () => {
+  console.log("Starting fetchNumberOfActiveGroups");
   for (const course of courses.value) {
-    try {
-      const response = await getActiveGroupCount(course.name);
-      activeGroupsCounts.value[course.name] = response.count;
-    } catch (error) {
-      console.error(
-        `Error fetching active group count for ${course.name}:`,
-        error,
-      );
-      activeGroupsCounts.value[course.name] = 0;
+    if (!activeGroupsCounts.value[course.name]) {
+      activeGroupsCounts.value[course.name] = {};
+    }
+
+    for (const exam of course.exams) {
+      try {
+        const response = await getActiveGroupCount(course.name, exam.date);
+        console.log("Response for", course.name, exam.date, ":", response);
+
+        // Store student names when it matches the current selection
+        if (course.name === course.value && exam.date === examDate.value) {
+          studentNames.value = response.student_names;
+        }
+
+        // Count groups that have more than one student
+        const activeGroupCount = response.groups.filter(
+          (group: { students: string[] }) => group.students.length > 1,
+        ).length;
+
+        activeGroupsCounts.value[course.name][exam.date] = activeGroupCount;
+
+        console.log(
+          `Active groups for ${course.name} on ${exam.date}: ${activeGroupCount}`,
+          `(Total groups with >1 student: ${activeGroupCount} out of ${response.groups.length} total groups)`,
+        );
+      } catch (error) {
+        console.error(
+          `Error fetching active group count for ${course.name} on ${exam.date}:`,
+          error,
+        );
+        activeGroupsCounts.value[course.name][exam.date] = 0;
+      }
     }
   }
+  console.log("Final activeGroupsCounts:", activeGroupsCounts.value);
 };
+
+// Add watcher to update student names when course or exam date changes
+watch([course, examDate], async ([newCourse, newExamDate]) => {
+  if (newCourse && newExamDate) {
+    try {
+      const response = await getActiveGroupCount(newCourse, newExamDate);
+      studentNames.value = response.student_names;
+    } catch (error) {
+      console.error("Error fetching student names:", error);
+      studentNames.value = [];
+    }
+  } else {
+    studentNames.value = [];
+  }
+});
 
 // Process group creation data
 const processGroupCreationData = (groupsInfo: any[]) => {
@@ -158,6 +199,12 @@ const filteredCourses = computed(() => {
   return courses.value.filter(
     (c) => c.name.toLowerCase() === course.value.toLowerCase(),
   );
+});
+
+// Add a new computed property to get active group count for current selection
+const currentActiveGroupCount = computed(() => {
+  if (!course.value || !examDate.value) return 0;
+  return activeGroupsCounts.value[course.value]?.[examDate.value] || 0;
 });
 
 onMounted(fetchProfessorsCourses);
@@ -252,11 +299,33 @@ onMounted(fetchProfessorsCourses);
             :course="course"
             :groupCount="groupCounts[course.name] || 0"
             :avgMembers="averageMembers[course.name] || 0"
-            :activeGroupCount="activeGroupsCounts[course.name] || 0"
+            :activeGroupCount="currentActiveGroupCount"
           />
         </div>
         <div v-else class="text-center text-gray-500 mt-8">
           Select a course to view details
+        </div>
+
+        <!-- Add Student Names Section before Group Creation Chart -->
+        <div
+          v-if="filteredCourses.length && studentNames.length > 0"
+          class="mt-8 mb-8"
+        >
+          <h2 class="text-2xl font-bold mb-4">Enrolled Students</h2>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div
+                v-for="(student, index) in studentNames"
+                :key="index"
+                class="bg-white p-3 rounded shadow-sm"
+              >
+                {{ student }}
+              </div>
+            </div>
+            <div class="mt-4 text-gray-600 text-sm">
+              Total Students: {{ studentNames.length }}
+            </div>
+          </div>
         </div>
 
         <!-- Group Creation Chart -->

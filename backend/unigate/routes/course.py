@@ -9,6 +9,7 @@ from unigate.schemas.course import (
     CourseGroupDistributionResponse,
     CourseReadWithUsersAndExams,
     GroupDistributionInfo,
+    GroupInfo,
 )
 from unigate.schemas.group import (
     GroupReadWithStudents,
@@ -91,15 +92,24 @@ def check_active_course(
     )
     all_students = set()
     student_names = []
+    groups_info = []
+
     for group in groups:
+        group_students = []
         for student in group.students:
+            student_full_name = f"{student.name} {student.surname or ''}"
             if student.id not in all_students:
                 all_students.add(student.id)
-                student_names.append(f"{student.name} {student.surname or ''}")
+                student_names.append(student_full_name)
+            group_students.append(student_full_name)
+
+        groups_info.append(GroupInfo(group_name=group.name, students=group_students))
+
     return ActiveCourseResponse(
         course_name=course_name,
         total_students=len(all_students),
         student_names=student_names,
+        groups=groups_info,
     )
 
 
@@ -218,10 +228,8 @@ def all_stats(
     "/names_courses",
     response_model=list[str],
 )
-def get_all_course_names(
-    session: SessionDep, auth_session: AuthSessionDep
-) -> list[str]:
-    courses = crud.course.get_all_name_courses(session=auth_session)
+def get_all_course_names() -> list[str]:
+    courses = crud.course.get_all_name_courses()
     if not courses:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
