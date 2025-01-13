@@ -22,13 +22,13 @@ class TestGroupDetails(BaseTest):
         group_card = (self.page.get_group_cards())[1]
         self.page.click_button(group_card)
         # Assert: Verify the group description is displayed
-        assert (
-            self.group_page_detail.check_description()
-        ), "Incorrect display of description"
+        assert self.group_page_detail.check_description(), (
+            "Incorrect display of description"
+        )
         assert self.group_page_detail.check_members_link(), "Members link not displayed"
-        assert (
-            self.group_page_detail.check_ask_join()
-        ), "Ask to join button not displayed"
+        assert self.group_page_detail.check_ask_join(), (
+            "Ask to join button not displayed"
+        )
         self.group_page_detail.click_members()
         # members_emails = self.group_page_members.get_members()
 
@@ -41,9 +41,9 @@ class TestGroupDetails(BaseTest):
         group_card = (self.page.get_group_cards())[7]
         self.page.click_button(group_card)
         # Assert: Verify the group description is displayed
-        assert (
-            self.group_page_detail.check_description()
-        ), "Incorrect display of description"
+        assert self.group_page_detail.check_description(), (
+            "Incorrect display of description"
+        )
         assert self.group_page_detail.check_members_link(), "Members link not displayed"
         assert self.group_page_detail.check_leave(), "Leave button not displayed"
         assert self.group_page_detail.check_manage(), "Manage button not displayed"

@@ -43,9 +43,9 @@ class TestLogout(BaseTest):
         time.sleep(1)
 
         # Verify redirected to login page
-        assert (
-            self.login_page.is_login_form_visible()
-        ), "Login form should be visible after logout"
+        assert self.login_page.is_login_form_visible(), (
+            "Login form should be visible after logout"
+        )
         # print(f"{Urls.BASE_URL}/login?message=You+have+successfully+logged+out.")
         assert (
             self.login_page.driver.current_url

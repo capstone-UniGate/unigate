@@ -17,12 +17,12 @@ class TestUserProfile(BaseTest):
         self.page.navigate()
 
     def test_verify_user_profile(self) -> None:
-        assert (
-            self.page.get_user_name_and_surname() == "Test Name Test Surname"
-        ), "Name and surname are wrong not displayed"
-        assert (
-            self.page.get_user_email() == "s1234567@studenti.unige.it"
-        ), "Email is wrong not displayed"
+        assert self.page.get_user_name_and_surname() == "Test Name Test Surname", (
+            "Name and surname are wrong not displayed"
+        )
+        assert self.page.get_user_email() == "s1234567@studenti.unige.it", (
+            "Email is wrong not displayed"
+        )
         assert self.page.get_user_role() == "Student", "Role is wrong or not displayed"
 
     def test_edit_photo(self) -> None:
@@ -41,9 +41,9 @@ class TestUserProfile(BaseTest):
         self.page.change_profile_image(file_path_profile_image)
         time.sleep(1)
         toast_message = self.page.get_toast_message()
-        assert (
-            toast_message == "Success"
-        ), "Toast message did not appear or was incorrect."
+        assert toast_message == "Success", (
+            "Toast message did not appear or was incorrect."
+        )
 
     def test_edit_photo_error(self) -> None:
         self.page.click_edit_button()

@@ -33,9 +33,9 @@ class TestGroupCreate(BaseTest):
         required_msg = expected_messages["required"]
         assert isinstance(required_msg, str)
         actual_required_count = error_messages.count(required_msg)
-        assert (
-            actual_required_count == expected_messages["count"]
-        ), f"Expected {expected_messages['count']} 'Required' messages, but got {actual_required_count}. Messages: {error_messages}"
+        assert actual_required_count == expected_messages["count"], (
+            f"Expected {expected_messages['count']} 'Required' messages, but got {actual_required_count}. Messages: {error_messages}"
+        )
 
     def test_cancel_button(self) -> None:
         time.sleep(0.5)

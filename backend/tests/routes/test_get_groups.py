@@ -19,9 +19,9 @@ def authenticate_user() -> dict:
 
     response = client.post("/auth/login", data=login_payload)
 
-    assert (
-        response.status_code == 200
-    ), f"Failed to authenticate user: {response.json()}"
+    assert response.status_code == 200, (
+        f"Failed to authenticate user: {response.json()}"
+    )
     return response.json()
 
 
@@ -57,8 +57,8 @@ def test_get_groups_list() -> None:
     headers = {"Authorization": f"Bearer {token}"}
     response = client.get("/groups", headers=headers)
 
-    assert (
-        response.status_code == 200
-    ), f"Failed to retrieve groups list: {response.json()}"
+    assert response.status_code == 200, (
+        f"Failed to retrieve groups list: {response.json()}"
+    )
     assert isinstance(response.json(), list), "Response should be a list of groups"
     assert len(response.json()) > 0, "There should be at least one group"

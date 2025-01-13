@@ -23,9 +23,9 @@ def authenticate_user() -> dict:
         "password": test_student_password,
     }
     response = client.post("/auth/login", data=login_payload)
-    assert (
-        response.status_code == 200
-    ), f"Failed to authenticate user: {response.json()}"
+    assert response.status_code == 200, (
+        f"Failed to authenticate user: {response.json()}"
+    )
     return response.json()
 
 
@@ -96,9 +96,9 @@ def test_create_group_failure_unauthenticated() -> None:
     }
 
     response = client.post("/groups", json=group_payload)
-    assert (
-        response.status_code == 401
-    ), f"Expected 401 Unauthorized, got {response.status_code}"
+    assert response.status_code == 401, (
+        f"Expected 401 Unauthorized, got {response.status_code}"
+    )
 
 
 def test_create_group_already_exists() -> None:
@@ -109,9 +109,9 @@ def test_create_group_already_exists() -> None:
     try:
         create_group(student_id=student_id, group_id=group_id)
     except AssertionError as e:
-        assert "Group creation failed" in str(
-            e
-        ), "Group creation did not fail as expected"
+        assert "Group creation failed" in str(e), (
+            "Group creation did not fail as expected"
+        )
 
 
 def test_join_group_not_found() -> None:
@@ -140,6 +140,6 @@ def test_leave_group_success() -> None:
     students = (response.json())["students"]
     assert response.status_code == 200, f"Unexpected: {response.json()}"
 
-    assert not any(
-        student["id"] == leaver_id for student in students
-    ), f"Leaver {leaver_id} found in group students list"
+    assert not any(student["id"] == leaver_id for student in students), (
+        f"Leaver {leaver_id} found in group students list"
+    )
