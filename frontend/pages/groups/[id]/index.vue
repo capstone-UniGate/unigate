@@ -186,7 +186,7 @@
             <p
               class="text-gray-700 text-base bg-gray-50 border border-gray-200 rounded-lg p-4"
             >
-              [tag1], [tag2]
+            <span class="mx-1" v-for="(tag, index) in group.tags" :key="index">{{ tag }}<span v-if="index < group.tags.length - 1">,</span></span>
             </p>
           </div>
 
