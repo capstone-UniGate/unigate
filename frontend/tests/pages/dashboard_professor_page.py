@@ -1,10 +1,9 @@
 import time
 
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.remote.webelement import WebElement
-
 
 from tests.constants import Urls
 
@@ -44,11 +43,11 @@ class DashboardProfessorPage(BasePage):
     def get_course_avg_members_group(self) -> str:
         role = self.driver.find_element(By.ID, "course_avg_members_group").text
         return role.split("Average members per group: ")[1].strip()
-    
+
     def get_course_number_active_groups(self) -> str:
         role = self.driver.find_element(By.ID, "course_number_active_groups").text
         return role.split("Number of Active Groups: ")[1].strip()
-    
+
     def get_group_creation_chart(self) -> WebElement:
         time.sleep(3)
         return self.driver.find_element(By.ID, "group_creation_chart")
