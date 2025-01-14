@@ -57,6 +57,8 @@ class GroupPage(BasePage):
     def click_group_button(self):
         self.click_element("//div[@class='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4']//div[1]//div[1]//div[2]//button[1]")
 
+    def click_private_group_button(self):
+        self.click_element("//div[8]//div[1]//div[2]//button[1]")
        
 
     def is_page_loaded(self) -> bool:

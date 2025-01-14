@@ -19,8 +19,7 @@ class TestGroupDetails(BaseTest):
     def test_group_details_for_non_member(self) -> None:
         """Test that a non-member student sees the correct details on a private group page."""
 
-        group_card = (self.page.get_group_cards())[1]
-        self.page.click_button(group_card)
+        self.page.click_group_button()
         # Assert: Verify the group description is displayed
         assert (
             self.group_page_detail.check_description()
