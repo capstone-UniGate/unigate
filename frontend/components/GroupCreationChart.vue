@@ -24,7 +24,7 @@ const yAccessor = (d: { count: number }) => d.count;
 </script>
 
 <template>
-  <div>
+  <div id="group_creation_chart">
     <!-- Chart Container -->
     <VisXYContainer style="width: 100%; height: 300px">
       <VisLine
