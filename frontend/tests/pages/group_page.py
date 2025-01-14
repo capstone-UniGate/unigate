@@ -20,12 +20,11 @@ class GroupPage(BasePage):
         super().__init__(driver)
         self.wait = WebDriverWait(driver, 10)
 
-    def load(self) -> bool:
+    def load(self) -> None:
         try:
             self.driver.get(Urls.GROUP_PAGE)
         except Exception:  # noqa: BLE001
-            return False
-        return True
+            pass
 
     def is_heading_visible(self) -> bool:
         try:
@@ -83,4 +82,10 @@ class GroupPage(BasePage):
                 (By.CSS_SELECTOR, "[data-testid='create-group-button']")
             )
         )
+        button.click()
+
+    def click_fabio_private_group_button(self) -> None:
+        button = self.driver.find_element(By.XPATH, "//body//div[@id='__nuxt']//div[@class='p-4']//div[@class='p-4']//div[2]//div[1]//div[2]//button[1]")
+        time.sleep(0.5)
+        # create_button.send_keys(Keys.ENTER)
         button.click()

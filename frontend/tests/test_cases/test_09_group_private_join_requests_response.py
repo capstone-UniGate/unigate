@@ -35,16 +35,15 @@ class TestGroupPrivateJoinRequestsResponse(BaseTest):
         self.group_page_members = GroupPageMembers(driver)
         self.main_page = MainPage(driver)
         self.page.load()
-
-        group_card = (self.page.get_group_cards())[7]
-        self.page.click_button(group_card)
+        time.sleep(2)
+        self.page.click_private_group_button()
         time.sleep(0.2)
         self.group_page_detail.click_ask_to_join()
         time.sleep(0.2)
         self.main_page.click_logout()
         time.sleep(0.2)
         self.login(driver)
-        self.page.load()
+        # self.page.load()
 
     @fixture()
     def setup_lorenzo(self, driver: webdriver.Chrome) -> None:
@@ -54,28 +53,25 @@ class TestGroupPrivateJoinRequestsResponse(BaseTest):
         self.group_page_members = GroupPageMembers(driver)
         self.main_page = MainPage(driver)
         self.page.load()
-
-        group_card = (self.page.get_group_cards())[7]
-        self.page.click_button(group_card)
+        time.sleep(2)
+        self.page.click_private_group_button()
         time.sleep(0.2)
         self.group_page_detail.click_ask_to_join()
         time.sleep(0.2)
         self.main_page.click_logout()
         time.sleep(0.2)
         self.login(driver)
-        self.page.load()
+        # self.page.load()
 
     @pytest.mark.usefixtures("setup_fabio")
     def test_empty_list(self) -> None:
-        group_card = (self.page.get_group_cards())[1]
-        self.page.click_button(group_card)
+        self.page.click_fabio_private_group_button()
         self.group_page_detail.click_manage()
         assert self.group_page_detail.check_no_reqs(), "There are requests"
 
     @pytest.mark.usefixtures("setup")
     def test_click_approve(self) -> None:
-        group_card = (self.page.get_group_cards())[7]
-        self.page.click_button(group_card)
+        self.page.click_private_group_button()
         self.group_page_detail.click_manage()
         time.sleep(0.2)
         self.group_page_detail.approve_request(0)
@@ -88,8 +84,7 @@ class TestGroupPrivateJoinRequestsResponse(BaseTest):
 
     @pytest.mark.usefixtures("setup_mimmo")
     def test_click_reject(self) -> None:
-        group_card = (self.page.get_group_cards())[7]
-        self.page.click_button(group_card)
+        self.page.click_private_group_button()
         self.group_page_detail.click_manage()
         time.sleep(0.2)
         self.group_page_detail.reject_request(0)
@@ -102,8 +97,7 @@ class TestGroupPrivateJoinRequestsResponse(BaseTest):
 
     @pytest.mark.usefixtures("setup_lorenzo")
     def test_click_block(self) -> None:
-        group_card = (self.page.get_group_cards())[7]
-        self.page.click_button(group_card)
+        self.page.click_private_group_button()
         self.group_page_detail.click_manage()
         time.sleep(0.2)
         self.group_page_detail.block_request(0)
