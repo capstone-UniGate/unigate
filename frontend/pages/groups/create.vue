@@ -11,6 +11,7 @@
           <FormControl>
             <input
               type="text"
+              id="course_name"
               placeholder="Enter Group Name"
               v-bind="componentField"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-500"
