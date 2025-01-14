@@ -3,6 +3,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import Select
 
 from tests.constants import Urls
 
@@ -14,7 +15,7 @@ class CreateGroupPage(BasePage):
     URL = Urls.CREATE_GROUP_PAGE
 
     # Locators
-    NAME_INPUT = (By.ID, "group-name-input")
+    NAME_INPUT = (By.ID, "radix-v-0-0-form-item")
     COURSE_SELECT = (By.ID, "course-select")
     PRIVACY_PUBLIC = (By.ID, "privacy-public")
     DESCRIPTION = (By.ID, "group-description")
@@ -122,8 +123,8 @@ class CreateGroupPage(BasePage):
     def fill_form(self, data: dict[str, str | list[str]]) -> None:
         """Fill the entire form with provided data"""
         self.wait_for_page_load()
-        self.select_course(str(data["course"]))
         self.set_name(str(data["name"]))
+        self.select_course(str(data["course"]))
         self.set_privacy_public()
         self.set_description(str(data["description"]))
         self.add_tags(
@@ -135,3 +136,34 @@ class CreateGroupPage(BasePage):
         """Verify all expected validation messages are present"""
         actual_messages = self.get_error_messages()
         return all(msg in actual_messages for msg in expected_messages)
+    
+
+    def enter_text(self, selector: str, text: str):
+        element = self.driver.find_element(By.XPATH, selector)
+        element.clear()
+        element.send_keys(text)
+
+        # Helper function to select a dropdown option
+    def select_option(self, selector: str, value: str):
+        dropdown = Select(self.driver.find_element(By.XPATH, selector))
+        dropdown.select_by_visible_text(value)
+
+    def enter_course_name(self, course_name: str):
+        self.enter_text("//input[@placeholder='Enter Course Name']", course_name)
+
+    def enter_group_name(self, group_name: str):
+        self.enter_text("//input[@id='radix-v-0-0-form-item']", group_name)
+        
+    def enter_group_name(self, course_name: str):
+        self.enter_text(self.SELECTORS["#radix-v-0-0-form-item"], course_name)
+
+    def select_exam_date(self, date: str):
+        self.select_option("//select[@id='examDate']", date)
+
+
+    def select_public_filter(self):
+        self.select_option("is_public_dropdown", "Public")
+
+    def select_private_filter(self):
+        self.select_option("is_public_dropdown", "Private")
+    

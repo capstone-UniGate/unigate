@@ -49,6 +49,16 @@ class GroupPage(BasePage):
         )
         group_button.click()
 
+    # Helper function to click an element
+    def click_element(self, selector: str):
+        self.driver.find_element(By.XPATH, selector).click()
+
+    # Actions using helper functions
+    def click_group_button(self):
+        self.click_element("//div[@class='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4']//div[1]//div[1]//div[2]//button[1]")
+
+       
+
     def is_page_loaded(self) -> bool:
         try:
             return (
