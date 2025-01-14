@@ -1,3 +1,4 @@
+import time
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
@@ -59,6 +60,12 @@ class GroupPage(BasePage):
 
     def click_private_group_button(self):
         self.click_element("//div[8]//div[1]//div[2]//button[1]")
+
+    def click_private_group_button2(self):
+        button = self.driver.find_element(By.XPATH, "//div[8]//div[1]//div[2]//button[1]")
+        time.sleep(0.5)
+        # create_button.send_keys(Keys.ENTER)
+        button.click()
        
 
     def is_page_loaded(self) -> bool:

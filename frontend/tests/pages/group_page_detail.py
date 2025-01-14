@@ -92,7 +92,6 @@ class GroupPageDetail:
 
     def click_join(self) -> None:
         create_button = self.driver.find_element(By.ID, "join-group-button")
-        create_button.send_keys(Keys.ENTER)
         create_button.click()
 
     def click_ask_to_join(self) -> None:
