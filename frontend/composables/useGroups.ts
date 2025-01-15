@@ -351,7 +351,7 @@ export function useGroups() {
         `/courses/${encodeURIComponent(courseName)}/yearly_stats`,
         {
           method: "GET",
-        }
+        },
       );
       return response;
     } catch (error) {
@@ -360,7 +360,7 @@ export function useGroups() {
     } finally {
       isLoading.value = false;
     }
-  } 
+  }
 
   async function getTotalMembers(courseName: string): Promise<number> {
     try {
@@ -368,9 +368,9 @@ export function useGroups() {
       isLoading.value = true;
       const response = await useApiFetch(
         `/courses/${encodeURIComponent(courseName)}/total_members`,
-        { method: "GET" }
+        { method: "GET" },
       );
-      if (typeof response !== 'number') {
+      if (typeof response !== "number") {
         throw new Error("Unexpected response type");
       }
       return response;
@@ -382,8 +382,7 @@ export function useGroups() {
       isLoading.value = false;
     }
   }
-  
-  
+
   return {
     groups,
     isLoading,

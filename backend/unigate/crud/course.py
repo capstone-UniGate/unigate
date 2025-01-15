@@ -34,8 +34,10 @@ class CRUDCourse(CRUDBase[Course, CourseCreate, Course]):
 
     def get_all_name_courses(self, *, session: Session) -> list[str]:
         return session.exec(select(self.model.name))
-    
-    def get_yearly_group_stats(self, session: Session, course_name: str) -> dict[int, int]:
+
+    def get_yearly_group_stats(
+        self, session: Session, course_name: str
+    ) -> dict[int, int]:
         """
         Get yearly group stats for a specific course.
         """
@@ -52,8 +54,8 @@ class CRUDCourse(CRUDBase[Course, CourseCreate, Course]):
 
     def get_total_members(self, *, session: Session, course_name: str) -> int:
         statement = (
-            select(func.count(func.distinct(Join.student_id))) 
-            .join(Group, Group.id == Join.group_id) 
+            select(func.count(func.distinct(Join.student_id)))
+            .join(Group, Group.id == Join.group_id)
             .where(Group.course_name == course_name)
         )
         result = session.exec(statement).one_or_none()

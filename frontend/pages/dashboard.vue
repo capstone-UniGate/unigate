@@ -42,7 +42,6 @@ const studentNames = ref<string[]>([]);
 const yearlyStats = ref<{ [key: number]: number }>({});
 const totalMembers = ref<number | null>(null);
 
-
 // Watcher to update exam dates when a course is selected
 watch(course, (newCourseName) => {
   const matchedCourse = courses.value.find(
@@ -83,8 +82,6 @@ const fetchTotalMembers = async () => {
     console.error("Error fetching total members:", error);
   }
 };
-
-
 
 // Fetch group counts for each course
 const fetchGroupCounts = async () => {
@@ -372,11 +369,17 @@ onMounted(fetchProfessorsCourses);
         </div>
 
         <!-- Yearly Group Enrollment and Participation -->
-        <div id="yearly_group_creation_chart"
-        v-if="filteredCourses.length && Object.keys(yearlyStats).length > 0"
-        class="mt-8">
-          <h2 class="text-2xl font-bold mb-6">Yearly Group Enrollment and Participation</h2>
-          <table class="table-auto w-full text-left border-collapse border border-gray-200">
+        <div
+          id="yearly_group_creation_chart"
+          v-if="filteredCourses.length && Object.keys(yearlyStats).length > 0"
+          class="mt-8"
+        >
+          <h2 class="text-2xl font-bold mb-6">
+            Yearly Group Enrollment and Participation
+          </h2>
+          <table
+            class="table-auto w-full text-left border-collapse border border-gray-200"
+          >
             <thead>
               <tr>
                 <th class="border border-gray-300 px-4 py-2">Year</th>
@@ -385,10 +388,17 @@ onMounted(fetchProfessorsCourses);
               </tr>
             </thead>
             <tbody>
-              <tr v-for="[year, totalGroups] in Object.entries(yearlyStats)" :key="year">
+              <tr
+                v-for="[year, totalGroups] in Object.entries(yearlyStats)"
+                :key="year"
+              >
                 <td class="border border-gray-300 px-4 py-2">{{ year }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ totalGroups }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ totalMembers }}</td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ totalGroups }}
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ totalMembers }}
+                </td>
               </tr>
             </tbody>
           </table>

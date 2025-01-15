@@ -237,6 +237,7 @@ def get_all_course_names() -> list[str]:
         )
     return courses
 
+
 @router.get(
     "/{course_name}/yearly_stats",
     response_model=dict[int, int],
@@ -246,12 +247,15 @@ def get_yearly_stats(session: SessionDep, course_name: str) -> dict[int, int]:
     Fetch yearly group creation statistics for a specific course.
     """
     try:
-        return crud.course.get_yearly_group_stats(session=session, course_name=course_name)
+        return crud.course.get_yearly_group_stats(
+            session=session, course_name=course_name
+        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error retrieving yearly stats: {e}",
         )
+
 
 @router.get("/{course_name}/total_members", response_model=int)
 def get_total_members(

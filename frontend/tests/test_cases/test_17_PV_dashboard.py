@@ -32,13 +32,13 @@ class TestUserProfile(BaseTest):
     def test_get_group_creation_chart(self) -> None:
         self.page.set_course_name("Capstone")
         self.page.select_filter(1)
-        assert (
-            self.page.get_group_creation_chart() is not None
-        ), "Group creation chart is not rendered"
+        assert self.page.get_group_creation_chart() is not None, (
+            "Group creation chart is not rendered"
+        )
 
     def test_get_yearly_group_creation_table(self) -> None:
         self.page.set_course_name("Capstone")
         self.page.select_filter(1)
-        assert (
-            self.page.get_yearly_group_creation_table() is not None
-        ), "Yearly group creation chart is not rendered"
+        assert self.page.get_yearly_group_creation_table() is not None, (
+            "Yearly group creation chart is not rendered"
+        )
