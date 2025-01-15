@@ -100,3 +100,14 @@ class GroupPage(BasePage):
             )
         )
         button.click()
+
+    def click_private_group_button(self) -> None:
+        button = self.wait.until(
+            EC.element_to_be_clickable(
+                (
+                    By.XPATH,
+                    "//div[8]//div[1]//div[2]//button[1]",
+                )
+            )
+        )
+        button.click()
