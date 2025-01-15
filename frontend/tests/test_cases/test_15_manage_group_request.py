@@ -24,13 +24,11 @@ class TestManageGroupRequest(BaseTest):
         self.page.click_private_group_button()
         self.group_page_detail.click_ask_to_join()
         self.main_page.click_logout()
-
         # Login as user2 and block user1
         self.login(self.page.driver)
         # Reinitialize page objects after second login
         self.page = GroupPage(self.page.driver)
         self.group_page_detail = GroupPageDetail(self.page.driver)
-
         time.sleep(2)  # Allow page to load fully
         self.page.click_private_group_button()
         time.sleep(1)  # Allow page to load fully
