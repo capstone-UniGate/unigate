@@ -17,10 +17,14 @@
     </h2>
 
     <!-- Average People per Group -->
-    <p class="text-sm mt-2">Average members per group: {{ avgMembers }}</p>
+    <p id="course_avg_members_group" class="text-sm mt-2">
+      Average members per group: {{ avgMembers }}
+    </p>
 
     <!-- Number of Active Groups -->
-    <p class="text-sm mt-2">Number of Active Groups: {{ activeGroupCount }}</p>
+    <p id="course_number_active_groups" class="text-sm mt-2">
+      Number of Active Groups: {{ activeGroupCount }}
+    </p>
 
     <!-- Exam List -->
     <div class="mt-3 space-y-2">
