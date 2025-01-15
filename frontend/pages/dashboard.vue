@@ -13,6 +13,8 @@ const {
   getAverageMembers,
   getActiveGroupCount,
   getGroupCreationDistribution,
+  getYearlyStats,
+  getTotalMembers,
 } = useGroups();
 
 const course = ref("");
@@ -36,8 +38,9 @@ const errorMessage = ref("");
 const averageMembers = ref<Record<string, number>>({});
 const activeGroupsCounts = ref<Record<string, Record<string, number>>>({});
 const groupCreationData = ref<{ date: string; count: number }[]>([]);
-const isLoadingChart = ref(true);
 const studentNames = ref<string[]>([]);
+const yearlyStats = ref<{ [key: number]: number }>({});
+const totalMembers = ref<number | null>(null);
 
 // Watcher to update exam dates when a course is selected
 watch(course, (newCourseName) => {
@@ -53,6 +56,32 @@ watch(course, (newCourseName) => {
     );
   }
 });
+
+const fetchYearlyStats = async () => {
+  if (!course.value) {
+    console.error("Course value is empty, skipping fetchYearlyStats.");
+    return;
+  }
+  try {
+    console.log(`Fetching yearly stats for course: ${course.value}`);
+    const response = await getYearlyStats(course.value);
+    console.log("Yearly stats response:", response);
+    yearlyStats.value = response as { [key: number]: number };
+  } catch (error) {
+    console.error("Error fetching yearly stats:", error);
+  }
+};
+
+const fetchTotalMembers = async () => {
+  if (!course.value) return;
+  try {
+    const response = await getTotalMembers(course.value);
+    totalMembers.value = response;
+    console.log("Total Members:", totalMembers.value);
+  } catch (error) {
+    console.error("Error fetching total members:", error);
+  }
+};
 
 // Fetch group counts for each course
 const fetchGroupCounts = async () => {
@@ -264,6 +293,8 @@ onMounted(fetchProfessorsCourses);
                       course,
                     );
                     await fetchGroupCreationData(course);
+                    await fetchYearlyStats();
+                    await fetchTotalMembers();
                   } catch (error) {
                     console.error(
                       'Error fetching group creation data for course:',
@@ -335,6 +366,42 @@ onMounted(fetchProfessorsCourses);
         >
           <h2 class="text-2xl font-bold mb-6">Group Creation Over Time</h2>
           <GroupCreationChart :data="groupCreationData" />
+        </div>
+
+        <!-- Yearly Group Enrollment and Participation -->
+        <div
+          id="yearly_group_creation_chart"
+          v-if="filteredCourses.length && Object.keys(yearlyStats).length > 0"
+          class="mt-8"
+        >
+          <h2 class="text-2xl font-bold mb-6">
+            Yearly Group Enrollment and Participation
+          </h2>
+          <table
+            class="table-auto w-full text-left border-collapse border border-gray-200"
+          >
+            <thead>
+              <tr>
+                <th class="border border-gray-300 px-4 py-2">Year</th>
+                <th class="border border-gray-300 px-4 py-2">Total Groups</th>
+                <th class="border border-gray-300 px-4 py-2">Total Members</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="[year, totalGroups] in Object.entries(yearlyStats)"
+                :key="year"
+              >
+                <td class="border border-gray-300 px-4 py-2">{{ year }}</td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ totalGroups }}
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ totalMembers }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

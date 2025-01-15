@@ -1,9 +1,10 @@
 import datetime
 
+from sqlalchemy.sql import func
 from sqlmodel import Session, select
 
 from unigate.crud.base import CRUDBase
-from unigate.models import Course
+from unigate.models import Course, Group, Join
 from unigate.schemas.course import CourseCreate
 
 
@@ -33,6 +34,32 @@ class CRUDCourse(CRUDBase[Course, CourseCreate, Course]):
 
     def get_all_name_courses(self, *, session: Session) -> list[str]:
         return session.exec(select(self.model.name))
+
+    def get_yearly_group_stats(
+        self, session: Session, course_name: str
+    ) -> dict[int, int]:
+        """
+        Get yearly group stats for a specific course.
+        """
+        statement = (
+            select(func.extract("year", Group.date).label("year"), func.count(Group.id))
+            .where(Group.course_name == course_name)
+            .group_by("year")
+            .order_by("year")
+        )
+        results = session.exec(statement).all()
+
+        yearly_stats = {int(row.year): row.count for row in results}
+        return yearly_stats
+
+    def get_total_members(self, *, session: Session, course_name: str) -> int:
+        statement = (
+            select(func.count(func.distinct(Join.student_id)))
+            .join(Group, Group.id == Join.group_id)
+            .where(Group.course_name == course_name)
+        )
+        result = session.exec(statement).one_or_none()
+        return result if result else 0
 
 
 course = CRUDCourse(Course)

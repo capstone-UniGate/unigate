@@ -49,5 +49,7 @@ class DashboardProfessorPage(BasePage):
         return role.split("Number of Active Groups: ")[1].strip()
 
     def get_group_creation_chart(self) -> WebElement:
-        time.sleep(3)
         return self.driver.find_element(By.ID, "group_creation_chart")
+
+    def get_yearly_group_creation_table(self) -> WebElement:
+        return self.driver.find_element(By.ID, "yearly_group_creation_chart")
