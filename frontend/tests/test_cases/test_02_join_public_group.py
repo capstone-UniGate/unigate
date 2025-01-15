@@ -21,8 +21,8 @@ class TestGroupCreate(BaseTest):
     def test_join_group_toast(self) -> None:
         """Test that clicking join button shows a toast message."""
         # Load the group details page
-        group_card = (self.page.get_group_cards())[0]
-        self.page.click_button(group_card)
+
+        self.page.click_group_button()
 
         time.sleep(0.5)
         # Click the button

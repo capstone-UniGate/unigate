@@ -6,20 +6,21 @@ from selenium import webdriver
 from tests.pages.group_page import GroupPage
 from tests.pages.group_page_detail import GroupPageDetail
 from tests.pages.group_page_members import GroupPageMembers
+from tests.test_cases.base_test import BaseTest
 
 
-class TestLeaveGroup:
+class TestLeaveGroup(BaseTest):
     @pytest.fixture(autouse=True)
-    def setup(self, driver: webdriver.Chrome) -> None:
-        self.page = GroupPage(driver)
-        self.group_page_detail = GroupPageDetail(driver)
-        self.group_page_members = GroupPageMembers(driver)
+    def setup(self, base_page: webdriver.Chrome) -> None:
+        self.login(base_page)
+        self.page = GroupPage(base_page)
+        self.group_page_detail = GroupPageDetail(base_page)
+        self.group_page_members = GroupPageMembers(base_page)
         self.page.load()
 
     def test_leave_group(self) -> None:
         # Load the group details page
-        group_card = (self.page.get_group_cards())[0]
-        self.page.click_button(group_card)
+        self.page.click_group_button()
 
         time.sleep(0.5)
         # Click the button

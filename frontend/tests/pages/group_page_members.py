@@ -21,19 +21,29 @@ class GroupPageMembers(BasePage):
         # Iterate through the members and verify their names and profile pictures
         for member in members_list:
             # Find the name element inside the member element
-            name_element = member.find_element(By.ID, "member_name")
+            name_element = member.find_element(By.ID, "member_name")  # type: ignore
 
             # Assert that the name is displayed
             if not name_element.is_displayed() or name_element.text != "":
                 return False
 
-            if not member.find_element(By.ID, "block_member").is_displayed():
+            block_member_element: WebElement = member.find_element(
+                By.ID, "block_member"
+            )  # type: ignore[arg-type]
+            if not block_member_element.is_displayed():
                 return False
         return True
 
     def block_member(self) -> None:
-        member = self.get_members()[0]
-        member.find_element(By.ID, "block_member").click()
+        self.driver.find_element(By.XPATH, "//button[@id='block_button']").click()  # type: ignore
+
+    def block_member_inside_group(self) -> None:
+        self.driver.find_element(By.XPATH, "//button[@id='block_member']").click()
+
+    def approve_button(self) -> None:
+        self.driver.find_element(
+            By.XPATH, "(//button[@id='approve_button'])[1]"
+        ).click()
 
     def check_no_members(self) -> bool:
         return (self.driver.find_element(By.ID, "no_members")).is_displayed()
@@ -50,7 +60,7 @@ class GroupPageMembers(BasePage):
 
     def unblock_member(self) -> None:
         member = self.get_blocked()[0]
-        member.find_element(By.ID, "unblock_student").click()
+        member.find_element(By.ID, "unblock_student").click()  # type: ignore[arg-type]
 
     def check_no_blocked(self) -> bool:
         return (self.driver.find_element(By.ID, "no_blocked_users")).is_displayed()

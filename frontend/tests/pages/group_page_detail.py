@@ -1,7 +1,6 @@
 import time
 
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
@@ -92,7 +91,6 @@ class GroupPageDetail:
 
     def click_join(self) -> None:
         create_button = self.driver.find_element(By.ID, "join-group-button")
-        create_button.send_keys(Keys.ENTER)
         create_button.click()
 
     def click_ask_to_join(self) -> None:
@@ -113,16 +111,20 @@ class GroupPageDetail:
 
     def check_description(self) -> bool:
         description_element = self.driver.find_element(
-            By.CSS_SELECTOR, ".text-gray-600"
+            By.XPATH, "//p[normalize-space()='This is a test group']"
         )
         return description_element.is_displayed() and description_element.text != ""
 
     def check_members_link(self) -> bool:
-        members_link = self.driver.find_element(By.CSS_SELECTOR, "a.text-blue-500")
+        members_link = self.driver.find_element(By.XPATH, "//a[@id='members_list']")
         return members_link.is_displayed()
 
     def check_ask_join(self) -> bool:
         join_button = self.driver.find_element(By.ID, "ask-to-join-button")
+        return join_button.is_displayed()
+
+    def check_join(self) -> bool:
+        join_button = self.driver.find_element(By.ID, "join-group-button")
         return join_button.is_displayed()
 
     def check_leave(self) -> bool:

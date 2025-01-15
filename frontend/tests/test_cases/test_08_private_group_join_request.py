@@ -18,8 +18,7 @@ class TestPrivateGroupJoinRequest(BaseTest):
 
     def test_join_group_toast(self) -> None:
         # Load the group details page
-        group_card = (self.page.get_group_cards())[7]
-        self.page.click_button(group_card)
+        self.page.click_private_group_button()
         time.sleep(1)
         # Click the button
         self.group_page_detail.click_ask_to_join()
