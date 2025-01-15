@@ -20,7 +20,7 @@ class TestManageGroupRequest(BaseTest):
     def test_block_user(self) -> None:
         """Test that blocking a user removes them from the request list."""
         # First login as user1 and request to join
-        self.login_fabio(self.page.driver)
+        self.login_lorenzo(self.page.driver)
         self.page.click_private_group_button()
         self.group_page_detail.click_ask_to_join()
         self.main_page.click_logout()
