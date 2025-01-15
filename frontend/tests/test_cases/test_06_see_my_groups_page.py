@@ -2,7 +2,9 @@ import time
 
 import pytest
 from selenium import webdriver
-from selenium.webdriver.support import expected_conditions as expected_conditions  # noqa: N812
+from selenium.webdriver.support import (
+    expected_conditions as expected_conditions,
+)
 from selenium.webdriver.support.ui import WebDriverWait
 
 from tests.constants import Urls
@@ -26,12 +28,12 @@ class TestSeeMyGroups(BaseTest):
     def test_create_group_navigation(self) -> None:
         """Test navigation to create group page"""
         self.page.click_create_group()
-
-        #write a test that user is in page create group
+        # write a test that user is in page create group
         time.sleep(1)  # Give page time to load
         current_url = self.page.driver.current_url
-        assert "/groups/see-my-group" in current_url, "Failed to navigate to create group page"
-        
+        assert "/groups/create" in current_url, (
+            "Failed to navigate to create group page"
+        )
 
     def test_group_cards_display(self) -> None:
         """Test that group cards are displayed after loading"""

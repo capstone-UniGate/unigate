@@ -77,3 +77,26 @@ class GroupPage(BasePage):
             )
         )
         button.click()
+
+    def click_fabio_private_group_button(self) -> None:
+        # Option 1: Wait for element to be clickable
+        button = self.wait.until(
+            EC.element_to_be_clickable(
+                (
+                    By.XPATH,
+                    "//body//div[@id='__nuxt']//div[@class='p-4']//div[@class='p-4']//div[2]//div[1]//div[2]//button[1]",
+                )
+            )
+        )
+        button.click()
+
+    def click_group_button(self) -> None:
+        button = self.wait.until(
+            EC.element_to_be_clickable(
+                (
+                    By.XPATH,
+                    "//div[@class='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4']//div[1]//div[1]//div[2]//button[1]",
+                )
+            )
+        )
+        button.click()
