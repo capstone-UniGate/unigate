@@ -24,7 +24,7 @@ class TestGroupMemberBlock(BaseTest):
         """Test that blocking a user removes them from the request list."""
         # Load the group details page
         # First login as user1 and request to join
-        self.login(self.page.driver)
+        self.login_mimmo(self.page.driver)
         self.page = GroupPage(self.page.driver)
         self.group_page_detail = GroupPageDetail(self.page.driver)
         self.group_page_members = GroupPageMembers(self.page.driver)
