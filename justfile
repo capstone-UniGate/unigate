@@ -16,7 +16,7 @@ frontend_python := frontend_venv + python
     just --list
 
 docker-up:
-    docker compose up --watch --build
+    docker compose up --watch --build --force-recreate
 
 docker-stop:
     docker compose stop
@@ -29,10 +29,16 @@ reset-database:
     docker compose exec postgres-unigate psql -U $POSTGRES_USER -d $UNIGATE_DB -c "DO \$\$ BEGIN EXECUTE 'DROP SCHEMA public CASCADE'; EXECUTE 'CREATE SCHEMA public'; END \$\$;"
     docker compose exec postgres-unigate psql -U $POSTGRES_USER -d $AUTH_DB -c "DO \$\$ BEGIN EXECUTE 'DROP SCHEMA public CASCADE'; EXECUTE 'CREATE SCHEMA public'; END \$\$;"
 
-init-database-docker: reset-database
+init-database-docker-real: reset-database
     docker compose exec backend-unigate sh -c "cd alembic_unigate && alembic upgrade head"
     docker compose exec backend-unigate sh -c "cd alembic_auth && alembic upgrade head"
     docker compose exec backend-unigate sh -c "python3 seeders/real.py"
+
+init-database-docker-base: reset-database
+    docker compose exec backend-unigate sh -c "cd alembic_unigate && alembic upgrade head"
+    docker compose exec backend-unigate sh -c "cd alembic_auth && alembic upgrade head"
+    docker compose exec backend-unigate sh -c "python3 seeders/base.py"
+
 
 init-database: reset-database
     cd backend/alembic_unigate && ../../{{ backend_venv }}/alembic upgrade head
@@ -48,8 +54,8 @@ init-minio: reset-minio
 seed-real:
     {{ backend_python }} backend/seeders/real.py
 
-seed-fake:
-    {{ backend_python }} backend/seeders/fake.py
+seed-base:
+    {{ backend_python }} backend/seeders/base.py
 
 backend-deps:
     cd backend && uv sync

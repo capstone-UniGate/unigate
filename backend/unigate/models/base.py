@@ -41,6 +41,7 @@ class GroupBase(SQLModel):
     course_name: str
     exam_date: datetime.date | None = None
     tags: list[str] | None = Field(default=None, sa_column=Column(ARRAY(sa.String)))
+    date: datetime.date | None = Field(default_factory=datetime.date.today)
 
 
 class RequestBase(SQLModel):

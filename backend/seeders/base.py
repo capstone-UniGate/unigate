@@ -15,58 +15,123 @@ from unigate.schemas.course import CourseCreate
 from unigate.schemas.group import GroupCreate
 from unigate.schemas.student import StudentCreate
 
-test_student = StudentCreate(
-    number=1234567,
-    email="s1234567@studenti.unige.it",
-    name="Test Name",
-    surname="Test Surname",
-)
+students = [
+    StudentCreate(
+        number=1234567,
+        email="s1234567@studenti.unige.it",
+        name="Test Name",
+        surname="Test Surname",
+    ),
+    StudentCreate(
+        number=4891185,
+        email="s4891185@studenti.unige.it",
+        name="Fabio",
+        surname="Fontana",
+    ),
+    StudentCreate(
+        number=4989646,
+        email="s4989646@studenti.unige.it",
+        name="Lorenzo",
+        surname="Foschi",
+    ),
+    StudentCreate(
+        number=5806782,
+        email="s5806782@studenti.unige.it",
+        name="Mimmo",
+        surname="Torabi",
+    ),
+    StudentCreate(
+        number=6015033,
+        email="s6015033@studenti.unige.it",
+        name="Musse",
+        surname="Gher",
+    ),
+    StudentCreate(
+        number=4820312,
+        email="s4820312@studenti.unige.it",
+        name="Giovanni",
+        surname="Bosi",
+    ),
+    StudentCreate(
+        number=5475593,
+        email="s5475593@studenti.unige.it",
+        name="Forough",
+        surname="Majidi",
+    ),
+    StudentCreate(
+        number=4878744,
+        email="s4878744@studenti.unige.it",
+        name="Michele",
+        surname="Frattini",
+    ),
+]
 
 professors = [
     AuthUserCreate(
-        number=101810,
+        number=0,
+        email="test@unige.it",
+        name="Test Name",
+        surname="Test Surname",
+        hashed_password=get_password_hash("testpassword"),
+    ),
+    AuthUserCreate(
+        number=1000000,
         email="marina.ribaudo@unige.it",
         name="Marina",
         surname="Ribaudo",
-        hashed_password=get_password_hash("profpassword"),
+        hashed_password=get_password_hash("testpassword"),
     ),
     AuthUserCreate(
-        number=101811,
+        number=2000000,
         email="maura.cerioli@unige.it",
         name="Maura",
         surname="Cerioli",
-        hashed_password=get_password_hash("profpassword"),
+        hashed_password=get_password_hash("testpassword"),
     ),
     AuthUserCreate(
-        number=3333333,
-        email="matteo@unige.it",
+        number=3000000,
+        email="matteo.dellamico@unige.it",
         name="Matteo",
-        surname="Dell Amico",
-        hashed_password=get_password_hash("profpassword"),
+        surname="Dell'Amico",
+        hashed_password=get_password_hash("testpassword"),
     ),
 ]
 
 groups = [
     GroupCreate(
-        name="Test Student Group",
-        description="Group for testing purposes",
+        name="Test Public Group",
+        description="This is a test group",
         category="Test",
         type=GroupType.PUBLIC,
         course_name="Test Course",
         date=datetime(2025, 1, 1, tzinfo=pytz.utc),
-        exam_date=datetime(2025, 1, 15, tzinfo=pytz.utc),
+        exam_date=datetime(2025, 1, 1, tzinfo=pytz.utc),
+    ),
+    GroupCreate(
+        name="Test Private Group",
+        description="This is a test group",
+        category="Test",
+        type=GroupType.PRIVATE,
+        course_name="Test Course",
+        date=datetime(2025, 1, 1, tzinfo=pytz.utc),
+        exam_date=datetime(2025, 1, 1, tzinfo=pytz.utc),
     ),
 ]
 
 courses = {
+    "Test Course": {
+        "course": CourseCreate(name="Test Course"),
+        "professors": [professors[0]],
+        "exam_dates": [datetime(2025, 1, 1, tzinfo=pytz.utc)],
+    },
     "Capstone": {
         "course": CourseCreate(name="Capstone"),
-        "professors": [professors[0], professors[1]],
+        "professors": [professors[1], professors[2]],
         "exam_dates": [],
     },
     "Distributed Systems": {
         "course": CourseCreate(name="Distributed Systems"),
-        "professors": [professors[0], professors[2]],
+        "professors": [professors[1], professors[3]],
         "exam_dates": [],
     },
 }
@@ -82,15 +147,18 @@ def generate_exam_dates():
 
 
 for course_name, details in courses.items():
-    details["exam_dates"] = generate_exam_dates()
+    if course_name != "Test Course":
+        details["exam_dates"] = generate_exam_dates()
 
 
 users = professors + [
     AuthUserCreate.model_validate(
-        test_student,
+        student,
         update={"hashed_password": get_password_hash("testpassword")},
-    )
+    ) for student in students
 ]
+
+test_student = students[0]
 
 
 def seed_auth() -> None:
@@ -121,26 +189,24 @@ def seed_auth() -> None:
 
 def seed_unigate() -> None:
     session = next(get_session())
-    course_cycle = cycle(courses.items())
 
-    current_student = crud.student.create(obj_in=test_student, session=session)
-
-    for group in groups:
-        current_course_name, details = next(course_cycle)
-        group = crud.group.create(
-            obj_in=group,
-            update={
-                "creator_id": current_student.id,
-                "name": f"{group.name} {current_student.number}",
-                "course_name": details["course"].name,
-                "exam_date": details["exam_dates"][0],
-            },
-            session=session,
-        )
-        group.students.append(current_student)
-        group.super_students.append(current_student)
-        session.add(group)
-    session.commit()
+    for student in students:
+        current_student = crud.student.create(obj_in=student, session=session)
+        for group in groups:
+            current_group = crud.group.create(
+                obj_in=group,
+                update={
+                    "creator_id": current_student.id,
+                    "name": f"Test {student.number} {group.type.value}",
+                    "course_name": group.course_name,
+                    "exam_date": group.exam_date,
+                },
+                session=session,
+            )
+            current_group.students.append(current_student)
+            current_group.super_students.append(current_student)
+            session.add(current_group)
+            session.commit()
 
 
 if __name__ == "__main__":
