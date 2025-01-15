@@ -18,9 +18,9 @@ def authenticate_user(username="S1234567") -> dict:
     }
 
     response = client.post("/auth/login", data=login_payload)
-    assert (
-        response.status_code == 200
-    ), f"Failed to authenticate user: {response.json()}"
+    assert response.status_code == 200, (
+        f"Failed to authenticate user: {response.json()}"
+    )
     return response.json()
 
 
@@ -86,25 +86,25 @@ def test_join_private_group_success() -> None:
     requests_response = client.get(
         f"/groups/{created_group_id}/requests", headers=headers
     )
-    assert (
-        requests_response.status_code == 200
-    ), f"Could not retrieve requests: {requests_response.json()}"
+    assert requests_response.status_code == 200, (
+        f"Could not retrieve requests: {requests_response.json()}"
+    )
     requests_data = requests_response.json()
 
     join_request = next(
         (req for req in requests_data if req["student_id"] == joiner_id), None
     )
-    assert (
-        join_request is not None
-    ), f"Join request not found for user {joiner_id}. Requests data: {requests_data}"
+    assert join_request is not None, (
+        f"Join request not found for user {joiner_id}. Requests data: {requests_data}"
+    )
     assert join_request["status"] == "PENDING"
 
     # Approve the request and verify it's approved
     approve_path = f"groups/{created_group_id}/requests/{join_request['id']}/approve"
     approve_response = client.post(approve_path, headers=headers)
-    assert (
-        approve_response.status_code == 200
-    ), f"Failed to approve request: {approve_response.json()}"
+    assert approve_response.status_code == 200, (
+        f"Failed to approve request: {approve_response.json()}"
+    )
 
     # Confirm it's now approved
     requests_response = client.get(

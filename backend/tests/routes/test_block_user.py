@@ -28,9 +28,9 @@ def authenticate_user(user_type: Literal["admin", "non-admin"] = "admin") -> str
     response = client.post(
         "/auth/login", data={"username": username, "password": PASSWORD}
     )
-    assert (
-        response.status_code == 200
-    ), f"Failed to authenticate user: {response.json()}"
+    assert response.status_code == 200, (
+        f"Failed to authenticate user: {response.json()}"
+    )
     return response.json()["access_token"]
 
 
@@ -138,9 +138,9 @@ def test_block_user() -> None:
 
     # Verify the student is in the 'blocked_students' list
     blocked_students = data.get("blocked_students", [])
-    assert any(
-        student["id"] == STUDENT_ID for student in blocked_students
-    ), "Student was not successfully blocked."
+    assert any(student["id"] == STUDENT_ID for student in blocked_students), (
+        "Student was not successfully blocked."
+    )
 
 
 def test_unblock_user() -> None:
@@ -167,9 +167,9 @@ def test_unblock_user() -> None:
 
     # Verify the student is not in the 'blocked_students' list
     blocked_students = data.get("blocked_students", [])
-    assert not any(
-        student["id"] == STUDENT_ID for student in blocked_students
-    ), "Student was not successfully unblocked."
+    assert not any(student["id"] == STUDENT_ID for student in blocked_students), (
+        "Student was not successfully unblocked."
+    )
 
 
 def test_non_admin_cannot_block_user() -> None:

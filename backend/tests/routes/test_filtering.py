@@ -18,9 +18,9 @@ def authenticate_user(
         "password": password,
     }
     response = client.post("/auth/login", data=login_payload)
-    assert (
-        response.status_code == 200
-    ), f"Failed to authenticate user: {response.json()}"
+    assert response.status_code == 200, (
+        f"Failed to authenticate user: {response.json()}"
+    )
     return response.json()
 
 

@@ -19,9 +19,9 @@ class TestUserProfile(BaseTest):
         self.login_and_navigate(self.login_professor)
         course_name = "Binary Analysis and secure coding"
         actual_course_name = self.page.get_course_name_card()
-        assert (
-            actual_course_name == course_name
-        ), f"Expected '{course_name}' but got '{actual_course_name}'"
+        assert actual_course_name == course_name, (
+            f"Expected '{course_name}' but got '{actual_course_name}'"
+        )
 
     def test_table_data(self) -> None:
         self.login_and_navigate(self.login_professor)
@@ -33,12 +33,12 @@ class TestUserProfile(BaseTest):
             "Total groups": 1,
         }
         actual_data = self.page.get_table_data()
-        assert (
-            actual_data == expected_data
-        ), f"Expected {expected_data} but got {actual_data}"
+        assert actual_data == expected_data, (
+            f"Expected {expected_data} but got {actual_data}"
+        )
 
     def test_fail_contains(self) -> None:
         self.login_and_navigate(self.login_lorenzo)
-        assert (
-            self.page.is_access_denied_image_present()
-        ), "The 'Access Denied' image is not present on the page."
+        assert self.page.is_access_denied_image_present(), (
+            "The 'Access Denied' image is not present on the page."
+        )

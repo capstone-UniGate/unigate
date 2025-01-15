@@ -22,9 +22,9 @@ def authenticate_user(username="S1234567") -> dict:
     }
 
     response = client.post("/auth/login", data=login_payload)
-    assert (
-        response.status_code == 200
-    ), f"Failed to authenticate user: {response.json()}"
+    assert response.status_code == 200, (
+        f"Failed to authenticate user: {response.json()}"
+    )
     return response.json()
 
 
@@ -72,9 +72,9 @@ def test_student_non_existent() -> None:
     headers = {"Authorization": "Bearer Cerioli Sium"}
 
     response = client.post(f"/groups/{created_group_id}/join", headers=headers)
-    assert (
-        response.status_code == 403
-    ), f"Unexpected status code: {response.status_code}"
+    assert response.status_code == 403, (
+        f"Unexpected status code: {response.status_code}"
+    )
     assert response.json() == {"detail": "Could not validate credentials"}
 
 
@@ -124,6 +124,6 @@ def test_valid_join() -> None:
     # Check that the group contains the joiner's details
     assert "students" in group_response, "Expected 'students' field in response"
     students = group_response["students"]
-    assert any(
-        student["id"] == joiner_id for student in students
-    ), f"Joiner {joiner_id} not found in group students list"
+    assert any(student["id"] == joiner_id for student in students), (
+        f"Joiner {joiner_id} not found in group students list"
+    )

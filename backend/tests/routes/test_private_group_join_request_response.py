@@ -23,9 +23,9 @@ def authenticate_user() -> dict:
         "password": test_student_password,
     }
     response = client.post("/auth/login", data=login_payload)
-    assert (
-        response.status_code == 200
-    ), f"Failed to authenticate user: {response.json()}"
+    assert response.status_code == 200, (
+        f"Failed to authenticate user: {response.json()}"
+    )
     return response.json()
 
 
@@ -120,9 +120,9 @@ def test_create_request_already_exists() -> None:
     client.post(f"/groups/{created_group_id}/join", headers=headers)
     response = client.post(f"/groups/{created_group_id}/join", headers=headers)
 
-    assert (
-        response.status_code == 200
-    ), f"Expected success (200), got {response.status_code}"
+    assert response.status_code == 200, (
+        f"Expected success (200), got {response.status_code}"
+    )
 
 
 def test_get_all_requests_for_group() -> None:

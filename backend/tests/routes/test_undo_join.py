@@ -18,9 +18,9 @@ def authenticate_user(
         "password": password,
     }
     response = client.post("/auth/login", data=login_payload)
-    assert (
-        response.status_code == 200
-    ), f"Failed to authenticate user: {response.json()}"
+    assert response.status_code == 200, (
+        f"Failed to authenticate user: {response.json()}"
+    )
     return response.json()
 
 
@@ -57,9 +57,9 @@ def test_undo_join_request_success():
     join_response = client.post(
         f"/groups/{created_group_id}/join", headers=other_user_headers
     )
-    assert (
-        join_response.status_code == 200
-    ), f"Join request failed: {join_response.json()}"
+    assert join_response.status_code == 200, (
+        f"Join request failed: {join_response.json()}"
+    )
 
     owner_token_data = authenticate_user(username="S1234567")
     owner_token = owner_token_data["access_token"]
@@ -68,9 +68,9 @@ def test_undo_join_request_success():
     requests_response = client.get(
         f"/groups/{created_group_id}/requests", headers=owner_headers
     )
-    assert (
-        requests_response.status_code == 200
-    ), f"Failed to fetch requests: {requests_response.json()}"
+    assert requests_response.status_code == 200, (
+        f"Failed to fetch requests: {requests_response.json()}"
+    )
 
     requests_data = requests_response.json()
     assert len(requests_data) > 0, "No join requests found."
@@ -83,23 +83,23 @@ def test_undo_join_request_success():
         ),
         None,
     )
-    assert (
-        join_request is not None
-    ), f"Join request not found. Debug data: {requests_data}"
+    assert join_request is not None, (
+        f"Join request not found. Debug data: {requests_data}"
+    )
 
     undo_response = client.delete(
         f"/groups/{created_group_id}/requests/undo", headers=other_user_headers
     )
-    assert (
-        undo_response.status_code == 200
-    ), f"Failed to undo join request: {undo_response.json()}"
+    assert undo_response.status_code == 200, (
+        f"Failed to undo join request: {undo_response.json()}"
+    )
 
     updated_requests_response = client.get(
         f"/groups/{created_group_id}/requests", headers=owner_headers
     )
-    assert (
-        updated_requests_response.status_code == 200
-    ), f"Failed to fetch requests: {updated_requests_response.json()}"
+    assert updated_requests_response.status_code == 200, (
+        f"Failed to fetch requests: {updated_requests_response.json()}"
+    )
 
     updated_requests_data = updated_requests_response.json()
     assert not any(
