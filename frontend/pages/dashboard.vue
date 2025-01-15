@@ -372,7 +372,8 @@ onMounted(fetchProfessorsCourses);
         </div>
 
         <!-- Yearly Group Enrollment and Participation -->
-        <div v-if="filteredCourses.length && Object.keys(yearlyStats).length > 0"
+        <div id="yearly_group_creation_chart"
+        v-if="filteredCourses.length && Object.keys(yearlyStats).length > 0"
         class="mt-8">
           <h2 class="text-2xl font-bold mb-6">Yearly Group Enrollment and Participation</h2>
           <table class="table-auto w-full text-left border-collapse border border-gray-200">
