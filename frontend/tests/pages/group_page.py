@@ -1,4 +1,3 @@
-import time
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
@@ -20,11 +19,12 @@ class GroupPage(BasePage):
         super().__init__(driver)
         self.wait = WebDriverWait(driver, 10)
 
-    def load(self) -> None:
+    def load(self) -> bool:
         try:
             self.driver.get(Urls.GROUP_PAGE)
         except Exception:  # noqa: BLE001
-            pass
+            return False
+        return True
 
     def is_heading_visible(self) -> bool:
         try:
@@ -49,24 +49,6 @@ class GroupPage(BasePage):
         )
         group_button.click()
 
-    # Helper function to click an element
-    def click_element(self, selector: str):
-        self.driver.find_element(By.XPATH, selector).click()
-
-    # Actions using helper functions
-    def click_group_button(self):
-        self.click_element("//div[@class='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4']//div[1]//div[1]//div[2]//button[1]")
-
-    def click_private_group_button(self):
-        self.click_element("//div[8]//div[1]//div[2]//button[1]")
-
-    def click_private_group_button2(self):
-        button = self.driver.find_element(By.XPATH, "//div[8]//div[1]//div[2]//button[1]")
-        time.sleep(0.5)
-        # create_button.send_keys(Keys.ENTER)
-        button.click()
-       
-
     def is_page_loaded(self) -> bool:
         try:
             return (
@@ -84,8 +66,14 @@ class GroupPage(BasePage):
         )
         button.click()
 
-    def click_fabio_private_group_button(self) -> None:
-        button = self.driver.find_element(By.XPATH, "//body//div[@id='__nuxt']//div[@class='p-4']//div[@class='p-4']//div[2]//div[1]//div[2]//button[1]")
-        time.sleep(0.5)
-        # create_button.send_keys(Keys.ENTER)
+    def click_viwe_derails_group(self) -> None:
+        # Option 1: Wait for element to be clickable
+        button = self.wait.until(
+            EC.element_to_be_clickable(
+                (
+                    By.CSS_SELECTOR,
+                    "body > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > main:nth-child(2) > div:nth-child(1) > div:nth-child(2) > div:nth-child(3) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) > button:nth-child(1)",
+                )
+            )
+        )
         button.click()
