@@ -1,9 +1,9 @@
 import datetime
 import uuid
-from typing import List
-from sqlalchemy.dialects.postgresql import ARRAY
+
 import sqlalchemy as sa
 from pydantic import EmailStr
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import registry
 from sqlmodel import Column, Enum, Field, SQLModel  # type: ignore
 
@@ -40,8 +40,7 @@ class GroupBase(SQLModel):
     type: GroupType = Field(sa_column=Column(Enum(GroupType, name="group_type")))
     course_name: str
     exam_date: datetime.date | None = None
-    tags: List[str] | None = Field(default=None, sa_column=Column(ARRAY(sa.String)))
-
+    tags: list[str] | None = Field(default=None, sa_column=Column(ARRAY(sa.String)))
 
 
 class RequestBase(SQLModel):

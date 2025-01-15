@@ -263,7 +263,6 @@ const allSuggestions = [
   "Tech Industry",
 ];
 
-
 const { handleSubmit, errors, setFieldValue } = useForm({
   validationSchema: formSchema,
 });
