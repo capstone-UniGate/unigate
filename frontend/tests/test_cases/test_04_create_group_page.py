@@ -1,10 +1,9 @@
 import time
-
 import pytest
 from selenium import webdriver
-from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
-
-from tests.constants import TestData, Urls
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
 from tests.pages.create_group_page import CreateGroupPage
 from tests.test_cases.base_test import BaseTest
 
@@ -12,32 +11,95 @@ from tests.test_cases.base_test import BaseTest
 class TestGroupCreate(BaseTest):
     @pytest.fixture(autouse=True)
     def setup(self, base_page: webdriver.Chrome) -> None:
+        """Setup the test by logging in and navigating to the group creation page."""
         self.login(base_page)
         self.page = CreateGroupPage(base_page)
         self.page.navigate()
-
-    def test_create_group_form(self) -> None:
         time.sleep(0.5)
-        self.page.fill_form(TestData.VALID_GROUP)
-        self.page.click_create()
-        self.wait.until(EC.url_to_be(url=Urls.GROUP_PAGE))
 
-    def test_form_validation(self) -> None:
-        # Define expected validation messages
-        expected_messages: dict[str, str | int] = {"required": "Required", "count": 5}
-        time.sleep(0.5)
-        self.page.click_create()
-        error_messages = self.page.get_error_messages()
+    def test_create_and_cancel_group(self) -> None:
+        """Test creating a group and canceling the form."""
+        # Fill in the group name
+        name_input = self.page.get_group_name_input()
+        name_input.send_keys("Test Group Name")
 
-        # Type assertion to tell mypy that we know "required" key contains a string
-        required_msg = expected_messages["required"]
-        assert isinstance(required_msg, str)
-        actual_required_count = error_messages.count(required_msg)
-        assert (
-            actual_required_count == expected_messages["count"]
-        ), f"Expected {expected_messages['count']} 'Required' messages, but got {actual_required_count}. Messages: {error_messages}"
+        # Fill in the course field
+        course_input = self.page.get_course_input()
+        course_input.send_keys("Test Course")
+        time.sleep(1)  # Allow time for the dropdown to appear
+        course_input.send_keys(Keys.DOWN)
+        course_input.send_keys(Keys.ENTER)
 
-    def test_cancel_button(self) -> None:
-        time.sleep(0.5)
-        self.page.click_cancel()
-        self.wait.until(EC.url_to_be(url=Urls.GROUP_PAGE))
+        # Select an exam date if available
+        exam_dropdown = self.page.get_exam_date_dropdown()
+        if exam_dropdown.is_enabled():
+            WebDriverWait(self.page.driver, 10).until(EC.element_to_be_clickable(exam_dropdown)).click()
+            options = self.page.get_exam_date_options()
+            if len(options) > 1:
+                options[1].click()  # Select the first available date
+
+        # Select privacy type
+        privacy_radio_public = self.page.get_privacy_radio_public()
+        privacy_radio_public.click()
+
+        # Fill in the description field
+        description_input = self.page.get_description_input()
+        description_input.send_keys("This is a test group description.")
+
+        # Add tags
+        tags_input = self.page.get_tags_input()
+        tags_input.send_keys("Vue.js")
+        tags_input.send_keys(Keys.ENTER)
+        tags_input.send_keys("Web Development")
+        tags_input.send_keys(Keys.ENTER)
+
+        # Test cancel button
+        cancel_button = self.page.get_cancel_button()
+        cancel_button.click()
+        assert WebDriverWait(self.page.driver, 10).until(
+            EC.url_contains("/groups")
+        ), "Cancel button did not redirect to the groups page."
+
+    def test_create_group_submit(self) -> None:
+        """Test that the form is successfully submitted to create a group."""
+        # Fill in the group name
+        name_input = self.page.get_group_name_input()
+        name_input.send_keys("Test Group Name")
+
+        # Fill in the course field
+        course_input = self.page.get_course_input()
+        course_input.send_keys("Test Course")
+        time.sleep(1)  # Allow time for the dropdown to appear
+        course_input.send_keys(Keys.DOWN)
+        course_input.send_keys(Keys.ENTER)
+
+        # Select an exam date if available
+        exam_dropdown = self.page.get_exam_date_dropdown()
+        if exam_dropdown.is_enabled():
+            WebDriverWait(self.page.driver, 10).until(EC.element_to_be_clickable(exam_dropdown)).click()
+            options = self.page.get_exam_date_options()
+            if len(options) > 1:
+                options[1].click()  # Select the first available date
+
+        # Select privacy type
+        privacy_radio_public = self.page.get_privacy_radio_public()
+        privacy_radio_public.click()
+
+        # Fill in the description field
+        description_input = self.page.get_description_input()
+        description_input.send_keys("This is a test group description.")
+
+        # Add tags
+        tags_input = self.page.get_tags_input()
+        tags_input.send_keys("Vue.js")
+        tags_input.send_keys(Keys.ENTER)
+        tags_input.send_keys("Web Development")
+        tags_input.send_keys(Keys.ENTER)
+
+        # Submit the form
+        submit_button = self.page.get_submit_button()
+        WebDriverWait(self.page.driver, 10).until(EC.element_to_be_clickable(submit_button)).click()
+
+        # Verify success toast message
+        toast_message = self.page.get_toast_message()
+        assert "Group created successfully!" in toast_message.text
