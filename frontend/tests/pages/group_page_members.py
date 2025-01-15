@@ -37,6 +37,14 @@ class GroupPageMembers(BasePage):
     def block_member(self) -> None:
         self.driver.find_element(By.XPATH, "//button[@id='block_button']").click()  # type: ignore
 
+    def block_member_inside_group(self) -> None:
+        self.driver.find_element(By.XPATH, "//button[@id='block_member']").click()
+
+    def approve_button(self) -> None:
+        self.driver.find_element(
+            By.XPATH, "(//button[@id='approve_button'])[1]"
+        ).click()
+
     def check_no_members(self) -> bool:
         return (self.driver.find_element(By.ID, "no_members")).is_displayed()
 
