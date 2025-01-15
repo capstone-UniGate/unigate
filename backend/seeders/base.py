@@ -1,8 +1,8 @@
+import random
 from datetime import datetime
 from itertools import cycle
-import random
-import pytz
 
+import pytz
 from unigate import crud
 from unigate.core.database import get_auth_session, get_session
 from unigate.core.security import get_password_hash
@@ -71,11 +71,13 @@ courses = {
     },
 }
 
+
 # Generate random exam dates for January, February, June, July, and September
 def generate_exam_dates():
     months = [1, 2, 6, 7, 9]
     return [
-        datetime(2025, month, random.randint(1, 28), tzinfo=pytz.utc) for month in months
+        datetime(2025, month, random.randint(1, 28), tzinfo=pytz.utc)
+        for month in months
     ]
 
 
@@ -89,6 +91,7 @@ users = professors + [
         update={"hashed_password": get_password_hash("testpassword")},
     )
 ]
+
 
 def seed_auth() -> None:
     session = next(get_auth_session())
@@ -115,6 +118,7 @@ def seed_auth() -> None:
                     )
     session.commit()
 
+
 def seed_unigate() -> None:
     session = next(get_session())
     course_cycle = cycle(courses.items())
@@ -137,6 +141,7 @@ def seed_unigate() -> None:
         group.super_students.append(current_student)
         session.add(group)
     session.commit()
+
 
 if __name__ == "__main__":
     seed_auth()
