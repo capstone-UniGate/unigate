@@ -29,12 +29,12 @@ class TestSeeMyGroups(BaseTest):
         WebDriverWait(self.page.driver, 10).until(
             lambda d: "/groups/create" in d.current_url
         )
-        assert (
-            "/groups/create" in self.page.driver.current_url
-        ), "Should navigate to create group page"
-        assert (
-            "/groups/create" in self.page.driver.current_url
-        ), "Should navigate to create group page"
+        assert "/groups/create" in self.page.driver.current_url, (
+            "Should navigate to create group page"
+        )
+        assert "/groups/create" in self.page.driver.current_url, (
+            "Should navigate to create group page"
+        )
 
     def test_group_cards_display(self) -> None:
         """Test that group cards are displayed after loading"""
@@ -42,9 +42,9 @@ class TestSeeMyGroups(BaseTest):
         time.sleep(0.5)
         group_cards = self.page.get_group_cards()
         # Test passes whether there are cards or not
-        assert isinstance(
-            group_cards, list
-        ), "Should return a list of cards (even if empty)"
+        assert isinstance(group_cards, list), (
+            "Should return a list of cards (even if empty)"
+        )
 
 
 # These test cases are not currently being used but are here for future reference

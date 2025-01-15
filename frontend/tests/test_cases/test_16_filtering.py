@@ -40,6 +40,6 @@ class TestGroupFilters(BaseTest):
         self.page.toggle_filters()
         self.page.enter_course("NonExistentCourse")
         self.page.click_apply_filters()
-        assert (
-            self.page.is_no_results_message_displayed()
-        ), "No matching results message not displayed."
+        assert self.page.is_no_results_message_displayed(), (
+            "No matching results message not displayed."
+        )

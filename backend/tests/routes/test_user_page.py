@@ -27,9 +27,9 @@ def authenticate_user(
         "password": password,
     }
     response = client.post("/auth/login", data=login_payload)
-    assert (
-        response.status_code == 200
-    ), f"Failed to authenticate user: {response.json()}"
+    assert response.status_code == 200, (
+        f"Failed to authenticate user: {response.json()}"
+    )
     return response.json()
 
 
@@ -49,9 +49,9 @@ def fetch_user_profile_picture() -> dict:
     headers = {"Authorization": f"Bearer {token}"}
 
     response = client.get("/students/propic-presigned-url", headers=headers)
-    assert (
-        response.status_code == 200
-    ), f"Failed to fetch user profile picture: {response.json()}"
+    assert response.status_code == 200, (
+        f"Failed to fetch user profile picture: {response.json()}"
+    )
     return response.json()
 
 
@@ -60,9 +60,9 @@ def test_verify_user_profile() -> None:
     profile_picture = fetch_user_profile_picture()
     assert user_data["name"] == "Test Name", "Name is wrong or not displayed"
     assert user_data["surname"] == "Test Surname", "Surname is wrong or not displayed"
-    assert (
-        user_data["email"] == "s1234567@studenti.unige.it"
-    ), "Email is wrong or not displayed"
+    assert user_data["email"] == "s1234567@studenti.unige.it", (
+        "Email is wrong or not displayed"
+    )
     assert "url" in profile_picture, "Profile picture URL is not available"
     assert profile_picture["url"].startswith(
         "http://localhost:9000/unigate/propics/1234567"
@@ -72,9 +72,9 @@ def test_verify_user_profile() -> None:
 def test_minio_connection():
     try:
         buckets = minio.list_buckets()
-        assert (
-            buckets
-        ), "No buckets found. MinIO potrebbe non essere configurato correttamente."
+        assert buckets, (
+            "No buckets found. MinIO potrebbe non essere configurato correttamente."
+        )
         print(
             f"Connesso a MinIO. Buckets disponibili: {[bucket.name for bucket in buckets]}"
         )

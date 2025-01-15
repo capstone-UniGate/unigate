@@ -46,9 +46,9 @@ class TestLogin(BaseTest):
         error_message = page.get_error_message()
 
         # Assert that the correct error message is displayed
-        assert (
-            error_message == expected_error_msg
-        ), f"Expected '{expected_error_msg}', but got '{error_message}'"
+        assert error_message == expected_error_msg, (
+            f"Expected '{expected_error_msg}', but got '{error_message}'"
+        )
         time.sleep(1)
 
         # Ensure the username and password fields are cleared for re-entry

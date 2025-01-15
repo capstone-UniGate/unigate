@@ -35,9 +35,9 @@ class TestGroupPage(BaseTest):
 
         try:
             group_cards = self.page.get_group_cards()
-            assert isinstance(
-                group_cards, list
-            ), "Should return a list of cards (even if empty)"
+            assert isinstance(group_cards, list), (
+                "Should return a list of cards (even if empty)"
+            )
 
             # Log the number of cards found (helpful for debugging)
             cards_count = len(group_cards)

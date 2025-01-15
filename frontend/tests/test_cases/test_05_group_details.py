@@ -1,5 +1,5 @@
-from pytest import fixture
 import pytest
+from pytest import fixture
 from selenium import webdriver
 
 from tests.pages.group_page import GroupPage
@@ -30,25 +30,24 @@ class TestGroupDetails(BaseTest):
 
         self.page.click_group_button()
         # Assert: Verify the group description is displayed
-        assert (
-            self.group_page_detail.check_description()
-        ), "Incorrect display of description"
-        assert (
-            self.group_page_detail.check_join()
-        ), "Ask to join button not displayed"
+        assert self.group_page_detail.check_description(), (
+            "Incorrect display of description"
+        )
+        assert self.group_page_detail.check_join(), "Ask to join button not displayed"
         self.group_page_detail.click_members()
         # members_emails = self.group_page_members.get_members()
 
         # assert len(members_emails)==0, "Non-members can see members"
 
         # Assert: Verify the "Join" button is visible
+
     @pytest.mark.usefixtures("setup_fabio")
     def test_group_details_for_superstudent(self) -> None:
         """Test that a superstudent sees the group details with join requests on group page with group id 1."""
         self.page.click_group_button()
         # Assert: Verify the group description is displayed
-        assert (
-            self.group_page_detail.check_description()
-        ), "Incorrect display of description"
+        assert self.group_page_detail.check_description(), (
+            "Incorrect display of description"
+        )
         assert self.group_page_detail.check_leave(), "Leave button not displayed"
         self.group_page_detail.click_members()

@@ -15,9 +15,9 @@ def authenticate_user(
         "password": password,
     }
     response = client.post("/auth/login", data=login_payload)
-    assert (
-        response.status_code == 200
-    ), f"Failed to authenticate user: {response.json()}"
+    assert response.status_code == 200, (
+        f"Failed to authenticate user: {response.json()}"
+    )
     return response.json()
 
 
@@ -27,9 +27,9 @@ def fetch_all_stats() -> dict:
     headers = {"Authorization": f"Bearer {token}"}
 
     response = client.get("/courses/all_stats", headers=headers)
-    assert (
-        response.status_code == 200
-    ), f"Failed to fetch course stats: {response.json()}"
+    assert response.status_code == 200, (
+        f"Failed to fetch course stats: {response.json()}"
+    )
     return response.json()
 
 
@@ -39,9 +39,9 @@ def get_all_course_names() -> list[str]:
     headers = {"Authorization": f"Bearer {token}"}
 
     response = client.get("/courses/names_courses", headers=headers)
-    assert (
-        response.status_code == 200
-    ), f"Failed to fetch course names: {response.json()}"
+    assert response.status_code == 200, (
+        f"Failed to fetch course names: {response.json()}"
+    )
     return response.json()
 
 
@@ -67,9 +67,9 @@ def modular_test(
     else:
         matching_group = course_details[0]
 
-    assert (
-        argument_to_test in matching_group
-    ), f"Argument {argument_to_test} not found in course details"
+    assert argument_to_test in matching_group, (
+        f"Argument {argument_to_test} not found in course details"
+    )
 
     value = matching_group[argument_to_test]
     assert value == expected_value, f"Incorrect: {value}. Expected: {expected_value}"

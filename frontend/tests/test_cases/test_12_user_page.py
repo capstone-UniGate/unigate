@@ -14,12 +14,12 @@ class TestUserProfile(BaseTest):
         self.page.navigate()
 
     def test_verify_user_profile(self) -> None:
-        assert (
-            self.page.get_user_name_and_surname() == "Test Name Test Surname"
-        ), "Name and surname are wrong not displayed"
-        assert (
-            self.page.get_user_email() == "s1234567@studenti.unige.it"
-        ), "Email is wrong not displayed"
+        assert self.page.get_user_name_and_surname() == "Test Name Test Surname", (
+            "Name and surname are wrong not displayed"
+        )
+        assert self.page.get_user_email() == "s1234567@studenti.unige.it", (
+            "Email is wrong not displayed"
+        )
         assert self.page.get_user_role() == "Student", "Role is wrong or not displayed"
 
     def test_edit_photo_error(self) -> None:

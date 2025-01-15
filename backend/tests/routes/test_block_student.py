@@ -16,9 +16,9 @@ def authenticate_user(username="S1234567") -> dict:
 
     response = client.post("/auth/login", data=login_payload)
 
-    assert (
-        response.status_code == 200
-    ), f"Failed to authenticate user: {response.json()}"
+    assert response.status_code == 200, (
+        f"Failed to authenticate user: {response.json()}"
+    )
     return response.json()
 
 
@@ -76,9 +76,9 @@ def test_block_user_success():
     blocked_student_ids = [
         student["id"] for student in response.json().get("blocked_students", [])
     ]
-    assert (
-        added_student_id in blocked_student_ids
-    ), f"Student {added_student_id} was not blocked."
+    assert added_student_id in blocked_student_ids, (
+        f"Student {added_student_id} was not blocked."
+    )
 
 
 def test_block_user_group_not_found():
