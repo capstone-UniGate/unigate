@@ -12,7 +12,7 @@
               alt="Logo"
               class="h-8 w-8 mr-2"
             />
-            <router-link to="/homepage" class="text-blue-800"
+            <router-link to="/groups" class="text-blue-800"
               >UniGate</router-link
             >
           </div>

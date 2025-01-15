@@ -1,0 +1,6 @@
+{
+	"dependencies": {
+		"@unovis/ts": "^1.5.0",
+		"@unovis/vue": "^1.5.0"
+	}
+}
