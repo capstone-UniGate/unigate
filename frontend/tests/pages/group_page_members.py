@@ -27,14 +27,15 @@ class GroupPageMembers(BasePage):
             if not name_element.is_displayed() or name_element.text != "":
                 return False
 
-            block_member_element: WebElement = member.find_element(By.ID, "block_member")  # type: ignore[arg-type]
+            block_member_element: WebElement = member.find_element(
+                By.ID, "block_member"
+            )  # type: ignore[arg-type]
             if not block_member_element.is_displayed():
                 return False
         return True
 
     def block_member(self) -> None:
-        member = self.get_members()[0]
-        member.find_element(By.ID, "block_member").click()  # type: ignore
+        self.driver.find_element(By.XPATH, "//button[@id='block_button']").click()  # type: ignore
 
     def check_no_members(self) -> bool:
         return (self.driver.find_element(By.ID, "no_members")).is_displayed()
