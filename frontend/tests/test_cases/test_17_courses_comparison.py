@@ -17,7 +17,7 @@ class TestUserProfile(BaseTest):
 
     def test_course_name(self) -> None:
         self.login_and_navigate(self.login_professor)
-        course_name = "Binary Analysis and secure coding"
+        course_name = "Test Course"
         actual_course_name = self.page.get_course_name_card()
         assert actual_course_name == course_name, (
             f"Expected '{course_name}' but got '{actual_course_name}'"
