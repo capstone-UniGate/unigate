@@ -1,7 +1,6 @@
 import time
 
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC  # noqa: N812
@@ -123,7 +122,7 @@ class GroupPageDetail:
     def check_ask_join(self) -> bool:
         join_button = self.driver.find_element(By.ID, "ask-to-join-button")
         return join_button.is_displayed()
-    
+
     def check_join(self) -> bool:
         join_button = self.driver.find_element(By.ID, "join-group-button")
         return join_button.is_displayed()

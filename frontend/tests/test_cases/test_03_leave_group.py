@@ -18,8 +18,6 @@ class TestLeaveGroup(BaseTest):
         self.group_page_members = GroupPageMembers(base_page)
         self.page.load()
 
-
-
     def test_leave_group(self) -> None:
         # Load the group details page
         self.page.click_group_button()

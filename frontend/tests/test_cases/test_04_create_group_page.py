@@ -101,7 +101,7 @@ class TestGroupCreate(BaseTest):
         tags_input.send_keys(Keys.ENTER)
         tags_input.send_keys("Web Development")
         tags_input.send_keys(Keys.ENTER)
-            # Submit the form
+        # Submit the form
         submit_button = self.page.get_submit_button()
         WebDriverWait(self.page.driver, 10).until(
             expected_conditions.element_to_be_clickable(submit_button)

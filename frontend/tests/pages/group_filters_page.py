@@ -27,7 +27,6 @@ class GroupFiltersPage:
     def click_element(self, selector: str):
         self.driver.find_element(By.XPATH, selector).click()
 
-
     # Helper function to select a dropdown option
     def select_option(self, selector: str, value: str):
         dropdown = Select(self.driver.find_element(By.XPATH, selector))
@@ -43,7 +42,6 @@ class GroupFiltersPage:
     def click_clear_filters(self):
         self.click_element(self.SELECTORS["clear_filters_button"])
 
-    
     # Helper function to enter text into an input field
     def enter_text(self, selector: str, text: str):
         element = self.driver.find_element(By.XPATH, selector)
