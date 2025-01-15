@@ -245,16 +245,22 @@ const filteredSuggestions = ref<string[]>([]);
 const errorMessage = ref("");
 
 const allSuggestions = [
-  "JavaScript",
-  "Vue.js",
-  "React",
-  "Angular",
-  "Svelte",
-  "Next.js",
-  "Nuxt.js",
-  "TypeScript",
-  "Webpack",
-  "Rollup",
+  "Machine Learning",
+  "High Performance Computing",
+  "Data Privacy",
+  "Cloud Computing",
+  "Blockchain Technology",
+  "Distributed Systems",
+  "Capstone Project",
+  "Software Development",
+  "Software Design",
+  "System Architecture",
+  "Agile Methodologies",
+  "DevOps",
+  "Requirements Engineering",
+  "Software Testing",
+  "Cybersecurity",
+  "Tech Industry",
 ];
 
 const { handleSubmit, errors, setFieldValue } = useForm({
