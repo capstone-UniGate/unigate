@@ -21,6 +21,9 @@ console.log("Processed Chart Data for Chart:", chartData);
 // Accessors for the chart
 const xAccessor = (d: { date: number }) => new Date(d.date); // Treat x-axis as dates
 const yAccessor = (d: { count: number }) => d.count;
+
+// Extract tick values from the data
+const tickValues = chartData.map((item) => item.date);
 </script>
 
 <template>
@@ -36,7 +39,8 @@ const yAccessor = (d: { count: number }) => d.count;
       <VisAxis
         type="x"
         scale="time"
-        :tickFormat="(d) => new Date(d).toLocaleDateString()"
+        :tickValues="tickValues"
+        :tickFormat="(d) => new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })"
       />
       <VisAxis type="y" />
     </VisXYContainer>
