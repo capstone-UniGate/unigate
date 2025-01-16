@@ -38,7 +38,9 @@ const averageMembers = ref<Record<string, number>>({});
 const activeGroupsCounts = ref<Record<string, Record<string, number>>>({});
 const groupCreationData = ref<{ date: string; count: number }[]>([]);
 const studentNames = ref<string[]>([]);
-const yearlyStats = ref<{ [key: number]: { totalGroups: number; totalMembers: number } }>({});
+const yearlyStats = ref<{
+  [key: number]: { totalGroups: number; totalMembers: number };
+}>({});
 
 // Watcher to update exam dates when a course is selected
 watch(course, (newCourseName) => {
@@ -376,13 +378,14 @@ onMounted(fetchProfessorsCourses);
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="(stats, year) in yearlyStats"
-                :key="year"
-              >
+              <tr v-for="(stats, year) in yearlyStats" :key="year">
                 <td class="border border-gray-300 px-4 py-2">{{ year }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ stats.totalGroups }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ stats.totalMembers }}</td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ stats.totalGroups }}
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ stats.totalMembers }}
+                </td>
               </tr>
             </tbody>
           </table>

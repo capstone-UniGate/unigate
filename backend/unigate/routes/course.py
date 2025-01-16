@@ -242,7 +242,9 @@ def get_all_course_names() -> list[str]:
     "/{course_name}/yearly_stats",
     response_model=dict[int, dict[str, int]],
 )
-def get_yearly_stats(session: SessionDep, course_name: str) -> dict[int, dict[str, int]]:
+def get_yearly_stats(
+    session: SessionDep, course_name: str
+) -> dict[int, dict[str, int]]:
     """
     Fetch yearly group creation and total members statistics for a specific course.
     """
@@ -255,4 +257,3 @@ def get_yearly_stats(session: SessionDep, course_name: str) -> dict[int, dict[st
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error retrieving yearly stats: {e}",
         )
-
