@@ -362,27 +362,6 @@ export function useGroups() {
     }
   }
 
-  async function getTotalMembers(courseName: string): Promise<number> {
-    try {
-      isError.value = false;
-      isLoading.value = true;
-      const response = await useApiFetch(
-        `/courses/${encodeURIComponent(courseName)}/total_members`,
-        { method: "GET" },
-      );
-      if (typeof response !== "number") {
-        throw new Error("Unexpected response type");
-      }
-      return response;
-    } catch (error) {
-      isError.value = true;
-      console.error("Error fetching total members:", error);
-      throw error;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
   return {
     groups,
     isLoading,
@@ -406,6 +385,5 @@ export function useGroups() {
     getActiveGroupCount,
     getGroupCreationDistribution,
     getYearlyStats,
-    getTotalMembers,
   };
 }
