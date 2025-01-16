@@ -4,16 +4,18 @@
       class="bg-light-blue-100/70 backdrop-blur-md border-b border-blue-300 fixed top-0 w-full z-50"
     >
       <div class="container mx-auto flex items-center justify-between p-4">
-        <!-- Logo and Welcome Message -->
+        <!-- Logo with click handler -->
         <div class="flex items-center space-x-4">
           <div class="text-2xl font-bold flex items-center">
             <img
               src="../static/images/logo.png"
               alt="Logo"
               class="h-8 w-8 mr-2"
+              @click="handleNavigation"
+              style="cursor: pointer"
             />
-            <router-link to="/homepage" class="text-blue-800"
-              >UniGate</router-link
+            <span @click="handleNavigation" class="text-blue-800 cursor-pointer"
+              >UniGate</span
             >
           </div>
           <!-- Student Name -->
@@ -29,10 +31,10 @@
         <nav
           class="hidden md:flex space-x-6 absolute left-1/2 transform -translate-x-1/2"
         >
-          <router-link
-            to="/homepage"
-            class="text-blue-800 hover:text-blue-500 transition"
-            >Home</router-link
+          <a
+            @click.prevent="handleNavigation"
+            class="text-blue-800 hover:text-blue-500 transition cursor-pointer"
+            >Home</a
           >
           <router-link
             to="/about"
@@ -184,11 +186,32 @@ onMounted(async () => {
   }
 });
 
+// Add navigation helper function
+const handleNavigation = async () => {
+  try {
+    if (!eventBus.username) {
+      console.error("No username found");
+      await router.push("/login");
+      return;
+    }
+
+    const targetPath = eventBus.username.startsWith("P")
+      ? "/dashboard"
+      : "/groups";
+    await router.push(targetPath);
+  } catch (error) {
+    console.error("Navigation failed:", error);
+    await router.push("/login");
+  }
+};
+
+// Update handleLogout
 const handleLogout = async () => {
   try {
     await logout();
     currentStudent.value = null;
-    eventBus.clearPhoto(); // Add this line to clear the photo
+    eventBus.clearPhoto();
+    eventBus.clearUsername(); // Clear username from eventBus
     await router.push("/login?message=You have successfully logged out.");
   } catch (error) {
     console.error("Logout error:", error);

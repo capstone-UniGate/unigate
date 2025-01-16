@@ -201,7 +201,9 @@ export default {
           throw new Error("Login response is empty");
         }
 
-        // Use async navigation with error handling
+        // Store username in eventBus for navigation
+        eventBus.setUsername(form.value.username);
+
         const targetPath = form.value.username.startsWith("P")
           ? "/dashboard"
           : "/groups";
