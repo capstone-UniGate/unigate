@@ -20,34 +20,6 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  pgadmin-unigate:
-    container_name: pgadmin-unigate
-    image: dpage/pgadmin4:8.13
-    entrypoint:
-      - /custom-entrypoint.sh
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL?Variable not set}
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD?Variable not set}
-      - PGADMIN_SERVER_JSON_FILE=/tmp/servers.json
-      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
-      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-    volumes:
-      - ./pgadmin/entrypoint.sh:/custom-entrypoint.sh
-      - pgadmin_data:/var/lib/pgadmin
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.unigate-pgadmin.entrypoints=websecure
-      - traefik.http.routers.unigate-pgadmin.rule=Host(`pgadmin.unigate.tech`)
-      - traefik.http.routers.unigate-pgadmin.tls.certresolver=dns-cloudflare
-      - traefik.http.services.unigate-pgadmin.loadbalancer.server.port=80
-    depends_on:
-      postgres-unigate:
-        condition: service_healthy
-        restart: true
-        required: true
-    restart: unless-stopped
-
   minio-unigate:
     container_name: minio-unigate
     image: minio/minio:RELEASE.2024-12-18T13-15-44Z
@@ -116,6 +88,8 @@ services:
       - MINIO_ACCESS_KEY=${MINIO_ROOT_USER?Variable not set}
       - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD?Variable not set}
       - MODE=prod
+    volumes:
+      - /var/run/unigate/fifo:/fifo
     labels:
       - traefik.enable=true
       - traefik.http.routers.unigate-backend.entrypoints=websecure
@@ -152,5 +126,4 @@ networks:
 
 volumes:
   pgdata:
-  pgadmin_data:
   minio_data:
