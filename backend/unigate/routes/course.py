@@ -228,8 +228,8 @@ def all_stats(
     "/names_courses",
     response_model=list[str],
 )
-def get_all_course_names() -> list[str]:
-    courses = crud.course.get_all_name_courses()
+def get_all_course_names(auth_session: AuthSessionDep) -> list[str]:
+    courses = crud.course.get_all_name_courses(session=auth_session)
     if not courses:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
