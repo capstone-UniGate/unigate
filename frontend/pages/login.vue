@@ -98,10 +98,10 @@
           id="login_button"
           type="button"
           class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white"
-          :disabled="!isFormValid"
+          :disabled="!isFormValid || isLoading"
           tabindex="3"
         >
-          Login
+          {{ isLoading ? "Logging in..." : "Login" }}
         </Button>
       </Form>
     </div>
@@ -129,6 +129,7 @@ export default {
   setup() {
     const router = useRouter();
     const { login } = useAuth();
+    const isLoading = ref(false);
 
     const form = ref({
       username: "",
@@ -185,12 +186,30 @@ export default {
     });
 
     const handleLogin = async () => {
+      if (isLoading.value) return;
+
       passwordError.value = "";
+      isLoading.value = true;
 
       try {
         const response = await login({
           username: form.value.username,
           password: form.value.password,
+        });
+
+        if (!response) {
+          throw new Error("Login response is empty");
+        }
+
+        // Store username in eventBus for navigation
+        eventBus.setUsername(form.value.username);
+
+        const targetPath = form.value.username.startsWith("P")
+          ? "/dashboard"
+          : "/groups";
+
+        await router.push(targetPath).catch((err) => {
+          throw new Error(`Failed to navigate to ${targetPath}`);
         });
 
         // Update photo URL after successful login
@@ -199,16 +218,20 @@ export default {
           eventBus.updatePhoto(photoUrl);
         }
 
-        // Check if user is professor (PXXXXXXX) or student (SXXXXXXX)
-        if (form.value.username.startsWith("P")) {
-          router.push("/dashboard");
-        } else {
-          router.push("/groups");
+        // Ensure username exists before checking
+        if (!form.value.username) {
+          throw new Error("Username is empty");
         }
       } catch (error: any) {
-        passwordError.value = error?.data?.message || "Login failed.";
+        console.error("Login error:", error);
+        passwordError.value =
+          error?.data?.message ||
+          error?.message ||
+          "Login failed. Please try again.";
         clearInput("username");
         clearInput("password");
+      } finally {
+        isLoading.value = false;
       }
     };
 
@@ -226,6 +249,7 @@ export default {
       passwordStrengthText,
       passwordStrengthTextClass,
       passwordStrengthColorClass,
+      isLoading,
     };
   },
 };
