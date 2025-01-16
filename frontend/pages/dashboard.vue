@@ -14,7 +14,6 @@ const {
   getActiveGroupCount,
   getGroupCreationDistribution,
   getYearlyStats,
-  getTotalMembers,
 } = useGroups();
 
 const course = ref("");
@@ -39,8 +38,9 @@ const averageMembers = ref<Record<string, number>>({});
 const activeGroupsCounts = ref<Record<string, Record<string, number>>>({});
 const groupCreationData = ref<{ date: string; count: number }[]>([]);
 const studentNames = ref<string[]>([]);
-const yearlyStats = ref<{ [key: number]: number }>({});
-const totalMembers = ref<number | null>(null);
+const yearlyStats = ref<{
+  [key: number]: { totalGroups: number; totalMembers: number };
+}>({});
 
 // Watcher to update exam dates when a course is selected
 watch(course, (newCourseName) => {
@@ -66,20 +66,11 @@ const fetchYearlyStats = async () => {
     console.log(`Fetching yearly stats for course: ${course.value}`);
     const response = await getYearlyStats(course.value);
     console.log("Yearly stats response:", response);
-    yearlyStats.value = response as { [key: number]: number };
+    yearlyStats.value = response as {
+      [key: number]: { totalGroups: number; totalMembers: number };
+    };
   } catch (error) {
     console.error("Error fetching yearly stats:", error);
-  }
-};
-
-const fetchTotalMembers = async () => {
-  if (!course.value) return;
-  try {
-    const response = await getTotalMembers(course.value);
-    totalMembers.value = response;
-    console.log("Total Members:", totalMembers.value);
-  } catch (error) {
-    console.error("Error fetching total members:", error);
   }
 };
 
@@ -294,7 +285,6 @@ onMounted(fetchProfessorsCourses);
                     );
                     await fetchGroupCreationData(course);
                     await fetchYearlyStats();
-                    await fetchTotalMembers();
                   } catch (error) {
                     console.error(
                       'Error fetching group creation data for course:',
@@ -388,16 +378,13 @@ onMounted(fetchProfessorsCourses);
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="[year, totalGroups] in Object.entries(yearlyStats)"
-                :key="year"
-              >
+              <tr v-for="(stats, year) in yearlyStats" :key="year">
                 <td class="border border-gray-300 px-4 py-2">{{ year }}</td>
                 <td class="border border-gray-300 px-4 py-2">
-                  {{ totalGroups }}
+                  {{ stats.totalGroups }}
                 </td>
                 <td class="border border-gray-300 px-4 py-2">
-                  {{ totalMembers }}
+                  {{ stats.totalMembers }}
                 </td>
               </tr>
             </tbody>

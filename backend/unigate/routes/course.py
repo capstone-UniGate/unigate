@@ -240,11 +240,13 @@ def get_all_course_names(auth_session: AuthSessionDep) -> list[str]:
 
 @router.get(
     "/{course_name}/yearly_stats",
-    response_model=dict[int, int],
+    response_model=dict[int, dict[str, int]],
 )
-def get_yearly_stats(session: SessionDep, course_name: str) -> dict[int, int]:
+def get_yearly_stats(
+    session: SessionDep, course_name: str
+) -> dict[int, dict[str, int]]:
     """
-    Fetch yearly group creation statistics for a specific course.
+    Fetch yearly group creation and total members statistics for a specific course.
     """
     try:
         return crud.course.get_yearly_group_stats(
@@ -254,18 +256,4 @@ def get_yearly_stats(session: SessionDep, course_name: str) -> dict[int, int]:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error retrieving yearly stats: {e}",
-        )
-
-
-@router.get("/{course_name}/total_members", response_model=int)
-def get_total_members(
-    session: SessionDep,
-    course_name: str,
-) -> int:
-    try:
-        return crud.course.get_total_members(session=session, course_name=course_name)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error occurred: {e}",
         )
