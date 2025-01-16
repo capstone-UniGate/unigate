@@ -46,7 +46,9 @@ class CRUDCourse(CRUDBase[Course, CourseCreate, Course]):
             select(
                 func.extract("year", Group.date).label("year"),
                 func.count(Group.id).label("totalGroups"),  # Total number of groups
-                func.count(Join.student_id).label("totalMembers")  # Total member occurrences
+                func.count(Join.student_id).label(
+                    "totalMembers"
+                ),  # Total member occurrences
             )
             .join(Join, Join.group_id == Group.id)  # Join groups with joins table
             .where(Group.course_name == course_name)  # Filter by course name
@@ -59,12 +61,11 @@ class CRUDCourse(CRUDBase[Course, CourseCreate, Course]):
         yearly_stats = {
             int(row.year): {
                 "totalGroups": row.totalGroups,
-                "totalMembers": row.totalMembers
+                "totalMembers": row.totalMembers,
             }
             for row in results
         }
         return yearly_stats
-
 
 
 course = CRUDCourse(Course)

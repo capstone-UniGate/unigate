@@ -41,6 +41,7 @@ def reset() -> dict[str, str]:
     except Exception:
         return {"error": "something went wrong"}
 
+
 @app.get("/wait")
 def wait() -> dict[str, str]:
     sleep(5)
@@ -48,7 +49,9 @@ def wait() -> dict[str, str]:
         for _ in range(120):
             try:
                 with next(get_session()) as session:
-                    test_student = crud.student.get_by_number(number=1234567, session=session)
+                    test_student = crud.student.get_by_number(
+                        number=1234567, session=session
+                    )
                     if test_student:
                         return {"message": "system is ready"}
             except Exception:  # noqa: S110
