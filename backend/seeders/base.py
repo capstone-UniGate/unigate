@@ -1,6 +1,5 @@
 import random
 from datetime import datetime
-from itertools import cycle
 
 import pytz
 from unigate import crud
@@ -155,7 +154,8 @@ users = professors + [
     AuthUserCreate.model_validate(
         student,
         update={"hashed_password": get_password_hash("testpassword")},
-    ) for student in students
+    )
+    for student in students
 ]
 
 test_student = students[0]
