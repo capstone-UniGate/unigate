@@ -45,24 +45,26 @@ class CRUDCourse(CRUDBase[Course, CourseCreate, Course]):
         statement = (
             select(
                 func.extract("year", Group.date).label("year"),
-                func.count(Group.id).label("totalGroups"),
-                func.count(func.distinct(Join.student_id)).label("totalMembers"),
+                func.count(Group.id).label("totalGroups"),  # Total number of groups
+                func.count(Join.student_id).label("totalMembers")  # Total member occurrences
             )
-            .join(Join, Join.group_id == Group.id)  # Join with the `joins` table
-            .where(Group.course_name == course_name)
-            .group_by("year")
-            .order_by("year")
+            .join(Join, Join.group_id == Group.id)  # Join groups with joins table
+            .where(Group.course_name == course_name)  # Filter by course name
+            .group_by("year")  # Group by year
+            .order_by("year")  # Order by year
         )
+
         results = session.exec(statement).all()
 
         yearly_stats = {
             int(row.year): {
                 "totalGroups": row.totalGroups,
-                "totalMembers": row.totalMembers,
+                "totalMembers": row.totalMembers
             }
             for row in results
         }
         return yearly_stats
+
 
 
 course = CRUDCourse(Course)
