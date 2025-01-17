@@ -16,7 +16,7 @@ frontend_python := frontend_venv + python
     just --list
 
 docker-up:
-    docker compose up --watch --build --force-recreate
+    docker compose up --build --watch
 
 docker-stop:
     docker compose stop

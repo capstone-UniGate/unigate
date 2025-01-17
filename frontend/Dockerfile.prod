@@ -17,4 +17,6 @@ ENV NODE_OPTIONS="--max-old-space-size=4096"
 
 RUN pnpm run build
 
-CMD ["pnpm", "run", "preview"]
+# CMD ["pnpm", "run", "preview"]
+
+CMD ["node", "/app/.output/server/index.mjs"]
