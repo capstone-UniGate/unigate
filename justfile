@@ -45,11 +45,13 @@ init-database: reset-database
     cd backend/alembic_auth && ../../{{ backend_venv }}/alembic upgrade head
 
 reset-minio:
-    docker compose exec mc-unigate sh -c "mc rb minio/unigate"
+    docker compose exec mc-unigate sh -c "mc rb minio/unigate --force"
 
 init-minio: reset-minio
     docker compose exec mc-unigate sh -c "mc mb minio/unigate"
-    docker compose exec mc-unigate sh -c "mc policy set download minio/unigate"
+    docker compose exec mc-unigate sh -c "mc anonymous set download minio/unigate"
+
+reset-all: init-database-docker-base init-minio
 
 seed-real:
     {{ backend_python }} backend/seeders/real.py
