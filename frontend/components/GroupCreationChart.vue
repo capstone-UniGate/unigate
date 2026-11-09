@@ -40,7 +40,14 @@ const tickValues = chartData.map((item) => item.date);
         type="x"
         scale="time"
         :tickValues="tickValues"
-        :tickFormat="(d) => new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })"
+        :tickFormat="
+          (d) =>
+            new Date(d).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })
+        "
       />
       <VisAxis type="y" />
     </VisXYContainer>
